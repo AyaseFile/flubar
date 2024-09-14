@@ -7,7 +7,7 @@ const kAlbumArtistColumnId = 5;
 const kTrackTotalColumnId = 6;
 const kDiscNumberColumnId = 7;
 const kDiscTotalColumnId = 8;
-const kYearColumnId = 9;
+const kDateColumnId = 9;
 const kGenreColumnId = 10;
 const kFileNameColumnId = 11;
 

@@ -1,5 +1,5 @@
+import 'package:flubar/rust/api/models.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:metadata_god/metadata_god.dart';
 
 part 'track.freezed.dart';
 
@@ -9,5 +9,6 @@ class Track with _$Track {
     required int id,
     required String path,
     required Metadata metadata,
+    required Properties properties,
   }) = _Track;
 }

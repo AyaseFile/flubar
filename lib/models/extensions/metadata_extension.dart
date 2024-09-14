@@ -1,8 +1,9 @@
-import 'package:metadata_god/metadata_god.dart';
+import 'dart:typed_data';
+
+import 'package:flubar/rust/api/models.dart';
 
 extension MetadataExtension on Metadata {
   Metadata copyWith({
-    TagType? tagType,
     // 允许传入 null 以清除值
     String? Function()? title,
     String? Function()? artist,
@@ -12,12 +13,11 @@ extension MetadataExtension on Metadata {
     int? Function()? trackTotal,
     int? Function()? discNumber,
     int? Function()? discTotal,
-    int? Function()? year,
+    String? Function()? date,
     String? Function()? genre,
-    Picture? Function()? picture,
+    Uint8List? Function()? frontCover,
   }) {
     return Metadata(
-      tagType: tagType ?? this.tagType,
       title: title != null ? title() : this.title,
       artist: artist != null ? artist() : this.artist,
       album: album != null ? album() : this.album,
@@ -26,16 +26,14 @@ extension MetadataExtension on Metadata {
       trackTotal: trackTotal != null ? trackTotal() : this.trackTotal,
       discNumber: discNumber != null ? discNumber() : this.discNumber,
       discTotal: discTotal != null ? discTotal() : this.discTotal,
-      year: year != null ? year() : this.year,
+      date: date != null ? date() : this.date,
       genre: genre != null ? genre() : this.genre,
-      picture: picture != null ? picture() : this.picture,
-      durationMs: durationMs,
+      frontCover: frontCover != null ? frontCover() : this.frontCover,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'tagtype': tagType,
       'title': title,
       'artist': artist,
       'album': album,
@@ -44,9 +42,8 @@ extension MetadataExtension on Metadata {
       'tracktotal': trackTotal,
       'discnumber': discNumber,
       'disctotal': discTotal,
-      'year': year,
+      'date': date,
       'genre': genre,
-      'durationms': durationMs,
     };
   }
 }

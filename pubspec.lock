@@ -339,6 +339,11 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_driver:
+    dependency: transitive
+    description: flutter
+    source: sdk
+    version: "0.0.0"
   flutter_hooks:
     dependency: "direct main"
     description:
@@ -372,7 +377,7 @@ packages:
     source: hosted
     version: "2.5.1"
   flutter_rust_bridge:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: flutter_rust_bridge
       sha256: b0271cc147d5afccf9774809e4eef52b7357babe1a1a31db649df6f02dd27580
@@ -421,6 +426,11 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.0"
+  fuchsia_remote_debug_protocol:
+    dependency: transitive
+    description: flutter
+    source: sdk
+    version: "0.0.0"
   get:
     dependency: "direct main"
     description:
@@ -501,6 +511,11 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.2.0"
+  integration_test:
+    dependency: "direct dev"
+    description: flutter
+    source: sdk
+    version: "0.0.0"
   io:
     dependency: transitive
     description:
@@ -686,17 +701,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.15.0"
-  metadata_god:
-    dependency: "direct main"
-    description:
-      path: "packages/metadata_god"
-      ref: "6c54de8"
-      resolved-ref: "6c54de836d897f09762ba6a4b891a06bb88158e0"
-      url: "https://github.com/AyaseFile/metadata_god.git"
-    source: git
-    version: "0.5.2+1"
   mime:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: mime
       sha256: "801fd0b26f14a4a58ccb09d5892c3fbdeff209594300a542492cf13fba9d247a"
@@ -815,6 +821,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.1"
+  process:
+    dependency: transitive
+    description:
+      name: process
+      sha256: "21e54fd2faf1b5bdd5102afd25012184a6793927648ea81eea80552ac9405b32"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.2"
   pub_semver:
     dependency: transitive
     description:
@@ -871,6 +885,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.13"
+  rust_lib_flubar:
+    dependency: "direct main"
+    description:
+      path: rust_builder
+      relative: true
+    source: path
+    version: "0.0.1"
   rxdart:
     dependency: transitive
     description:
@@ -1020,6 +1041,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.8.20"
+  sync_http:
+    dependency: transitive
+    description:
+      name: sync_http
+      sha256: "7f0cd72eca000d2e026bcd6f990b81d0ca06022ef4e32fb257b30d3d1014a961"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.1"
   synchronized:
     dependency: transitive
     description:
@@ -1188,6 +1217,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.1"
+  webdriver:
+    dependency: transitive
+    description:
+      name: webdriver
+      sha256: "003d7da9519e1e5f329422b36c4dcdf18d7d2978d1ba099ea4e45ba490ed845e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.3"
   win32:
     dependency: transitive
     description:

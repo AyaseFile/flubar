@@ -1,15 +1,16 @@
 import 'dart:typed_data';
 
+import 'package:flubar/app/talker.dart';
 import 'package:flubar/models/extensions/metadata_extension.dart';
 import 'package:flubar/models/extensions/uint8list_extension.dart';
 import 'package:flubar/models/state/track.dart';
 import 'package:flubar/models/state/track_cover.dart';
+import 'package:flubar/rust/api/id3.dart';
+import 'package:flubar/rust/api/lofty.dart';
 import 'package:flubar/ui/dialogs/metadata_dialog/providers.dart';
 import 'package:flubar/ui/snackbar/view.dart';
 import 'package:flubar/ui/view/playlist_view/providers.dart';
-import 'package:flubar/utils/metadata/updater.dart';
 import 'package:flutter/foundation.dart';
-import 'package:metadata_god/metadata_god.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'providers.g.dart';
@@ -22,7 +23,7 @@ class GroupedTrackCover extends _$GroupedTrackCover with TrackCoverMixin {
     final coverMap = <Uint8List?, List<Track>>{};
 
     for (final track in selectedTracks) {
-      final cover = track.metadata.picture?.data;
+      final cover = track.metadata.frontCover;
       final existingKey = coverMap.keys.firstWhere(
         (key) => key?.isContentEqual(cover) ?? (cover == null),
         orElse: () => cover,
@@ -76,11 +77,11 @@ mixin TrackCoverMixin on AutoDisposeNotifier<List<TrackCoverModel>> {
     }).toList();
   }
 
-  void updateCoverState(String mimeType, Uint8List cover) {
+  void updateCoverState(Uint8List cover) {
     final index = ref.read(currentTrackCoverIndexProvider);
     state = state.map((e) {
       if (e == state[index]) {
-        return e.copyWith(updated: true, mimeType: mimeType, newCover: cover);
+        return e.copyWith(updated: true, newCover: cover);
       }
       return e;
     }).toList();
@@ -92,18 +93,19 @@ mixin TrackCoverMixin on AutoDisposeNotifier<List<TrackCoverModel>> {
     var failed = 0;
     await Future.wait(state.map((cover) async {
       if (!cover.updated) return;
-      final picture = cover.newCover == null
-          ? null
-          : Picture(mimeType: cover.mimeType, data: cover.newCover!);
+      final frontCover = cover.newCover;
       await Future.wait(cover.tracks.map((t) async {
-        final metadata = t.metadata.copyWith(picture: () => picture);
-        final tagType =
-            await MetadataUpdater.write(metadata: metadata, file: t.path);
-        if (tagType == TagType.unknown) {
-          failed++;
-        } else {
-          updatedTracks
-              .add(t.copyWith(metadata: metadata.copyWith(tagType: tagType)));
+        final metadata = t.metadata.copyWith(frontCover: () => frontCover);
+        try {
+          await loftyWritePicture(file: t.path, picture: frontCover);
+          updatedTracks.add(t.copyWith(metadata: metadata));
+        } catch (loftyError) {
+          try {
+            await id3WritePicture(file: t.path, picture: frontCover);
+          } catch (id3Error) {
+            failed++;
+            globalTalker.error('无法更新封面: ${t.path}', [loftyError, id3Error]);
+          }
         }
       }));
     }));

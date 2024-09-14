@@ -12,7 +12,6 @@ class TrackCoverModel with _$TrackCoverModel {
     @Default(false) bool updated,
     @Default(null) Uint8List? oldCover,
     @Default(null) Uint8List? newCover,
-    @Default('') String mimeType,
     required List<Track> tracks,
   }) = _TrackCover;
 }
@@ -23,7 +22,6 @@ extension RemoveCover on TrackCoverModel {
       updated: true,
       oldCover: oldCover,
       newCover: null,
-      mimeType: mimeType,
       tracks: tracks,
     );
   }

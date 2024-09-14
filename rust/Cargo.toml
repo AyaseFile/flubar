@@ -1,0 +1,15 @@
+[package]
+name = "rust_lib_flubar"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+flutter_rust_bridge = "=2.3.0"
+anyhow = "1.0.88"
+lofty = "0.21.1"
+id3 = "1.14.0"
+ffmpeg-next = "7.0.4"
+infer = "0.16.0"

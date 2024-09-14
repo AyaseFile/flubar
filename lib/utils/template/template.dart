@@ -1,4 +1,4 @@
-import 'package:metadata_god/metadata_god.dart';
+import 'package:flubar/rust/api/models.dart';
 import 'package:path/path.dart' as p;
 
 class _CompileResult {
@@ -58,8 +58,8 @@ class TemplateProcessor {
           return metadata.discNumber?.toString();
         case 'disctotal':
           return metadata.discTotal?.toString();
-        case 'year':
-          return metadata.year?.toString();
+        case 'date':
+          return metadata.date?.toString();
         case 'genre':
           return metadata.genre;
         default:

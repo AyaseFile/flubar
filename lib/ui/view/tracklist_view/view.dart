@@ -4,6 +4,8 @@ import 'package:flubar/ui/dialogs/cover_dialog/view.dart';
 import 'package:flubar/ui/dialogs/get_dialog/providers.dart';
 import 'package:flubar/ui/dialogs/metadata_dialog/providers.dart';
 import 'package:flubar/ui/dialogs/metadata_dialog/view.dart';
+import 'package:flubar/ui/dialogs/properties_dialog/providers.dart';
+import 'package:flubar/ui/dialogs/properties_dialog/view.dart';
 import 'package:flubar/ui/dialogs/rename_dialog/view.dart';
 import 'package:flubar/ui/dialogs/transcode_dialog/view.dart';
 import 'package:flubar/ui/view/playlist_view/providers.dart';
@@ -179,7 +181,8 @@ class TrackRow extends ConsumerWidget {
               kTrackTitleColumnId => track.metadata.title ?? '',
               kArtistNameColumnId => track.metadata.artist ?? '',
               kAlbumColumnId => track.metadata.album ?? '',
-              kDurationColumnId => _formatDuration(track.metadata.durationMs),
+              kDurationColumnId =>
+                CommonProperties.formatDuration(track.properties.duration),
               _ => throw UnimplementedError(),
             };
             return Align(
@@ -243,6 +246,14 @@ class TrackRow extends ConsumerWidget {
           ],
         ),
         MenuAction(
+          title: '属性',
+          image: MenuImage.icon(Icons.info),
+          callback: () async {
+            const dialog = Dialog(child: PropertiesDialog());
+            await ref.read(getDialogProvider.notifier).show<void>(dialog);
+          },
+        ),
+        MenuAction(
             title: '转码',
             image: MenuImage.icon(Icons.transit_enterexit),
             callback: () async => await ref
@@ -263,20 +274,6 @@ class TrackRow extends ConsumerWidget {
         ),
       ],
     );
-  }
-
-  String _formatDuration(double? milliseconds) {
-    if (milliseconds == null || milliseconds.isNaN) return '00:00';
-    final duration = Duration(milliseconds: milliseconds.round());
-    final hours = duration.inHours;
-    final minutes = duration.inMinutes.remainder(60);
-    final seconds = duration.inSeconds.remainder(60);
-
-    if (hours > 0) {
-      return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
-    } else {
-      return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
-    }
   }
 }
 

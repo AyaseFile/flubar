@@ -1,12 +1,14 @@
+import 'package:flubar/app/talker.dart';
 import 'package:flubar/models/extensions/metadata_extension.dart';
 import 'package:flubar/models/state/common_metadata.dart';
 import 'package:flubar/models/state/track.dart';
+import 'package:flubar/rust/api/id3.dart';
+import 'package:flubar/rust/api/lofty.dart';
+import 'package:flubar/rust/api/models.dart';
 import 'package:flubar/ui/snackbar/view.dart';
 import 'package:flubar/ui/view/playlist_view/providers.dart';
 import 'package:flubar/ui/view/tracklist_view/constants.dart';
 import 'package:flubar/ui/view/tracklist_view/providers.dart';
-import 'package:flubar/utils/metadata/updater.dart';
-import 'package:metadata_god/metadata_god.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'constants.dart';
@@ -38,7 +40,7 @@ class SelectedTracks extends _$SelectedTracks {
       kTrackTotalColumnId => kTrackTotalRowId,
       kDiscNumberColumnId => kDiscNumberRowId,
       kDiscTotalColumnId => kDiscTotalRowId,
-      kYearColumnId => kYearRowId,
+      kDateColumnId => kDateRowId,
       kGenreColumnId => kGenreRowId,
       _ => throw UnimplementedError(),
     };
@@ -65,12 +67,17 @@ class SelectedTracks extends _$SelectedTracks {
     final updatedTracks = <Track>[];
     var failed = 0;
     await Future.wait(state.map((t) async {
-      final tagType =
-          await MetadataUpdater.write(metadata: t.metadata, file: t.path);
-      if (tagType == TagType.unknown) {
-        failed++;
-      } else {
+      try {
+        await loftyWriteMetadata(metadata: t.metadata, file: t.path);
         updatedTracks.add(t);
+      } catch (loftyError) {
+        try {
+          await id3WriteMetadata(metadata: t.metadata, file: t.path);
+          updatedTracks.add(t);
+        } catch (id3Error) {
+          failed++;
+          globalTalker.error('无法更新元数据: ${t.path}', [loftyError, id3Error]);
+        }
       }
     }));
     ref.read(playlistsProvider.notifier).updateTracks(id, updatedTracks);
@@ -106,8 +113,8 @@ final _updateFunctions = {
       track.metadata.copyWith(discNumber: () => _parseInt(value)),
   kDiscTotalRowId: (Track track, String? value) =>
       track.metadata.copyWith(discTotal: () => _parseInt(value)),
-  kYearRowId: (Track track, String? value) =>
-      track.metadata.copyWith(year: () => _parseInt(value)),
+  kDateRowId: (Track track, String? value) =>
+      track.metadata.copyWith(date: () => _parseString(value)),
   kGenreRowId: (Track track, String? value) =>
       track.metadata.copyWith(genre: () => _parseString(value)),
 };
@@ -134,7 +141,7 @@ class CommonMetadata extends _$CommonMetadata {
     final trackTotalSet = <int?>{};
     final discNumberSet = <int?>{};
     final discTotalSet = <int?>{};
-    final yearSet = <int?>{};
+    final dateSet = <String?>{};
     final genreSet = <String?>{};
 
     for (final m in metadata) {
@@ -146,7 +153,7 @@ class CommonMetadata extends _$CommonMetadata {
       trackTotalSet.add(m.trackTotal);
       discNumberSet.add(m.discNumber);
       discTotalSet.add(m.discTotal);
-      yearSet.add(m.year);
+      dateSet.add(m.date);
       genreSet.add(m.genre);
     }
 
@@ -213,12 +220,12 @@ class CommonMetadata extends _$CommonMetadata {
               .join(', '),
           multi: discTotalSet.length > 1),
       CommonMetadataModel(
-          id: kYearRowId,
-          key: '年份',
-          value: yearSet
-              .where((year) => year != null && year.toString().isNotEmpty)
+          id: kDateRowId,
+          key: '日期',
+          value: dateSet
+              .where((date) => date != null && date.toString().isNotEmpty)
               .join(', '),
-          multi: yearSet.length > 1),
+          multi: dateSet.length > 1),
       CommonMetadataModel(
           id: kGenreRowId,
           key: '流派',

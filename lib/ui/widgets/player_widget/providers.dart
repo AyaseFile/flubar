@@ -1,9 +1,10 @@
+// ignore_for_file: avoid_public_notifier_properties
 import 'dart:async';
 
 import 'package:flubar/app/talker.dart';
+import 'package:flubar/rust/api/models.dart';
 import 'package:flubar/ui/dialogs/metadata_dialog/providers.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:metadata_god/metadata_god.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'providers.g.dart';

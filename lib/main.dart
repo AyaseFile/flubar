@@ -7,12 +7,13 @@ import 'package:flubar/app/storage/providers.dart';
 import 'package:flubar/app/talker.dart';
 import 'package:flubar/app/window/init.dart';
 import 'package:flubar/models/state/storage.dart';
+import 'package:flubar/rust/api/ffmpeg.dart';
+import 'package:flubar/rust/frb_generated.dart';
 import 'package:flubar/ui/widgets/player_widget/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
-import 'package:metadata_god/metadata_god.dart';
 import 'package:path_provider/path_provider.dart';
 
 void main() async {
@@ -43,7 +44,8 @@ void main() async {
     }
   }();
 
-  await MetadataGod.initialize();
+  await RustLib.init();
+  await initFfmpeg();
   JustAudioMediaKit.ensureInitialized(
       linux: true, windows: false, macOS: false, android: false, iOS: false);
   runApp(

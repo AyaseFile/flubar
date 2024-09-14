@@ -8,7 +8,7 @@ const kTrackNumberRowId = 4;
 const kTrackTotalRowId = 5;
 const kDiscNumberRowId = 6;
 const kDiscTotalRowId = 7;
-const kYearRowId = 8;
+const kDateRowId = 8;
 const kGenreRowId = 9;
 
 const kKeyColumnIndex = 0;

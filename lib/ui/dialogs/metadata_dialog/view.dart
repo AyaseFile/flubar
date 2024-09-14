@@ -238,7 +238,7 @@ class MetadataRow extends ConsumerWidget {
                   kTrackTotalRowId => kTrackTotalColumnId,
                   kDiscNumberRowId => kDiscNumberColumnId,
                   kDiscTotalRowId => kDiscTotalColumnId,
-                  kYearRowId => kYearColumnId,
+                  kDateRowId => kDateColumnId,
                   kGenreRowId => kGenreColumnId,
                   _ => throw UnimplementedError(),
                 };

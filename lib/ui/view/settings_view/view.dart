@@ -155,7 +155,7 @@ class _SettingsListView extends ConsumerWidget {
             SettingsTile<String>(
               title: '文件名模板',
               description:
-                  '可用项: %filename%, %title%, %artist%, %album%, %albumartist%, %tracknumber%, %tracktotal%, %discnumber%, %disctotal%, %year%, %genre%',
+                  '可用项: %filename%, %title%, %artist%, %album%, %albumartist%, %tracknumber%, %tracktotal%, %discnumber%, %disctotal%, %date%, %genre%',
               leading: const Icon(Icons.text_fields),
               selector: (state) => state.fileNameTpl,
               onPressed: (_) => Get.dialog(

@@ -1,12 +1,13 @@
 import 'package:cross_file/cross_file.dart';
 import 'package:flubar/app/talker.dart';
 import 'package:flubar/models/extensions/metadata_extension.dart';
+import 'package:flubar/models/extensions/properties_extension.dart';
 import 'package:flubar/models/state/track.dart';
+import 'package:flubar/rust/api/ffmpeg.dart';
+import 'package:flubar/rust/api/models.dart';
 import 'package:flubar/ui/snackbar/view.dart';
 import 'package:flubar/ui/view/playlist_view/providers.dart';
 import 'package:flubar/ui/view/tracklist_view/providers.dart';
-import 'package:flubar/utils/metadata/reader.dart';
-import 'package:metadata_god/metadata_god.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'providers.g.dart';
@@ -38,21 +39,34 @@ class MediaDragState extends _$MediaDragState {
     var failed = 0;
     final results = await Future.wait(
       files.map((file) async {
-        var metadata = await MetadataReader.read(file: file.path);
-        if (metadata == null) {
+        final path = file.path;
+        try {
+          final (metadata, properties) = await readFile(file: path);
+          globalTalker.debug(
+              '文件: ${file.path}, 元数据: ${metadata.toJson()}, 属性: ${properties.toJson()}');
+          return Track(
+            id: maxTrackIdNotifier.nextId(),
+            path: path,
+            metadata: metadata,
+            properties: properties,
+          );
+        } catch (e) {
           failed++;
-          metadata = const Metadata(tagType: TagType.unknown);
+          globalTalker.handle(e, null, '无法读取文件: $path');
+          return Track(
+            id: id,
+            metadata: const Metadata(),
+            properties: const Properties(),
+            path: file.path,
+          );
         }
-        final id = maxTrackIdNotifier.nextId();
-        globalTalker.debug('文件: ${file.path}, 元数据: ${metadata.toJson()}');
-        return Track(id: id, metadata: metadata, path: file.path);
       }),
       eagerError: false,
     );
 
     playlistsNotifier.addTracks(id, results);
     if (failed != 0) {
-      showExceptionSnackbar(title: '错误', message: '无法读取 $failed 个文件的元数据');
+      showExceptionSnackbar(title: '错误', message: '无法读取 $failed 个文件');
     }
   }
 
