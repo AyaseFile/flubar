@@ -7,6 +7,7 @@ def install_dependencies():
         shell=True,
     )
     subprocess.run("sudo apt-get install -y libmpv-dev", shell=True)
+    subprocess.run("sudo apt-get install -y pkg-config ffmpeg", shell=True)
 
 
 def build_flutter():
