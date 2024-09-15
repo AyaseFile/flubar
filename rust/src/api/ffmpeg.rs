@@ -150,8 +150,8 @@ pub fn read_file(file: String) -> Result<(Metadata, Properties)> {
 #[inline]
 fn get_metadata_value(dict: &ffmpeg::dictionary::Ref, key: &str) -> Option<String> {
     dict.get(key)
-        .map(|s| s.to_owned())
-        .or_else(|| dict.get(&key.to_uppercase()).map(|s| s.to_owned()))
+        .map(|s| String::from_utf8_lossy(s.as_bytes()).into_owned())
+        .or_else(|| dict.get(&key.to_uppercase()).map(|s| String::from_utf8_lossy(s.as_bytes()).into_owned()))
 }
 
 #[inline]
