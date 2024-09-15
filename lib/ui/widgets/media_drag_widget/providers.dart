@@ -52,7 +52,7 @@ class MediaDragState extends _$MediaDragState {
           );
         } catch (e) {
           failed++;
-          globalTalker.handle(e, null, '无法读取文件: $path');
+          globalTalker.error('无法读取文件: $path', e, null);
           return Track(
             id: id,
             metadata: const Metadata(),
