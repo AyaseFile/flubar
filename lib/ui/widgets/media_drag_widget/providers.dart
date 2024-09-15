@@ -54,7 +54,7 @@ class MediaDragState extends _$MediaDragState {
           failed++;
           globalTalker.error('无法读取文件: $path', e, null);
           return Track(
-            id: id,
+            id: maxTrackIdNotifier.nextId(),
             metadata: const Metadata(),
             properties: const Properties(),
             path: file.path,
