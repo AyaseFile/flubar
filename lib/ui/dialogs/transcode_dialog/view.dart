@@ -73,6 +73,7 @@ class _TranscodeDialog extends ConsumerWidget {
                   if (remember) {
                     ref.read(transcodeFmtProvider.notifier).saveFormat();
                     ref.read(transcodeOptsProvider.notifier).saveOptions();
+                    ref.read(overwriteExistingFilesProvider.notifier).save();
                   }
                   await ref.read(transcodeProvider.notifier).transcodeFiles();
                   final failedCount = ref.read(transcodeFailedCountProvider);
@@ -104,7 +105,14 @@ class _TranscodeSettings extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _SettingRow(label: '输出格式', child: _TranscodeFormatSelector()),
-        _SettingRow(label: '输出位置', child: _OutputDirectorySelector()),
+        _SettingRow(
+          label: '输出位置',
+          child: Row(children: [
+            _OutputDirectorySelector(),
+            SizedBox(width: kSpaceBetweenItems),
+            _OverwriteExistingFilesCheckbox()
+          ]),
+        ),
         _TranscodeOptionsSelector(),
       ],
     );
@@ -229,6 +237,25 @@ class _OutputDirectorySelector extends ConsumerWidget {
             ),
           ),
         ],
+      ],
+    );
+  }
+}
+
+class _OverwriteExistingFilesCheckbox extends ConsumerWidget {
+  const _OverwriteExistingFilesCheckbox();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final overwrite = ref.watch(overwriteExistingFilesProvider);
+    return Row(
+      children: [
+        Checkbox(
+          value: overwrite,
+          onChanged: (_) =>
+              ref.read(overwriteExistingFilesProvider.notifier).toggle(),
+        ),
+        const Text('覆盖已有文件'),
       ],
     );
   }

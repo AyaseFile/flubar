@@ -49,6 +49,7 @@ class SettingsModel with _$SettingsModel {
     @Default(_S.kDefaultFlacCompressionLevel) int flacCompressionLevel,
     @Default(_S.kDefaultWavEncoder) FfmpegEncoder wavEncoder,
     @Default(_S.kRememberTranscodeChoice) bool rememberTranscodeChoice,
+    @Default(_S.kOverwriteExistingFiles) bool overwriteExistingFiles,
   }) = _SettingsModel;
 
   factory SettingsModel.fromJson(Map<String, dynamic> json) =>

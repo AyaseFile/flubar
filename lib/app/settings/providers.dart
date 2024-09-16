@@ -32,6 +32,7 @@ class Settings extends _$Settings {
           flacCompressionLevel: loadedSettings.flacCompressionLevel,
           wavEncoder: loadedSettings.wavEncoder,
           rememberTranscodeChoice: loadedSettings.rememberTranscodeChoice,
+          overwriteExistingFiles: loadedSettings.overwriteExistingFiles,
         );
       } catch (e) {
         globalTalker.handle(e, null, '无法解析设置文件: $str');
@@ -70,6 +71,9 @@ class Settings extends _$Settings {
 
   void updateRememberTranscodeChoice(bool rememberTranscodeChoice) =>
       state = state.copyWith(rememberTranscodeChoice: rememberTranscodeChoice);
+
+  void updateOverwriteExistingFiles(bool overwriteExistingFiles) =>
+      state = state.copyWith(overwriteExistingFiles: overwriteExistingFiles);
 
   void saveSettings() =>
       ref.read(storageUtilProvider.notifier).writeSettingsSync(state);

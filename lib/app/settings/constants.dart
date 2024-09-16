@@ -11,4 +11,5 @@ class DefaultSettings {
   static const kDefaultFlacCompressionLevel = 5;
   static const kDefaultWavEncoder = FfmpegEncoder.pcm_s16le;
   static const kRememberTranscodeChoice = true;
+  static const kOverwriteExistingFiles = false;
 }

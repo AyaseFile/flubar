@@ -61,7 +61,9 @@ class TranscodeUtil extends _$TranscodeUtil
   }
 
   static FfmpegCommand buildFfmpegCommand(
-      String ffmpegPath, TranscodeOptions options) {
+      {required String ffmpegPath,
+      required TranscodeOptions options,
+      required bool overwriteExistingFiles}) {
     final args = <CliArg>[];
 
     options.map(
@@ -92,7 +94,7 @@ class TranscodeUtil extends _$TranscodeUtil
       },
     );
 
-    args.add(const CliArg(name: 'y'));
+    if (overwriteExistingFiles) args.add(const CliArg(name: 'y'));
 
     return FfmpegCommand.simple(
       ffmpegPath: ffmpegPath,
@@ -125,7 +127,12 @@ class TranscodeUtil extends _$TranscodeUtil
     final options = ref.read(transcodeOptsProvider);
     final ffmpegPath =
         ref.read(settingsProvider.select((state) => state.ffmpegPath));
-    _baseCommand = buildFfmpegCommand(ffmpegPath, options);
+    final overwrite = ref.read(overwriteExistingFilesProvider);
+    _baseCommand = buildFfmpegCommand(
+      ffmpegPath: ffmpegPath,
+      options: options,
+      overwriteExistingFiles: overwrite,
+    );
     _ext = options.map(
       copy: (_) => null,
       noMetadata: (_) => null,

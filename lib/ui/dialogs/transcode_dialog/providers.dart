@@ -98,8 +98,12 @@ class TranscodeCmd extends _$TranscodeCmd {
     final options = ref.watch(transcodeOptsProvider);
     final ffmpegPath =
         ref.watch(settingsProvider.select((state) => state.ffmpegPath));
-    final command =
-        TranscodeUtil.buildFfmpegCommand(ffmpegPath, options).copyWith(
+    final overwrite = ref.watch(overwriteExistingFilesProvider);
+    final command = TranscodeUtil.buildFfmpegCommand(
+      ffmpegPath: ffmpegPath,
+      options: options,
+      overwriteExistingFiles: overwrite,
+    ).copyWith(
       inputs: [FfmpegInput.asset('{input_file}')],
       outputFilepath: '{output_file}',
     );
@@ -155,4 +159,16 @@ class TranscodeFailedCount extends _$TranscodeFailedCount {
   void increment() => state++;
 
   void setCancelled() => state = -1;
+}
+
+@riverpod
+class OverwriteExistingFiles extends _$OverwriteExistingFiles {
+  @override
+  bool build() => ref
+      .watch(settingsProvider.select((state) => state.overwriteExistingFiles));
+
+  void toggle() => state = !state;
+
+  void save() =>
+      ref.read(settingsProvider.notifier).updateOverwriteExistingFiles(state);
 }
