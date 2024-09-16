@@ -53,6 +53,32 @@ class _EditMetadataDialog extends ConsumerWidget {
               automaticallyImplyLeading: false,
               title: const Text('编辑元数据'),
               actions: [
+                Builder(builder: (context) {
+                  return IconButton(
+                    icon: const Icon(Icons.settings),
+                    onPressed: () {
+                      _showSettingsPopupMenu(
+                        context: context,
+                        children: [
+                          ListTile(
+                            title: const Text('强制写入元数据'),
+                            trailing: Consumer(builder: (context, ref, _) {
+                              final force = ref.watch(settingsProvider
+                                  .select((state) => state.forceWriteMetadata));
+                              return Checkbox(
+                                value: force,
+                                onChanged: (value) => ref
+                                    .read(settingsProvider.notifier)
+                                    .updateForceWriteMetadata(value!),
+                              );
+                            }),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }),
+                const SizedBox(width: 8),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
                   child: const Text('取消'),
@@ -76,6 +102,39 @@ class _EditMetadataDialog extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+
+  void _showSettingsPopupMenu({
+    required BuildContext context,
+    required List<ListTile> children,
+  }) {
+    final RenderBox button = context.findRenderObject() as RenderBox;
+    final RenderBox overlay =
+        Overlay.of(context).context.findRenderObject() as RenderBox;
+    final RelativeRect position = RelativeRect.fromRect(
+      Rect.fromPoints(
+        button.localToGlobal(Offset.zero, ancestor: overlay),
+        button.localToGlobal(button.size.bottomRight(Offset.zero),
+            ancestor: overlay),
+      ),
+      Offset.zero & overlay.size,
+    );
+    showMenu<void>(
+      context: context,
+      position: position,
+      items: [
+        PopupMenuItem<void>(
+          child: IntrinsicHeight(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: children,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
