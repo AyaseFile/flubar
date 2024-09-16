@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 
@@ -31,7 +32,7 @@ class TranscodeUtil extends _$TranscodeUtil
   @override
   void build() {
     ref.keepAlive();
-    isolateTask ??= (List<dynamic> args) {
+    isolateTask ??= (List<dynamic> args) async {
       final sendPort = args[0] as SendPort;
       final transcodeData = args[1] as List<(FfmpegCommand, String, String)>;
       for (final (baseCommand, path, outputFile) in transcodeData) {
@@ -41,14 +42,15 @@ class TranscodeUtil extends _$TranscodeUtil
             outputFilepath: outputFile,
           );
           final cli = command.toCli();
-          final result = Process.runSync(cli.executable, cli.args);
-          if (result.exitCode == 0) {
+          final process = await Process.start(cli.executable, cli.args);
+          final exitCode = await process.exitCode;
+          if (exitCode == 0) {
             sendPort.send({'error': null});
           } else {
-            final e = result.stderr.toString().trim();
+            final stderr = await process.stderr.transform(utf8.decoder).join();
             sendPort.send({
-              'error': '无法转码文件 $path. 退出码: ${result.exitCode}',
-              'e': FfmpegException(e)
+              'error': '无法转码文件 $path. 退出码: $exitCode',
+              'e': FfmpegException(stderr.trim())
             });
           }
         } catch (e, st) {
