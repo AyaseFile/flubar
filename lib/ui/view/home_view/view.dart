@@ -1,5 +1,7 @@
 import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/app/talker.dart';
+import 'package:flubar/rust/api/ffmpeg.dart';
+import 'package:flubar/rust/frb_generated.dart';
 import 'package:flubar/ui/constants.dart';
 import 'package:flubar/ui/view/playlist_view/view.dart';
 import 'package:flubar/ui/view/tracklist_view/view.dart';
@@ -23,6 +25,15 @@ class _HomeViewState extends ConsumerState<HomeView> with WindowListener {
   void initState() {
     super.initState();
     windowManager.addListener(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        await RustLib.init();
+        await initFfmpeg();
+        globalTalker.debug('Rust Api 初始化完成');
+      } catch (e) {
+        globalTalker.handle(e, null, '无法初始化 Rust Api');
+      }
+    });
   }
 
   @override
