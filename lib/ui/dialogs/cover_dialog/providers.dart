@@ -102,6 +102,7 @@ mixin TrackCoverMixin on AutoDisposeNotifier<List<TrackCoverModel>> {
         } catch (loftyError) {
           try {
             await id3WritePicture(file: t.path, picture: frontCover);
+            updatedTracks.add(t.copyWith(metadata: metadata));
           } catch (id3Error) {
             failed++;
             globalTalker.error('无法更新封面: ${t.path}', [loftyError, id3Error]);
