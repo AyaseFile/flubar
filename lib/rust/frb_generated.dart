@@ -91,10 +91,10 @@ abstract class RustLibApi extends BaseApi {
       {required String file, Uint8List? picture});
 
   Future<void> crateApiLoftyLoftyWriteMetadata(
-      {required String file, required Metadata metadata});
+      {required String file, required Metadata metadata, required bool force});
 
   Future<void> crateApiLoftyLoftyWritePicture(
-      {required String file, Uint8List? picture});
+      {required String file, Uint8List? picture, required bool force});
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -208,12 +208,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Future<void> crateApiLoftyLoftyWriteMetadata(
-      {required String file, required Metadata metadata}) {
+      {required String file, required Metadata metadata, required bool force}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(file, serializer);
         sse_encode_box_autoadd_metadata(metadata, serializer);
+        sse_encode_bool(force, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 5, port: port_);
       },
@@ -222,7 +223,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_AnyhowException,
       ),
       constMeta: kCrateApiLoftyLoftyWriteMetadataConstMeta,
-      argValues: [file, metadata],
+      argValues: [file, metadata, force],
       apiImpl: this,
     ));
   }
@@ -230,17 +231,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiLoftyLoftyWriteMetadataConstMeta =>
       const TaskConstMeta(
         debugName: "lofty_write_metadata",
-        argNames: ["file", "metadata"],
+        argNames: ["file", "metadata", "force"],
       );
 
   @override
   Future<void> crateApiLoftyLoftyWritePicture(
-      {required String file, Uint8List? picture}) {
+      {required String file, Uint8List? picture, required bool force}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(file, serializer);
         sse_encode_opt_list_prim_u_8_strict(picture, serializer);
+        sse_encode_bool(force, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 6, port: port_);
       },
@@ -249,7 +251,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_AnyhowException,
       ),
       constMeta: kCrateApiLoftyLoftyWritePictureConstMeta,
-      argValues: [file, picture],
+      argValues: [file, picture, force],
       apiImpl: this,
     ));
   }
@@ -257,7 +259,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiLoftyLoftyWritePictureConstMeta =>
       const TaskConstMeta(
         debugName: "lofty_write_picture",
-        argNames: ["file", "picture"],
+        argNames: ["file", "picture", "force"],
       );
 
   @protected
@@ -270,6 +272,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   String dco_decode_String(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as String;
+  }
+
+  @protected
+  bool dco_decode_bool(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as bool;
   }
 
   @protected
@@ -420,6 +428,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_list_prim_u_8_strict(deserializer);
     return utf8.decoder.convert(inner);
+  }
+
+  @protected
+  bool sse_decode_bool(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getUint8() != 0;
   }
 
   @protected
@@ -597,12 +611,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  bool sse_decode_bool(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return deserializer.buffer.getUint8() != 0;
-  }
-
-  @protected
   void sse_encode_AnyhowException(
       AnyhowException self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -613,6 +621,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_String(String self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_prim_u_8_strict(utf8.encoder.convert(self), serializer);
+  }
+
+  @protected
+  void sse_encode_bool(bool self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putUint8(self ? 1 : 0);
   }
 
   @protected
@@ -763,11 +777,5 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_i_32(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putInt32(self);
-  }
-
-  @protected
-  void sse_encode_bool(bool self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    serializer.buffer.putUint8(self ? 1 : 0);
   }
 }

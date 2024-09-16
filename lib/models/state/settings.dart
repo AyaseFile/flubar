@@ -41,6 +41,7 @@ class SettingsModel with _$SettingsModel {
     @Default(_S.kDarkMode) bool darkMode,
     @Default(_S.kFfmpegPath) String ffmpegPath,
     @Default(_S.kFileNameTpl) String fileNameTpl,
+    @Default(_S.kForceWriteMetadata) bool forceWriteMetadata,
     @Default(_S.kTranscodeFormat) TranscodeFormat transcodeFormat,
     @Default(_S.kIsolateCount) int isolateCount,
     @Default(_S.kDefaultMp3Bitrate) int mp3Bitrate,

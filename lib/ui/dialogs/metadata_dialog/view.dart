@@ -1,3 +1,4 @@
+import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/models/state/common_metadata.dart';
 import 'package:flubar/ui/constants.dart';
 import 'package:flubar/ui/dialogs/editable_table_view/constants.dart';
@@ -59,9 +60,11 @@ class _EditMetadataDialog extends ConsumerWidget {
                 const SizedBox(width: 8),
                 TextButton(
                   onPressed: () async {
+                    final force = ref.read(settingsProvider
+                        .select((state) => state.forceWriteMetadata));
                     await ref
                         .read(selectedTracksProvider.notifier)
-                        .updateMetadata();
+                        .updateMetadata(force);
                     if (context.mounted) Navigator.of(context).pop();
                   },
                   autofocus: true,

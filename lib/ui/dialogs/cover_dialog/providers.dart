@@ -87,7 +87,7 @@ mixin TrackCoverMixin on AutoDisposeNotifier<List<TrackCoverModel>> {
     }).toList();
   }
 
-  Future<void> updateCover() async {
+  Future<void> updateCover(bool force) async {
     final id = ref.read(playlistIdProvider).selectedId;
     final updatedTracks = <Track>[];
     var failed = 0;
@@ -97,9 +97,15 @@ mixin TrackCoverMixin on AutoDisposeNotifier<List<TrackCoverModel>> {
       await Future.wait(cover.tracks.map((t) async {
         final metadata = t.metadata.copyWith(frontCover: () => frontCover);
         try {
-          await loftyWritePicture(file: t.path, picture: frontCover);
+          await loftyWritePicture(
+              file: t.path, picture: frontCover, force: force);
           updatedTracks.add(t.copyWith(metadata: metadata));
         } catch (loftyError) {
+          if (force) {
+            failed++;
+            globalTalker.error('无法强制更新封面: ${t.path}', loftyError);
+            return;
+          }
           try {
             await id3WritePicture(file: t.path, picture: frontCover);
             updatedTracks.add(t.copyWith(metadata: metadata));

@@ -1,3 +1,4 @@
+import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/models/state/track_cover.dart';
 import 'package:flubar/ui/constants.dart';
 import 'package:flubar/ui/widgets/cover_drag_widget/view.dart';
@@ -63,14 +64,16 @@ class CoverDialog extends ConsumerWidget {
                 const SizedBox(width: 8),
                 TextButton(
                   onPressed: () async {
+                    final force = ref.read(settingsProvider
+                        .select((state) => state.forceWriteMetadata));
                     if (isBatch) {
                       await ref
                           .read(batchedTrackCoverProvider.notifier)
-                          .updateCover();
+                          .updateCover(force);
                     } else {
                       await ref
                           .read(groupedTrackCoverProvider.notifier)
-                          .updateCover();
+                          .updateCover(force);
                     }
                     if (context.mounted) Navigator.of(context).pop();
                   },

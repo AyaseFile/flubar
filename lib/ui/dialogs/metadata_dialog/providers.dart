@@ -62,15 +62,21 @@ class SelectedTracks extends _$SelectedTracks {
     }).toList();
   }
 
-  Future<void> updateMetadata() async {
+  Future<void> updateMetadata(bool force) async {
     final id = ref.read(playlistIdProvider).selectedId;
     final updatedTracks = <Track>[];
     var failed = 0;
     await Future.wait(state.map((t) async {
       try {
-        await loftyWriteMetadata(metadata: t.metadata, file: t.path);
+        await loftyWriteMetadata(
+            metadata: t.metadata, file: t.path, force: force);
         updatedTracks.add(t);
       } catch (loftyError) {
+        if (force) {
+          failed++;
+          globalTalker.error('无法强制更新元数据: ${t.path}', loftyError);
+          return;
+        }
         try {
           await id3WriteMetadata(metadata: t.metadata, file: t.path);
           updatedTracks.add(t);

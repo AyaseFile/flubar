@@ -58,6 +58,47 @@ class _SettingsListView extends ConsumerWidget {
           ],
         ),
         SettingsSection(
+          title: const Text('元数据'),
+          tiles: [
+            SwitchSettingsTile(
+              title: '强制写入元数据',
+              leading: const Icon(Icons.edit),
+              selector: (state) => state.forceWriteMetadata,
+              onToggle: (value) => ref
+                  .read(settingsProvider.notifier)
+                  .updateForceWriteMetadata(value),
+            ),
+            SettingsTile<String>(
+              title: '文件名模板',
+              description:
+                  '可用项: %filename%, %title%, %artist%, %album%, %albumartist%, %tracknumber%, %tracktotal%, %discnumber%, %disctotal%, %date%, %genre%',
+              leading: const Icon(Icons.text_fields),
+              selector: (state) => state.fileNameTpl,
+              onPressed: (_) => Get.dialog(
+                InputDialog(
+                  dialogTitle: '文件名模板',
+                  initialValue: ref.read(
+                      settingsProvider.select((state) => state.fileNameTpl)),
+                  onConfirm: (value) => ref
+                      .read(settingsProvider.notifier)
+                      .updateFileNameTpl(value),
+                ),
+              ),
+            ),
+            ExampleSettingsTile(
+              title: '模板示例',
+              description: {
+                ...kExampleTrack.metadata.toJson(),
+                'path': kExampleTrack.path,
+              }.toString(),
+              leading: const Icon(Icons.text_fields, color: Colors.transparent),
+              selector: (state) => state.fileNameTpl,
+              processValue: (value) => ref.read(tplUtilProvider).process(
+                  metadata: kExampleTrack.metadata, path: kExampleTrack.path),
+            ),
+          ],
+        ),
+        SettingsSection(
           title: const Text('转码'),
           tiles: [
             SettingsTile<String>(
@@ -146,39 +187,6 @@ class _SettingsListView extends ConsumerWidget {
               leading: const Icon(Icons.equalizer, color: Colors.transparent),
               selector: (state) => state.wavEncoder.displayName,
               onPressed: (_) => Get.dialog(const WavEncoderDialog()),
-            ),
-          ],
-        ),
-        SettingsSection(
-          title: const Text('元数据'),
-          tiles: [
-            SettingsTile<String>(
-              title: '文件名模板',
-              description:
-                  '可用项: %filename%, %title%, %artist%, %album%, %albumartist%, %tracknumber%, %tracktotal%, %discnumber%, %disctotal%, %date%, %genre%',
-              leading: const Icon(Icons.text_fields),
-              selector: (state) => state.fileNameTpl,
-              onPressed: (_) => Get.dialog(
-                InputDialog(
-                  dialogTitle: '文件名模板',
-                  initialValue: ref.read(
-                      settingsProvider.select((state) => state.fileNameTpl)),
-                  onConfirm: (value) => ref
-                      .read(settingsProvider.notifier)
-                      .updateFileNameTpl(value),
-                ),
-              ),
-            ),
-            ExampleSettingsTile(
-              title: '模板示例',
-              description: {
-                ...kExampleTrack.metadata.toJson(),
-                'path': kExampleTrack.path,
-              }.toString(),
-              leading: const Icon(Icons.text_fields, color: Colors.transparent),
-              selector: (state) => state.fileNameTpl,
-              processValue: (value) => ref.read(tplUtilProvider).process(
-                  metadata: kExampleTrack.metadata, path: kExampleTrack.path),
             ),
           ],
         ),

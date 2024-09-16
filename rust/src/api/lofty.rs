@@ -8,8 +8,12 @@ use lofty::tag::items::Timestamp;
 use lofty::tag::{ItemKey, Tag, TagExt};
 use std::str::FromStr;
 
-pub fn lofty_write_metadata(file: String, metadata: Metadata) -> Result<()> {
-    let mut tag = get_or_create_tag_for_file(&file)?;
+pub fn lofty_write_metadata(file: String, metadata: Metadata, force: bool) -> Result<()> {
+    let mut tag = if force {
+        force_create_tag_for_file(&file)?
+    } else {
+        get_or_create_tag_for_file(&file)?
+    };
 
     fn set_or_remove(tag: &mut Tag, key: ItemKey, value: Option<String>) -> Result<()> {
         match value {
@@ -63,8 +67,12 @@ pub fn lofty_write_metadata(file: String, metadata: Metadata) -> Result<()> {
     Ok(())
 }
 
-pub fn lofty_write_picture(file: String, picture: Option<Vec<u8>>) -> Result<()> {
-    let mut tag = get_or_create_tag_for_file(&file)?;
+pub fn lofty_write_picture(file: String, picture: Option<Vec<u8>>, force: bool) -> Result<()> {
+    let mut tag = if force {
+        force_create_tag_for_file(&file)?
+    } else {
+        get_or_create_tag_for_file(&file)?
+    };
 
     if let Some(picture) = picture {
         let kind = infer::get(&picture).expect("Failed to get mime type");
@@ -93,17 +101,7 @@ pub fn lofty_write_picture(file: String, picture: Option<Vec<u8>>) -> Result<()>
 }
 
 fn get_or_create_tag_for_file(file: &str) -> Result<Tag> {
-    let tagged_file = match lofty::read_from_path(file) {
-        Ok(tagged_file) => tagged_file,
-        _ => {
-            let prob = lofty::probe::Probe::open(file)?;
-            if prob.file_type().is_none() {
-                return Err(anyhow!("File type could not be determined"));
-            }
-            TaggedFile::new(prob.file_type().unwrap(), FileProperties::default(), vec![])
-        }
-    };
-
+    let tagged_file = get_tagged_file(file)?;
     match tagged_file.primary_tag() {
         Some(primary_tag) => Ok(primary_tag.to_owned()),
         None => {
@@ -112,6 +110,34 @@ fn get_or_create_tag_for_file(file: &str) -> Result<Tag> {
             } else {
                 Err(anyhow!("Failed to get or create tag"))
             }
+        }
+    }
+}
+fn force_create_tag_for_file(file: &str) -> Result<Tag> {
+    let mut tagged_file = get_tagged_file(file)?;
+    match tagged_file.primary_tag_mut() {
+        Some(primary_tag) => Ok(primary_tag.to_owned()),
+        None => {
+            if let Some(first_tag) = tagged_file.first_tag_mut() {
+                Ok(first_tag.to_owned())
+            } else {
+                let tag_type = tagged_file.primary_tag_type();
+                tagged_file.insert_tag(Tag::new(tag_type));
+                Ok(tagged_file.primary_tag_mut().unwrap().to_owned())
+            }
+        }
+    }
+}
+
+fn get_tagged_file(file: &str) -> Result<TaggedFile> {
+    match lofty::read_from_path(file) {
+        Ok(tagged_file) => Ok(tagged_file),
+        _ => {
+            let prob = lofty::probe::Probe::open(file)?;
+            if prob.file_type().is_none() {
+                return Err(anyhow!("File type could not be determined"));
+            }
+            Ok(TaggedFile::new(prob.file_type().unwrap(), FileProperties::default(), vec![]))
         }
     }
 }

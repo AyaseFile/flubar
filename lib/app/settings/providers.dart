@@ -25,6 +25,7 @@ class Settings extends _$Settings {
           darkMode: loadedSettings.darkMode,
           ffmpegPath: loadedSettings.ffmpegPath,
           fileNameTpl: loadedSettings.fileNameTpl,
+          forceWriteMetadata: loadedSettings.forceWriteMetadata,
           transcodeFormat: loadedSettings.transcodeFormat,
           isolateCount: loadedSettings.isolateCount,
           mp3Bitrate: loadedSettings.mp3Bitrate,
@@ -48,6 +49,9 @@ class Settings extends _$Settings {
 
   void updateFileNameTpl(String fileNameTpl) =>
       state = state.copyWith(fileNameTpl: fileNameTpl);
+
+  void updateForceWriteMetadata(bool forceWriteMetadata) =>
+      state = state.copyWith(forceWriteMetadata: forceWriteMetadata);
 
   void updateTranscodeFormat(TranscodeFormat transcodeFormat) =>
       state = state.copyWith(transcodeFormat: transcodeFormat);
