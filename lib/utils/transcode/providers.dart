@@ -37,6 +37,15 @@ class TranscodeUtil extends _$TranscodeUtil
       final transcodeData = args[1] as List<(FfmpegCommand, String, String)>;
       for (final (baseCommand, path, outputFile) in transcodeData) {
         try {
+          // 检查输出文件是否存在
+          final file = File(outputFile);
+          if (file.existsSync() &&
+              !baseCommand.args.contains(const CliArg(name: 'y'))) {
+            sendPort.send({
+              'error': '输出文件 $outputFile 已存在',
+            });
+            continue;
+          }
           final command = baseCommand.copyWith(
             inputs: [FfmpegInput.asset(path)],
             outputFilepath: outputFile,
