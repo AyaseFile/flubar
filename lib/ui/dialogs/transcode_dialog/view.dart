@@ -114,6 +114,7 @@ class _TranscodeSettings extends StatelessWidget {
           ]),
         ),
         _TranscodeOptionsSelector(),
+        _SettingRow(label: '输出文件名模板', child: _TplField()),
       ],
     );
   }
@@ -357,6 +358,30 @@ class _CommandField extends HookConsumerWidget {
       decoration: const InputDecoration(
         enabled: false,
         labelText: 'FFmpeg 命令',
+        border: OutlineInputBorder(),
+      ),
+    );
+  }
+}
+
+class _TplField extends HookConsumerWidget {
+  const _TplField();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tplController =
+        useTextEditingController(text: ref.read(outputFileNameTplProvider));
+
+    ref.listen<String>(outputFileNameTplProvider, (previous, next) {
+      tplController.value = TextEditingValue(text: next);
+    });
+
+    return TextField(
+      controller: tplController,
+      onChanged: (value) =>
+          ref.read(outputFileNameTplProvider.notifier).setTpl(value),
+      decoration: const InputDecoration(
+        labelText: '文件名模板',
         border: OutlineInputBorder(),
       ),
     );

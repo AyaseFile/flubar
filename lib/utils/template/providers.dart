@@ -39,6 +39,15 @@ class TplUtil extends _$TplUtil with IsolateMixin<(String, String)> {
         ref.watch(settingsProvider.select((state) => state.fileNameTpl)));
   }
 
+  void setTpl(String tpl) {
+    state = TemplateProcessor(tpl);
+  }
+
+  void resetTpl() {
+    state = TemplateProcessor(
+        ref.read(settingsProvider.select((state) => state.fileNameTpl)));
+  }
+
   @override
   List<(String, String)> getData() {
     final selectedTracks = ref.read(selectedTracksProvider);

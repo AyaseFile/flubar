@@ -140,6 +140,9 @@ class TranscodeUtil extends _$TranscodeUtil
       flac: (_) => '.flac',
       wav: (_) => '.wav',
     );
+    ref
+        .read(tplUtilProvider.notifier)
+        .setTpl(ref.read(outputFileNameTplProvider));
     _tplProcessor = ref.read(tplUtilProvider);
     _useOriginalDir = ref.read(useOriginalDirectoryProvider);
     _customOutputDir = ref.read(outputDirectoryProvider);
@@ -150,8 +153,10 @@ class TranscodeUtil extends _$TranscodeUtil
       .info('转码操作已取消.${e.reason != null ? ' 原因: ${e.reason}' : ''}');
 
   @override
-  void onCompletion(Duration duration) =>
-      transcodeTalker.info('转码操作结束. 耗时: $duration');
+  void onCompletion(Duration duration) {
+    transcodeTalker.info('转码操作结束. 耗时: $duration');
+    ref.read(tplUtilProvider.notifier).resetTpl();
+  }
 
   @override
   void onError(Object e, StackTrace st) =>

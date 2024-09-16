@@ -172,3 +172,12 @@ class OverwriteExistingFiles extends _$OverwriteExistingFiles {
   void save() =>
       ref.read(settingsProvider.notifier).updateOverwriteExistingFiles(state);
 }
+
+@riverpod
+class OutputFileNameTpl extends _$OutputFileNameTpl {
+  @override
+  String build() =>
+      ref.watch(settingsProvider.select((state) => state.fileNameTpl));
+
+  void setTpl(String tpl) => state = tpl;
+}
