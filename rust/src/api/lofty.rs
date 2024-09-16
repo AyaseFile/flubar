@@ -100,6 +100,7 @@ pub fn lofty_write_picture(file: String, picture: Option<Vec<u8>>, force: bool) 
     Ok(())
 }
 
+#[inline]
 fn get_or_create_tag_for_file(file: &str) -> Result<Tag> {
     let tagged_file = get_tagged_file(file)?;
     match tagged_file.primary_tag() {
@@ -113,6 +114,8 @@ fn get_or_create_tag_for_file(file: &str) -> Result<Tag> {
         }
     }
 }
+
+#[inline]
 fn force_create_tag_for_file(file: &str) -> Result<Tag> {
     let mut tagged_file = get_tagged_file(file)?;
     match tagged_file.primary_tag_mut() {
@@ -129,6 +132,7 @@ fn force_create_tag_for_file(file: &str) -> Result<Tag> {
     }
 }
 
+#[inline]
 fn get_tagged_file(file: &str) -> Result<TaggedFile> {
     match lofty::read_from_path(file) {
         Ok(tagged_file) => Ok(tagged_file),
