@@ -32,7 +32,7 @@ class _TranscodeDialog extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           const _TranscodeSettings(),
-          const SizedBox(height: 16),
+          const SizedBox(height: 16 + kSettingRowVerticalPadding),
           const _CommandField(),
           const SizedBox(height: 16),
           if (transcodeState.isLoading) ...[
@@ -269,8 +269,8 @@ class _TranscodeOptionsSelector extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final options = ref.watch(transcodeOptsProvider);
     return options.map(
-      copy: (_) => const SizedBox.shrink(),
-      noMetadata: (_) => const SizedBox.shrink(),
+      copy: (_) => const SizedBox(height: kSettingRowVerticalPadding * 2),
+      noMetadata: (_) => const SizedBox(height: kSettingRowVerticalPadding * 2),
       mp3: (mp3) => _SettingRow(
         label: '码率',
         child: Row(
