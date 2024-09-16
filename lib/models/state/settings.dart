@@ -50,6 +50,8 @@ class SettingsModel with _$SettingsModel {
     @Default(_S.kDefaultWavEncoder) FfmpegEncoder wavEncoder,
     @Default(_S.kRememberTranscodeChoice) bool rememberTranscodeChoice,
     @Default(_S.kOverwriteExistingFiles) bool overwriteExistingFiles,
+    @Default(_S.kWindowWidth) double windowWidth,
+    @Default(_S.kWindowHeight) double windowHeight,
   }) = _SettingsModel;
 
   factory SettingsModel.fromJson(Map<String, dynamic> json) =>

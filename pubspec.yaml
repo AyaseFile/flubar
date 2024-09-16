@@ -41,6 +41,10 @@ dependencies:
   rust_lib_flubar:
     path: rust_builder
   flutter_rust_bridge: 2.3.0
+  window_size:
+    git:
+      url: https://github.com/google/flutter-desktop-embedding.git
+      path: plugins/window_size
 
 dev_dependencies:
   flutter_test:

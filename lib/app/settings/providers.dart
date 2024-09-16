@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:flubar/app/settings/util.dart';
 import 'package:flubar/app/talker.dart';
@@ -33,6 +34,8 @@ class Settings extends _$Settings {
           wavEncoder: loadedSettings.wavEncoder,
           rememberTranscodeChoice: loadedSettings.rememberTranscodeChoice,
           overwriteExistingFiles: loadedSettings.overwriteExistingFiles,
+          windowWidth: loadedSettings.windowWidth,
+          windowHeight: loadedSettings.windowHeight,
         );
       } catch (e) {
         globalTalker.handle(e, null, '无法解析设置文件: $str');
@@ -74,6 +77,13 @@ class Settings extends _$Settings {
 
   void updateOverwriteExistingFiles(bool overwriteExistingFiles) =>
       state = state.copyWith(overwriteExistingFiles: overwriteExistingFiles);
+
+  void updateWindowSize(Size size) {
+    state = state.copyWith(
+      windowWidth: size.width,
+      windowHeight: size.height,
+    );
+  }
 
   void saveSettings() =>
       ref.read(storageUtilProvider.notifier).writeSettingsSync(state);

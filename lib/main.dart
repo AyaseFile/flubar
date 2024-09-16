@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
 import 'package:flubar/app/app.dart';
+import 'package:flubar/app/settings/constants.dart';
 import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/app/storage/providers.dart';
 import 'package:flubar/app/talker.dart';
@@ -13,10 +15,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:window_size/window_size.dart';
+
+typedef _S = DefaultSettings;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initWindow();
 
   initTalker();
   const errorHandler = _ErrorHandler();
@@ -41,6 +45,24 @@ void main() async {
       return '{}';
     }
   }();
+
+  final loadedWidth = jsonDecode(settingsString)['windowWidth'] as double?;
+  final loadedHeight = jsonDecode(settingsString)['windowHeight'] as double?;
+  var windowSize = const Size(_S.kWindowWidth, _S.kWindowHeight);
+  if (loadedWidth != null && loadedHeight != null) {
+    final screen = await getCurrentScreen();
+    if (screen != null) {
+      final width = screen.visibleFrame.width;
+      final height = screen.visibleFrame.height;
+      if (loadedWidth > 0 &&
+          loadedWidth < width &&
+          loadedHeight > 0 &&
+          loadedHeight < height) {
+        windowSize = Size(loadedWidth, loadedHeight);
+      }
+    }
+  }
+  await initWindow(windowSize);
 
   JustAudioMediaKit.ensureInitialized(
       linux: true, windows: false, macOS: false, android: false, iOS: false);
