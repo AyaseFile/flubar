@@ -62,7 +62,7 @@ class SelectedTracks extends _$SelectedTracks {
     }).toList();
   }
 
-  Future<void> updateMetadata(bool force) async {
+  Future<bool> updateMetadata(bool force) async {
     final id = ref.read(playlistIdProvider).selectedId;
     final updatedTracks = <Track>[];
     var failed = 0;
@@ -89,7 +89,9 @@ class SelectedTracks extends _$SelectedTracks {
     ref.read(playlistsProvider.notifier).updateTracks(id, updatedTracks);
     if (failed != 0) {
       showExceptionSnackbar(title: '错误', message: '无法更新 $failed 个文件的元数据');
+      return false;
     }
+    return true;
   }
 
   Metadata _updated(Track track, int rowId, String? value) {

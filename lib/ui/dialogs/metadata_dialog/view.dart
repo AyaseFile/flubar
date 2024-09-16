@@ -88,10 +88,10 @@ class _EditMetadataDialog extends ConsumerWidget {
                   onPressed: () async {
                     final force = ref.read(settingsProvider
                         .select((state) => state.forceWriteMetadata));
-                    await ref
+                    final success = await ref
                         .read(selectedTracksProvider.notifier)
                         .updateMetadata(force);
-                    if (context.mounted) Navigator.of(context).pop();
+                    if (context.mounted && success) Navigator.of(context).pop();
                   },
                   autofocus: true,
                   child: const Text('保存'),
