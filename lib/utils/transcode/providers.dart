@@ -68,6 +68,13 @@ class TranscodeUtil extends _$TranscodeUtil
       copy: (_) {
         args.add(const CliArg(name: 'c:a', value: 'copy'));
       },
+      noMetadata: (_) {
+        args.addAll([
+          const CliArg(name: 'c:a', value: 'copy'),
+          const CliArg(name: 'bitexact'),
+          const CliArg(name: 'map_metadata', value: '-1'),
+        ]);
+      },
       mp3: (mp3) {
         args.addAll([
           const CliArg(name: 'c:a', value: 'libmp3lame'),
@@ -121,6 +128,7 @@ class TranscodeUtil extends _$TranscodeUtil
     _baseCommand = buildFfmpegCommand(ffmpegPath, options);
     _ext = options.map(
       copy: (_) => null,
+      noMetadata: (_) => null,
       mp3: (_) => '.mp3',
       flac: (_) => '.flac',
       wav: (_) => '.wav',

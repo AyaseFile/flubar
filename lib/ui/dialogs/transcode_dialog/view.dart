@@ -242,6 +242,7 @@ class _TranscodeOptionsSelector extends ConsumerWidget {
     final options = ref.watch(transcodeOptsProvider);
     return options.map(
       copy: (_) => const SizedBox.shrink(),
+      noMetadata: (_) => const SizedBox.shrink(),
       mp3: (mp3) => _SettingRow(
         label: '码率',
         child: Row(

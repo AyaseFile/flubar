@@ -32,6 +32,8 @@ class TranscodeOpts extends _$TranscodeOpts {
     switch (fmt) {
       case TranscodeFormat.copy:
         return const TranscodeOptions.copy();
+      case TranscodeFormat.noMetadata:
+        return const TranscodeOptions.noMetadata();
       case TranscodeFormat.mp3:
         return TranscodeOptions.mp3(
             bitrate: ref
@@ -73,6 +75,7 @@ class TranscodeOpts extends _$TranscodeOpts {
   void saveOptions() {
     state.map(
       copy: (_) {},
+      noMetadata: (_) {},
       mp3: (mp3) {
         ref.read(settingsProvider.notifier).updateMp3Bitrate(mp3.bitrate);
       },
