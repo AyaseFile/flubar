@@ -6,13 +6,14 @@ import 'package:flubar/ui/dialogs/input_dialog/view.dart';
 import 'package:flubar/ui/dialogs/slider_dialog/view.dart';
 import 'package:flubar/ui/dialogs/transcode_fmt_dialog/view.dart';
 import 'package:flubar/ui/dialogs/wav_encoder_dialog/view.dart';
-import 'package:flubar/ui/view/settings_view/constants.dart';
 import 'package:flubar/ui/widgets/setting_tile/view.dart';
 import 'package:flubar/utils/template/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart' hide SettingsTile;
 import 'package:get/get.dart';
+
+import 'constants.dart';
 
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});

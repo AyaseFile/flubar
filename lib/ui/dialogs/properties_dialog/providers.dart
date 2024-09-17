@@ -1,7 +1,8 @@
 import 'package:flubar/models/state/common_properties.dart';
 import 'package:flubar/ui/dialogs/metadata_dialog/providers.dart';
-import 'package:flubar/ui/dialogs/properties_dialog/constants.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import 'constants.dart';
 
 part 'providers.g.dart';
 
@@ -73,7 +74,7 @@ class CommonProperties extends _$CommonProperties {
       return '${countMap.keys.first}$suffix';
     }
 
-    final List<String> formattedValues = countMap.entries.map((entry) {
+    final formattedValues = countMap.entries.map((entry) {
       final percentage = (entry.value / totalCount * 100).toStringAsFixed(2);
       return '${entry.key}$suffix ($percentage%)';
     }).toList();
@@ -99,7 +100,7 @@ class CommonProperties extends _$CommonProperties {
       return '${countMap.keys.first}$suffix';
     }
 
-    final List<String> formattedValues = countMap.entries.map((entry) {
+    final formattedValues = countMap.entries.map((entry) {
       final percentage = (entry.value / totalCount * 100).toStringAsFixed(2);
       return '${entry.key}$suffix ($percentage%)';
     }).toList();

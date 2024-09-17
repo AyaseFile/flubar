@@ -1,6 +1,7 @@
-import 'package:flubar/ui/view/tracklist_view/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:material_table_view/material_table_view.dart';
+
+import 'constants.dart';
 
 @immutable
 class AdvancedColumn extends TableColumn {

@@ -1,5 +1,4 @@
 import 'package:flubar/ui/constants.dart';
-import 'package:flubar/ui/dialogs/properties_dialog/providers.dart';
 import 'package:flubar/ui/view/tracklist_view/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +6,7 @@ import 'package:material_table_view/material_table_view.dart';
 import 'package:material_table_view/table_view_typedefs.dart';
 
 import 'constants.dart';
+import 'providers.dart';
 
 class PropertiesDialog extends ConsumerWidget {
   const PropertiesDialog({super.key});
