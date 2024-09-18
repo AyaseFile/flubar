@@ -9,7 +9,6 @@ mixin IsolateMixin<T> {
   void Function(List<dynamic>)? isolateTask;
 
   Future<void> performTasks() async {
-    assert(isolateTask != null);
     _token = CancelToken();
     try {
       await _executeIsolates();
@@ -27,6 +26,7 @@ mixin IsolateMixin<T> {
 
   Future<void> _executeIsolates() async {
     init();
+    assert(isolateTask != null);
     final data = getData();
     final dataLength = data.length;
     final receivePort = ReceivePort();

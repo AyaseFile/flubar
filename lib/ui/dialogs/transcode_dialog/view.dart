@@ -110,7 +110,11 @@ class _TranscodeSettings extends StatelessWidget {
           child: Row(children: [
             _OutputDirectorySelector(),
             SizedBox(width: kSpaceBetweenItems),
-            _OverwriteExistingFilesCheckbox()
+            _OverwriteExistingFilesCheckbox(),
+            SizedBox(width: kSpaceBetweenItems),
+            _ClearMetadataCheckbox(),
+            SizedBox(width: kSpaceBetweenItems),
+            _RewriteMetadataCheckbox(),
           ]),
         ),
         _TranscodeOptionsSelector(),
@@ -262,6 +266,44 @@ class _OverwriteExistingFilesCheckbox extends ConsumerWidget {
   }
 }
 
+class _ClearMetadataCheckbox extends ConsumerWidget {
+  const _ClearMetadataCheckbox();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final clear = ref.watch(clearMetadataProvider);
+    return Row(
+      children: [
+        Checkbox(
+          value: clear,
+          onChanged: (value) =>
+              ref.read(clearMetadataProvider.notifier).set(value!),
+        ),
+        const Text('清除元数据'),
+      ],
+    );
+  }
+}
+
+class _RewriteMetadataCheckbox extends ConsumerWidget {
+  const _RewriteMetadataCheckbox();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final rewrite = ref.watch(rewriteMetadataProvider);
+    return Row(
+      children: [
+        Checkbox(
+          value: rewrite,
+          onChanged: (value) =>
+              ref.read(rewriteMetadataProvider.notifier).set(value!),
+        ),
+        const Text('重写元数据'),
+      ],
+    );
+  }
+}
+
 class _TranscodeOptionsSelector extends ConsumerWidget {
   const _TranscodeOptionsSelector();
 
@@ -270,7 +312,6 @@ class _TranscodeOptionsSelector extends ConsumerWidget {
     final options = ref.watch(transcodeOptsProvider);
     return options.map(
       copy: (_) => const SizedBox(height: kSettingRowVerticalPadding * 2),
-      noMetadata: (_) => const SizedBox(height: kSettingRowVerticalPadding * 2),
       mp3: (mp3) => _SettingRow(
         label: '码率',
         child: Row(

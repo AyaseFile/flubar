@@ -10,7 +10,6 @@ typedef _S = DefaultSettings;
 
 enum TranscodeFormat {
   copy('Copy'),
-  noMetadata('No Metadata'),
   mp3('MP3'),
   flac('FLAC'),
   wav('WAV');

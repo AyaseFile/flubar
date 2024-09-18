@@ -10,8 +10,6 @@ typedef _S = DefaultSettings;
 class TranscodeOptions with _$TranscodeOptions {
   const factory TranscodeOptions.copy() = CopyTranscodeOptions;
 
-  const factory TranscodeOptions.noMetadata() = NoMetadataTranscodeOptions;
-
   const factory TranscodeOptions.mp3({
     @Default(_S.kDefaultMp3Bitrate) int bitrate,
   }) = Mp3TranscodeOptions;

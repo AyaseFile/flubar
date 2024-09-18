@@ -9,6 +9,9 @@ import 'package:flubar/models/cancel_token/cancel_token.dart';
 import 'package:flubar/models/exceptions/ffmpeg_exception.dart';
 import 'package:flubar/models/extensions/ffmpeg_command.dart';
 import 'package:flubar/models/isolate/mixin.dart';
+import 'package:flubar/models/state/track.dart';
+import 'package:flubar/rust/api/lofty.dart';
+import 'package:flubar/rust/frb_generated.dart';
 import 'package:flubar/ui/dialogs/metadata_dialog/providers.dart';
 import 'package:flubar/ui/dialogs/transcode_dialog/providers.dart';
 import 'package:flubar/utils/template/providers.dart';
@@ -22,7 +25,7 @@ part 'providers.g.dart';
 
 @riverpod
 class TranscodeUtil extends _$TranscodeUtil
-    with IsolateMixin<(FfmpegCommand, String, String)> {
+    with IsolateMixin<(FfmpegCommand, Track, String)> {
   late FfmpegCommand _baseCommand;
   late String? _ext;
   late TemplateProcessor _tplProcessor;
@@ -32,10 +35,15 @@ class TranscodeUtil extends _$TranscodeUtil
   @override
   void build() {
     ref.keepAlive();
-    isolateTask ??= (List<dynamic> args) async {
+  }
+
+  void setIsolateTask({required bool rewrite}) {
+    isolateTask = (List<dynamic> args) async {
+      if (rewrite) await RustLib.init();
       final sendPort = args[0] as SendPort;
-      final transcodeData = args[1] as List<(FfmpegCommand, String, String)>;
-      for (final (baseCommand, path, outputFile) in transcodeData) {
+      final transcodeData = args[1] as List<(FfmpegCommand, Track, String)>;
+      for (final (baseCommand, track, outputFile) in transcodeData) {
+        final path = track.path;
         try {
           // 检查输出文件是否存在
           final file = File(outputFile);
@@ -54,6 +62,14 @@ class TranscodeUtil extends _$TranscodeUtil
           final process = await Process.start(cli.executable, cli.args);
           final exitCode = await process.exitCode;
           if (exitCode == 0) {
+            if (!rewrite) return;
+            final metadata = track.metadata;
+            await loftyWriteMetadata(
+                file: outputFile,
+                metadata: metadata,
+                force: true); // 清除了元数据, 需要强制写入
+            await loftyWritePicture(
+                file: outputFile, picture: metadata.frontCover, force: true);
             sendPort.send({'error': null});
           } else {
             final stderr = await process.stderr.transform(utf8.decoder).join();
@@ -66,25 +82,21 @@ class TranscodeUtil extends _$TranscodeUtil
           sendPort.send({'error': '无法转码文件 $path', 'e': e, 'st': st});
         }
       }
+      if (rewrite) RustLib.dispose();
     };
   }
 
-  static FfmpegCommand buildFfmpegCommand(
-      {required String ffmpegPath,
-      required TranscodeOptions options,
-      required bool overwriteExistingFiles}) {
+  static FfmpegCommand buildFfmpegCommand({
+    required String ffmpegPath,
+    required TranscodeOptions options,
+    required bool overwriteExistingFiles,
+    required bool clearMetadata,
+  }) {
     final args = <CliArg>[];
 
     options.map(
       copy: (_) {
         args.add(const CliArg(name: 'c:a', value: 'copy'));
-      },
-      noMetadata: (_) {
-        args.addAll([
-          const CliArg(name: 'c:a', value: 'copy'),
-          const CliArg(name: 'bitexact'),
-          const CliArg(name: 'map_metadata', value: '-1'),
-        ]);
       },
       mp3: (mp3) {
         args.addAll([
@@ -105,6 +117,14 @@ class TranscodeUtil extends _$TranscodeUtil
 
     if (overwriteExistingFiles) args.add(const CliArg(name: 'y'));
 
+    if (clearMetadata) {
+      args.addAll([
+        const CliArg(name: 'bitexact'),
+        const CliArg(name: 'map', value: '0:a'),
+        const CliArg(name: 'map_metadata', value: '-1'),
+      ]);
+    }
+
     return FfmpegCommand.simple(
       ffmpegPath: ffmpegPath,
       inputs: [],
@@ -114,16 +134,18 @@ class TranscodeUtil extends _$TranscodeUtil
   }
 
   @override
-  List<(FfmpegCommand, String, String)> getData() {
+  List<(FfmpegCommand, Track, String)> getData() {
     final selectedTracks = ref.read(selectedTracksProvider);
     return selectedTracks.map((track) {
+      final path = track.path;
+      final metadata = track.metadata;
       final dir = _useOriginalDir
-          ? p.dirname(track.path)
-          : (_customOutputDir ?? p.dirname(track.path));
+          ? p.dirname(path)
+          : (_customOutputDir ?? p.dirname(path));
       final newName = _tplProcessor.process(
-          metadata: track.metadata, path: track.path, extension: _ext);
+          metadata: metadata, path: path, extension: _ext);
       final outputFile = p.join(dir, newName);
-      return (_baseCommand, track.path, outputFile);
+      return (_baseCommand, track, outputFile);
     }).toList();
   }
 
@@ -137,14 +159,17 @@ class TranscodeUtil extends _$TranscodeUtil
     final ffmpegPath =
         ref.read(settingsProvider.select((state) => state.ffmpegPath));
     final overwrite = ref.read(overwriteExistingFilesProvider);
+    final clearMetadata = ref.read(clearMetadataProvider);
+    final rewrite = ref.read(rewriteMetadataProvider);
+    setIsolateTask(rewrite: rewrite);
     _baseCommand = buildFfmpegCommand(
       ffmpegPath: ffmpegPath,
       options: options,
       overwriteExistingFiles: overwrite,
+      clearMetadata: clearMetadata,
     );
     _ext = options.map(
       copy: (_) => null,
-      noMetadata: (_) => null,
       mp3: (_) => '.mp3',
       flac: (_) => '.flac',
       wav: (_) => '.wav',

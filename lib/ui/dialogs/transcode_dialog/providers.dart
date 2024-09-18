@@ -32,8 +32,6 @@ class TranscodeOpts extends _$TranscodeOpts {
     switch (fmt) {
       case TranscodeFormat.copy:
         return const TranscodeOptions.copy();
-      case TranscodeFormat.noMetadata:
-        return const TranscodeOptions.noMetadata();
       case TranscodeFormat.mp3:
         return TranscodeOptions.mp3(
             bitrate: ref
@@ -75,7 +73,6 @@ class TranscodeOpts extends _$TranscodeOpts {
   void saveOptions() {
     state.map(
       copy: (_) {},
-      noMetadata: (_) {},
       mp3: (mp3) {
         ref.read(settingsProvider.notifier).updateMp3Bitrate(mp3.bitrate);
       },
@@ -99,10 +96,12 @@ class TranscodeCmd extends _$TranscodeCmd {
     final ffmpegPath =
         ref.watch(settingsProvider.select((state) => state.ffmpegPath));
     final overwrite = ref.watch(overwriteExistingFilesProvider);
+    final clearMetadata = ref.watch(clearMetadataProvider);
     final command = TranscodeUtil.buildFfmpegCommand(
       ffmpegPath: ffmpegPath,
       options: options,
       overwriteExistingFiles: overwrite,
+      clearMetadata: clearMetadata,
     ).copyWith(
       inputs: [FfmpegInput.asset('{input_file}')],
       outputFilepath: '{output_file}',
@@ -180,4 +179,38 @@ class OutputFileNameTpl extends _$OutputFileNameTpl {
       ref.watch(settingsProvider.select((state) => state.fileNameTpl));
 
   void setTpl(String tpl) => state = tpl;
+}
+
+@riverpod
+class ClearMetadata extends _$ClearMetadata {
+  @override
+  bool build() => true;
+
+  void set(bool value) => value ? enable() : disable();
+
+  void enable() {
+    state = true;
+  }
+
+  void disable() {
+    state = false;
+    ref.read(rewriteMetadataProvider.notifier).disable();
+  }
+}
+
+@riverpod
+class RewriteMetadata extends _$RewriteMetadata {
+  @override
+  bool build() => true;
+
+  void set(bool value) => value ? enable() : disable();
+
+  void enable() {
+    state = true;
+    ref.read(clearMetadataProvider.notifier).enable();
+  }
+
+  void disable() {
+    state = false;
+  }
 }
