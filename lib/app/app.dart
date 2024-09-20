@@ -19,9 +19,10 @@ class FlubarApp extends ConsumerWidget {
         brightness: Brightness.dark,
         colorSchemeSeed: Colors.lightBlue,
       ),
-      themeMode: ref.watch(settingsProvider.select((state) => state.darkMode))
-          ? ThemeMode.dark
-          : ThemeMode.light,
+      themeMode:
+          ref.watch(generalSettingsProvider.select((state) => state.darkMode))
+              ? ThemeMode.dark
+              : ThemeMode.light,
       home: const HomeView(),
     );
   }

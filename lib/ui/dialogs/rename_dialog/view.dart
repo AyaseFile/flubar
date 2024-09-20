@@ -22,8 +22,8 @@ class _RenameDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final length = ref.watch(selectedTracksProvider).length;
-    final tpl =
-        ref.watch(settingsProvider.select((state) => state.fileNameTpl));
+    final tpl = ref
+        .watch(metadataSettingsProvider.select((state) => state.fileNameTpl));
     final renameState = ref.watch(renameProvider);
     return AlertDialog(
       title: const Text('重命名'),

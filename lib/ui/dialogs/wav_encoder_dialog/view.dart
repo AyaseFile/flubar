@@ -35,7 +35,9 @@ class WavEncoderDialog extends ConsumerWidget {
         TextButton(
           onPressed: () {
             final encoder = ref.read(encoderSelectionProvider);
-            ref.read(settingsProvider.notifier).updateWavEncoder(encoder);
+            ref
+                .read(transcodeSettingsProvider.notifier)
+                .updateWavEncoder(encoder);
             Navigator.pop(context, encoder);
           },
           autofocus: true,

@@ -36,23 +36,50 @@ enum FfmpegEncoder {
 }
 
 @freezed
-class SettingsModel with _$SettingsModel {
-  const factory SettingsModel({
+class GeneralSettingsModel with _$GeneralSettingsModel {
+  const factory GeneralSettingsModel({
     @Default(_S.kDarkMode) bool darkMode,
-    @Default(_S.kFfmpegPath) String ffmpegPath,
-    @Default(_S.kFileNameTpl) String fileNameTpl,
+  }) = _GeneralSettings;
+
+  factory GeneralSettingsModel.fromJson(Map<String, dynamic> json) =>
+      _$GeneralSettingsModelFromJson(json);
+}
+
+@freezed
+class MetadataSettingsModel with _$MetadataSettingsModel {
+  const factory MetadataSettingsModel({
     @Default(_S.kForceWriteMetadata) bool forceWriteMetadata,
-    @Default(_S.kTranscodeFormat) TranscodeFormat transcodeFormat,
+    @Default(_S.kFileNameTpl) String fileNameTpl,
+  }) = _MetadataSettings;
+
+  factory MetadataSettingsModel.fromJson(Map<String, dynamic> json) =>
+      _$MetadataSettingsModelFromJson(json);
+}
+
+@freezed
+class TranscodeSettingsModel with _$TranscodeSettingsModel {
+  const factory TranscodeSettingsModel({
+    @Default(_S.kFfmpegPath) String ffmpegPath,
     @Default(_S.kIsolateCount) int isolateCount,
+    @Default(_S.kTranscodeFormat) TranscodeFormat transcodeFormat,
     @Default(_S.kDefaultMp3Bitrate) int mp3Bitrate,
     @Default(_S.kDefaultFlacCompressionLevel) int flacCompressionLevel,
     @Default(_S.kDefaultWavEncoder) FfmpegEncoder wavEncoder,
     @Default(_S.kRememberTranscodeChoice) bool rememberTranscodeChoice,
     @Default(_S.kOverwriteExistingFiles) bool overwriteExistingFiles,
-    @Default(_S.kWindowWidth) double windowWidth,
-    @Default(_S.kWindowHeight) double windowHeight,
-  }) = _SettingsModel;
+  }) = _TranscodeSettings;
 
-  factory SettingsModel.fromJson(Map<String, dynamic> json) =>
-      _$SettingsModelFromJson(json);
+  factory TranscodeSettingsModel.fromJson(Map<String, dynamic> json) =>
+      _$TranscodeSettingsModelFromJson(json);
+}
+
+@freezed
+class WindowSettingsModel with _$WindowSettingsModel {
+  const factory WindowSettingsModel({
+    @Default(_S.kWindowWidth) double width,
+    @Default(_S.kWindowHeight) double height,
+  }) = _WindowSettings;
+
+  factory WindowSettingsModel.fromJson(Map<String, dynamic> json) =>
+      _$WindowSettingsModelFromJson(json);
 }

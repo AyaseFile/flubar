@@ -1,14 +1,15 @@
 import 'package:flubar/app/settings/providers.dart';
-import 'package:flubar/models/state/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart' as settings_ui;
 
-class SettingsTile<T> extends settings_ui.AbstractSettingsTile {
+class SettingsTile<N extends Notifier<T>, T, V>
+    extends settings_ui.AbstractSettingsTile {
   final String title;
   final String? description;
   final Widget? leading;
-  final T Function(SettingsModel) selector;
+  final NotifierProvider<N, T> provider;
+  final V Function(T) selector;
   final void Function(BuildContext)? onPressed;
 
   const SettingsTile({
@@ -16,6 +17,7 @@ class SettingsTile<T> extends settings_ui.AbstractSettingsTile {
     required this.title,
     this.description,
     this.leading,
+    required this.provider,
     required this.selector,
     this.onPressed,
   });
@@ -23,7 +25,7 @@ class SettingsTile<T> extends settings_ui.AbstractSettingsTile {
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, ref, _) {
-      final value = ref.watch(settingsProvider.select(selector));
+      final value = ref.watch(provider.select(selector));
       return settings_ui.SettingsTile(
         title: Text(title, style: const TextStyle(fontSize: 14)),
         description: description != null
@@ -42,7 +44,6 @@ class ExampleSettingsTile extends settings_ui.AbstractSettingsTile {
   final String title;
   final String? description;
   final Widget? leading;
-  final String Function(SettingsModel) selector;
   final String Function(String)? processValue;
 
   const ExampleSettingsTile({
@@ -50,7 +51,6 @@ class ExampleSettingsTile extends settings_ui.AbstractSettingsTile {
     required this.title,
     this.description,
     this.leading,
-    required this.selector,
     this.processValue,
   });
 
@@ -58,7 +58,8 @@ class ExampleSettingsTile extends settings_ui.AbstractSettingsTile {
   Widget build(BuildContext context) {
     return Consumer(builder: (context, ref, _) {
       final value = () {
-        final value = ref.watch(settingsProvider.select(selector));
+        final value = ref.watch(
+            metadataSettingsProvider.select((state) => state.fileNameTpl));
         return processValue != null ? processValue!(value) : value;
       }();
       return settings_ui.SettingsTile(
@@ -75,16 +76,19 @@ class ExampleSettingsTile extends settings_ui.AbstractSettingsTile {
   }
 }
 
-class SwitchSettingsTile extends settings_ui.AbstractSettingsTile {
+class SwitchSettingsTile<N extends Notifier<T>, T>
+    extends settings_ui.AbstractSettingsTile {
   final String title;
   final Widget? leading;
-  final bool Function(SettingsModel) selector;
+  final NotifierProvider<N, T> provider;
+  final bool Function(T) selector;
   final void Function(bool)? onToggle;
 
   const SwitchSettingsTile({
     super.key,
     required this.title,
     this.leading,
+    required this.provider,
     required this.selector,
     this.onToggle,
   });
@@ -92,7 +96,7 @@ class SwitchSettingsTile extends settings_ui.AbstractSettingsTile {
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, ref, _) {
-      final value = ref.watch(settingsProvider.select(selector));
+      final value = ref.watch(provider.select(selector));
       return settings_ui.SettingsTile.switchTile(
         initialValue: value,
         onToggle: onToggle,

@@ -63,12 +63,12 @@ class _EditMetadataDialog extends ConsumerWidget {
                           ListTile(
                             title: const Text('强制写入元数据'),
                             trailing: Consumer(builder: (context, ref, _) {
-                              final force = ref.watch(settingsProvider
+                              final force = ref.watch(metadataSettingsProvider
                                   .select((state) => state.forceWriteMetadata));
                               return Checkbox(
                                 value: force,
                                 onChanged: (value) => ref
-                                    .read(settingsProvider.notifier)
+                                    .read(metadataSettingsProvider.notifier)
                                     .updateForceWriteMetadata(value!),
                               );
                             }),
@@ -86,7 +86,7 @@ class _EditMetadataDialog extends ConsumerWidget {
                 const SizedBox(width: 8),
                 TextButton(
                   onPressed: () async {
-                    final force = ref.read(settingsProvider
+                    final force = ref.read(metadataSettingsProvider
                         .select((state) => state.forceWriteMetadata));
                     final success = await ref
                         .read(selectedTracksProvider.notifier)

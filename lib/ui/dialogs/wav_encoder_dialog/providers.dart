@@ -8,7 +8,7 @@ part 'providers.g.dart';
 class EncoderSelection extends _$EncoderSelection {
   @override
   FfmpegEncoder build() =>
-      ref.watch(settingsProvider.select((state) => state.wavEncoder));
+      ref.watch(transcodeSettingsProvider.select((state) => state.wavEncoder));
 
   void select(FfmpegEncoder value) => state = value;
 }

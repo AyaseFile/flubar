@@ -35,8 +35,8 @@ class TplUtil extends _$TplUtil with IsolateMixin<(String, String)> {
         }
       }
     };
-    return TemplateProcessor(
-        ref.watch(settingsProvider.select((state) => state.fileNameTpl)));
+    return TemplateProcessor(ref
+        .watch(metadataSettingsProvider.select((state) => state.fileNameTpl)));
   }
 
   void setTpl(String tpl) {
@@ -44,8 +44,8 @@ class TplUtil extends _$TplUtil with IsolateMixin<(String, String)> {
   }
 
   void resetTpl() {
-    state = TemplateProcessor(
-        ref.read(settingsProvider.select((state) => state.fileNameTpl)));
+    state = TemplateProcessor(ref
+        .read(metadataSettingsProvider.select((state) => state.fileNameTpl)));
   }
 
   @override
@@ -61,7 +61,7 @@ class TplUtil extends _$TplUtil with IsolateMixin<(String, String)> {
 
   @override
   int getIsolateCount() =>
-      ref.read(settingsProvider.select((state) => state.isolateCount));
+      ref.read(transcodeSettingsProvider.select((state) => state.isolateCount));
 
   @override
   void init() {}

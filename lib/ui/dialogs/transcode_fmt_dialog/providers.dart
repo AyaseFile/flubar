@@ -7,8 +7,8 @@ part 'providers.g.dart';
 @riverpod
 class Selection extends _$Selection {
   @override
-  TranscodeFormat build() =>
-      ref.watch(settingsProvider.select((state) => state.transcodeFormat));
+  TranscodeFormat build() => ref.watch(
+      transcodeSettingsProvider.select((state) => state.transcodeFormat));
 
   void select(TranscodeFormat value) => state = value;
 }

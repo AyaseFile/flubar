@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/models/extensions/metadata_extension.dart';
+import 'package:flubar/models/state/settings.dart';
 import 'package:flubar/ui/dialogs/input_dialog/view.dart';
 import 'package:flubar/ui/dialogs/slider_dialog/view.dart';
 import 'package:flubar/ui/dialogs/transcode_fmt_dialog/view.dart';
@@ -49,39 +50,43 @@ class _SettingsListView extends ConsumerWidget {
         SettingsSection(
           title: const Text('常规'),
           tiles: [
-            SwitchSettingsTile(
+            SwitchSettingsTile<GeneralSettings, GeneralSettingsModel>(
               title: '深色模式',
               leading: const Icon(Icons.dark_mode),
+              provider: generalSettingsProvider,
               selector: (state) => state.darkMode,
-              onToggle: (value) =>
-                  ref.read(settingsProvider.notifier).updateDarkMode(value),
+              onToggle: (value) => ref
+                  .read(generalSettingsProvider.notifier)
+                  .updateDarkMode(value),
             ),
           ],
         ),
         SettingsSection(
           title: const Text('元数据'),
           tiles: [
-            SwitchSettingsTile(
+            SwitchSettingsTile<MetadataSettings, MetadataSettingsModel>(
               title: '强制写入元数据',
               leading: const Icon(Icons.edit),
+              provider: metadataSettingsProvider,
               selector: (state) => state.forceWriteMetadata,
               onToggle: (value) => ref
-                  .read(settingsProvider.notifier)
+                  .read(metadataSettingsProvider.notifier)
                   .updateForceWriteMetadata(value),
             ),
-            SettingsTile<String>(
+            SettingsTile<MetadataSettings, MetadataSettingsModel, String>(
               title: '文件名模板',
               description:
                   '可用项: %filename%, %title%, %artist%, %album%, %albumartist%, %tracknumber%, %tracktotal%, %discnumber%, %disctotal%, %date%, %genre%',
               leading: const Icon(Icons.text_fields),
+              provider: metadataSettingsProvider,
               selector: (state) => state.fileNameTpl,
               onPressed: (_) => Get.dialog(
                 InputDialog(
                   dialogTitle: '文件名模板',
-                  initialValue: ref.read(
-                      settingsProvider.select((state) => state.fileNameTpl)),
+                  initialValue: ref.read(metadataSettingsProvider
+                      .select((state) => state.fileNameTpl)),
                   onConfirm: (value) => ref
-                      .read(settingsProvider.notifier)
+                      .read(metadataSettingsProvider.notifier)
                       .updateFileNameTpl(value),
                 ),
               ),
@@ -93,7 +98,6 @@ class _SettingsListView extends ConsumerWidget {
                 'path': kExampleTrack.path,
               }.toString(),
               leading: const Icon(Icons.text_fields, color: Colors.transparent),
-              selector: (state) => state.fileNameTpl,
               processValue: (value) => ref.read(tplUtilProvider).process(
                   metadata: kExampleTrack.metadata, path: kExampleTrack.path),
             ),
@@ -102,24 +106,26 @@ class _SettingsListView extends ConsumerWidget {
         SettingsSection(
           title: const Text('转码'),
           tiles: [
-            SettingsTile<String>(
+            SettingsTile<TranscodeSettings, TranscodeSettingsModel, String>(
               title: 'FFmpeg 路径',
               leading: const Icon(Icons.insert_drive_file),
+              provider: transcodeSettingsProvider,
               selector: (state) => state.ffmpegPath,
               onPressed: (_) => Get.dialog(
                 InputDialog(
                   dialogTitle: 'FFmpeg 路径',
-                  initialValue: ref.read(
-                      settingsProvider.select((state) => state.ffmpegPath)),
+                  initialValue: ref.read(transcodeSettingsProvider
+                      .select((state) => state.ffmpegPath)),
                   onConfirm: (value) => ref
-                      .read(settingsProvider.notifier)
+                      .read(transcodeSettingsProvider.notifier)
                       .updateFfmpegPath(value),
                 ),
               ),
             ),
-            SettingsTile<int>(
+            SettingsTile<TranscodeSettings, TranscodeSettingsModel, int>(
               title: 'Isolate 数量',
               leading: const Icon(Icons.device_hub),
+              provider: transcodeSettingsProvider,
               selector: (state) => state.isolateCount,
               onPressed: (_) {
                 final int maxIsolates = Platform.numberOfProcessors;
@@ -129,25 +135,27 @@ class _SettingsListView extends ConsumerWidget {
                     min: 1,
                     max: maxIsolates.toDouble(),
                     divisions: maxIsolates - 1,
-                    initialValue: ref.read(
-                        settingsProvider.select((state) => state.isolateCount)),
+                    initialValue: ref.read(transcodeSettingsProvider
+                        .select((state) => state.isolateCount)),
                     onChanged: (value) => ref
-                        .read(settingsProvider.notifier)
+                        .read(transcodeSettingsProvider.notifier)
                         .updateIsolateCount(value),
                     labelSuffix: ' 个',
                   ),
                 );
               },
             ),
-            SettingsTile<String>(
+            SettingsTile<TranscodeSettings, TranscodeSettingsModel, String>(
               title: '转码格式',
               leading: const Icon(Icons.audio_file),
+              provider: transcodeSettingsProvider,
               selector: (state) => state.transcodeFormat.displayName,
               onPressed: (_) => Get.dialog(const TranscodeFormatDialog()),
             ),
-            SettingsTile<int>(
+            SettingsTile<TranscodeSettings, TranscodeSettingsModel, int>(
               title: 'MP3 比特率',
               leading: const Icon(Icons.equalizer, color: Colors.transparent),
+              provider: transcodeSettingsProvider,
               selector: (state) => state.mp3Bitrate,
               onPressed: (_) => Get.dialog(
                 SliderDialog(
@@ -155,18 +163,19 @@ class _SettingsListView extends ConsumerWidget {
                   min: 64,
                   max: 320,
                   divisions: 256 ~/ 64,
-                  initialValue: ref.read(
-                      settingsProvider.select((state) => state.mp3Bitrate)),
+                  initialValue: ref.read(transcodeSettingsProvider
+                      .select((state) => state.mp3Bitrate)),
                   onChanged: (value) => ref
-                      .read(settingsProvider.notifier)
+                      .read(transcodeSettingsProvider.notifier)
                       .updateMp3Bitrate(value),
                   labelSuffix: ' kbps',
                 ),
               ),
             ),
-            SettingsTile<int>(
+            SettingsTile<TranscodeSettings, TranscodeSettingsModel, int>(
               title: 'FLAC 压缩等级',
               leading: const Icon(Icons.equalizer, color: Colors.transparent),
+              provider: transcodeSettingsProvider,
               selector: (state) => state.flacCompressionLevel,
               onPressed: (_) => Get.dialog(
                 SliderDialog(
@@ -174,18 +183,19 @@ class _SettingsListView extends ConsumerWidget {
                   min: 0,
                   max: 8,
                   divisions: 8,
-                  initialValue: ref.read(settingsProvider
+                  initialValue: ref.read(transcodeSettingsProvider
                       .select((state) => state.flacCompressionLevel)),
                   onChanged: (value) => ref
-                      .read(settingsProvider.notifier)
+                      .read(transcodeSettingsProvider.notifier)
                       .updateFlacCompressionLevel(value),
                 ),
               ),
             ),
             // wavEncoder
-            SettingsTile<String>(
+            SettingsTile<TranscodeSettings, TranscodeSettingsModel, String>(
               title: 'WAV 编码器',
               leading: const Icon(Icons.equalizer, color: Colors.transparent),
+              provider: transcodeSettingsProvider,
               selector: (state) => state.wavEncoder.displayName,
               onPressed: (_) => Get.dialog(const WavEncoderDialog()),
             ),

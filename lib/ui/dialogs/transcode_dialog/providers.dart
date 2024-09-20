@@ -12,15 +12,15 @@ part 'providers.g.dart';
 @riverpod
 class TranscodeFmt extends _$TranscodeFmt {
   @override
-  TranscodeFormat build() =>
-      ref.watch(settingsProvider.select((state) => state.transcodeFormat));
+  TranscodeFormat build() => ref.watch(
+      transcodeSettingsProvider.select((state) => state.transcodeFormat));
 
   void setFormat(TranscodeFormat format) {
     state = format;
   }
 
   void saveFormat() {
-    ref.read(settingsProvider.notifier).updateTranscodeFormat(state);
+    ref.read(transcodeSettingsProvider.notifier).updateTranscodeFormat(state);
   }
 }
 
@@ -34,36 +34,38 @@ class TranscodeOpts extends _$TranscodeOpts {
         return const TranscodeOptions.copy();
       case TranscodeFormat.mp3:
         return TranscodeOptions.mp3(
-            bitrate: ref
-                .watch(settingsProvider.select((state) => state.mp3Bitrate)));
+            bitrate: ref.watch(
+                transcodeSettingsProvider.select((state) => state.mp3Bitrate)));
       case TranscodeFormat.flac:
         return TranscodeOptions.flac(
-            compressionLevel: ref.watch(settingsProvider
+            compressionLevel: ref.watch(transcodeSettingsProvider
                 .select((state) => state.flacCompressionLevel)));
       case TranscodeFormat.wav:
         return TranscodeOptions.wav(
-            encoder: ref
-                .watch(settingsProvider.select((state) => state.wavEncoder)));
+            encoder: ref.watch(
+                transcodeSettingsProvider.select((state) => state.wavEncoder)));
     }
   }
 
   void setMp3Options({int? bitrate}) {
     state = TranscodeOptions.mp3(
         bitrate: bitrate ??
-            ref.read(settingsProvider.select((state) => state.mp3Bitrate)));
+            ref.read(
+                transcodeSettingsProvider.select((state) => state.mp3Bitrate)));
   }
 
   void setFlacOptions({int? compressionLevel}) {
     state = TranscodeOptions.flac(
         compressionLevel: compressionLevel ??
-            ref.read(settingsProvider
+            ref.read(transcodeSettingsProvider
                 .select((state) => state.flacCompressionLevel)));
   }
 
   void setWavOptions({FfmpegEncoder? encoder}) {
     state = TranscodeOptions.wav(
         encoder: encoder ??
-            ref.read(settingsProvider.select((state) => state.wavEncoder)));
+            ref.read(
+                transcodeSettingsProvider.select((state) => state.wavEncoder)));
   }
 
   void setOptions(TranscodeOptions options) {
@@ -74,15 +76,19 @@ class TranscodeOpts extends _$TranscodeOpts {
     state.map(
       copy: (_) {},
       mp3: (mp3) {
-        ref.read(settingsProvider.notifier).updateMp3Bitrate(mp3.bitrate);
+        ref
+            .read(transcodeSettingsProvider.notifier)
+            .updateMp3Bitrate(mp3.bitrate);
       },
       flac: (flac) {
         ref
-            .read(settingsProvider.notifier)
+            .read(transcodeSettingsProvider.notifier)
             .updateFlacCompressionLevel(flac.compressionLevel);
       },
       wav: (wav) {
-        ref.read(settingsProvider.notifier).updateWavEncoder(wav.encoder);
+        ref
+            .read(transcodeSettingsProvider.notifier)
+            .updateWavEncoder(wav.encoder);
       },
     );
   }
@@ -93,8 +99,8 @@ class TranscodeCmd extends _$TranscodeCmd {
   @override
   String build() {
     final options = ref.watch(transcodeOptsProvider);
-    final ffmpegPath =
-        ref.watch(settingsProvider.select((state) => state.ffmpegPath));
+    final ffmpegPath = ref
+        .watch(transcodeSettingsProvider.select((state) => state.ffmpegPath));
     final overwrite = ref.watch(overwriteExistingFilesProvider);
     final clearMetadata = ref.watch(clearMetadataProvider);
     final command = TranscodeUtil.buildFfmpegCommand(
@@ -163,20 +169,21 @@ class TranscodeFailedCount extends _$TranscodeFailedCount {
 @riverpod
 class OverwriteExistingFiles extends _$OverwriteExistingFiles {
   @override
-  bool build() => ref
-      .watch(settingsProvider.select((state) => state.overwriteExistingFiles));
+  bool build() => ref.watch(transcodeSettingsProvider
+      .select((state) => state.overwriteExistingFiles));
 
   void toggle() => state = !state;
 
-  void save() =>
-      ref.read(settingsProvider.notifier).updateOverwriteExistingFiles(state);
+  void save() => ref
+      .read(transcodeSettingsProvider.notifier)
+      .updateOverwriteExistingFiles(state);
 }
 
 @riverpod
 class OutputFileNameTpl extends _$OutputFileNameTpl {
   @override
   String build() =>
-      ref.watch(settingsProvider.select((state) => state.fileNameTpl));
+      ref.watch(metadataSettingsProvider.select((state) => state.fileNameTpl));
 
   void setTpl(String tpl) => state = tpl;
 }

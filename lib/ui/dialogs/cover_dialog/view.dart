@@ -64,7 +64,7 @@ class CoverDialog extends ConsumerWidget {
                 const SizedBox(width: 8),
                 TextButton(
                   onPressed: () async {
-                    final force = ref.read(settingsProvider
+                    final force = ref.read(metadataSettingsProvider
                         .select((state) => state.forceWriteMetadata));
                     if (isBatch) {
                       await ref

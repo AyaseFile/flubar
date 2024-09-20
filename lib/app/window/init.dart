@@ -2,12 +2,12 @@ import 'dart:ui';
 
 import 'package:window_manager/window_manager.dart';
 
-Future<void> initWindow(Size size) async {
+Future<void> initWindow(double width, double height) async {
   await windowManager.ensureInitialized();
 
   windowManager.waitUntilReadyToShow(
       WindowOptions(
-        size: size,
+        size: Size(width, height),
         minimumSize: const Size(700, 500),
         center: true,
       ), () async {

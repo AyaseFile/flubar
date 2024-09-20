@@ -1,23 +1,21 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:flubar/app/app.dart';
-import 'package:flubar/app/settings/constants.dart';
 import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/app/storage/providers.dart';
 import 'package:flubar/app/talker.dart';
 import 'package:flubar/app/window/init.dart';
+import 'package:flubar/models/state/settings.dart';
 import 'package:flubar/models/state/storage.dart';
 import 'package:flubar/ui/widgets/player_widget/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:window_size/window_size.dart';
-
-typedef _S = DefaultSettings;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,32 +35,32 @@ void main() async {
 
   final dataPath = (await getApplicationSupportDirectory()).path;
   final storage = StorageModel.fromDataPath(dataPath);
-  final settingsString = () {
-    try {
-      return File(storage.settingsPath).readAsStringSync();
-    } catch (e) {
-      globalTalker.handle(e, null, '无法读取设置文件: ${storage.settingsPath}');
-      return '{}';
-    }
-  }();
+  final box = await Hive.openBox('settings', path: dataPath);
 
-  final loadedWidth = jsonDecode(settingsString)['windowWidth'] as double?;
-  final loadedHeight = jsonDecode(settingsString)['windowHeight'] as double?;
-  var windowSize = const Size(_S.kWindowWidth, _S.kWindowHeight);
-  if (loadedWidth != null && loadedHeight != null) {
+  var windowSettings = const WindowSettingsModel();
+  final str = (box.get('window') as String?) ?? '{}';
+  try {
+    final loadedSettings = WindowSettingsModel.fromJson(
+      jsonDecode(str) as Map<String, dynamic>,
+    );
     final screen = await getCurrentScreen();
     if (screen != null) {
       final width = screen.visibleFrame.width;
       final height = screen.visibleFrame.height;
-      if (loadedWidth > 0 &&
-          loadedWidth < width &&
-          loadedHeight > 0 &&
-          loadedHeight < height) {
-        windowSize = Size(loadedWidth, loadedHeight);
+      if (loadedSettings.width > 0 &&
+          loadedSettings.width < width &&
+          loadedSettings.height > 0 &&
+          loadedSettings.height < height) {
+        windowSettings = windowSettings.copyWith(
+          width: loadedSettings.width,
+          height: loadedSettings.height,
+        );
       }
     }
+  } catch (e) {
+    globalTalker.handle(e, null, '无法解析窗口设置: $str');
   }
-  await initWindow(windowSize);
+  await initWindow(windowSettings.width, windowSettings.height);
 
   JustAudioMediaKit.ensureInitialized(
       linux: true, windows: false, macOS: false, android: false, iOS: false);
@@ -70,7 +68,8 @@ void main() async {
     ProviderScope(
       overrides: [
         storageProvider.overrideWithValue(storage),
-        settingsStringProvider.overrideWithValue(settingsString),
+        settingsBoxProvider.overrideWithValue(box),
+        windowSettingsLoadedProvider.overrideWithValue(windowSettings),
       ],
       child: const FlubarApp(),
     ),

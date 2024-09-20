@@ -68,7 +68,7 @@ class _TranscodeDialog extends ConsumerWidget {
           onPressed: transcodeState.isLoading
               ? () => ref.read(transcodeProvider.notifier).cancelTranscode()
               : () async {
-                  final remember = ref.read(settingsProvider
+                  final remember = ref.read(transcodeSettingsProvider
                       .select((state) => state.rememberTranscodeChoice));
                   if (remember) {
                     ref.read(transcodeFmtProvider.notifier).saveFormat();
@@ -189,14 +189,14 @@ class _RememberChoiceCheckbox extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final remember = ref.watch(
-        settingsProvider.select((state) => state.rememberTranscodeChoice));
+    final remember = ref.watch(transcodeSettingsProvider
+        .select((state) => state.rememberTranscodeChoice));
     return Row(
       children: [
         Checkbox(
           value: remember,
           onChanged: (_) => ref
-              .read(settingsProvider.notifier)
+              .read(transcodeSettingsProvider.notifier)
               .updateRememberTranscodeChoice(!remember),
         ),
         const Text('记住选择'),

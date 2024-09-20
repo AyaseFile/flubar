@@ -151,13 +151,13 @@ class TranscodeUtil extends _$TranscodeUtil
 
   @override
   int getIsolateCount() =>
-      ref.read(settingsProvider.select((state) => state.isolateCount));
+      ref.read(transcodeSettingsProvider.select((state) => state.isolateCount));
 
   @override
   void init() {
     final options = ref.read(transcodeOptsProvider);
     final ffmpegPath =
-        ref.read(settingsProvider.select((state) => state.ffmpegPath));
+        ref.read(transcodeSettingsProvider.select((state) => state.ffmpegPath));
     final overwrite = ref.read(overwriteExistingFilesProvider);
     final clearMetadata = ref.read(clearMetadataProvider);
     final rewrite = ref.read(rewriteMetadataProvider);

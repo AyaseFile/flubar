@@ -35,7 +35,9 @@ class TranscodeFormatDialog extends ConsumerWidget {
         TextButton(
           onPressed: () {
             final fmt = ref.read(selectionProvider);
-            ref.read(settingsProvider.notifier).updateTranscodeFormat(fmt);
+            ref
+                .read(transcodeSettingsProvider.notifier)
+                .updateTranscodeFormat(fmt);
             Navigator.of(context).pop();
           },
           autofocus: true,

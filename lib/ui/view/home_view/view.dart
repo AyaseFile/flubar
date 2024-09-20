@@ -21,7 +21,7 @@ class HomeView extends ConsumerStatefulWidget {
 }
 
 class _HomeViewState extends ConsumerState<HomeView> with WindowListener {
-  late Size windowSize;
+  late Size _windowSize;
 
   @override
   void initState() {
@@ -35,7 +35,7 @@ class _HomeViewState extends ConsumerState<HomeView> with WindowListener {
       } catch (e) {
         globalTalker.handle(e, null, '无法初始化 Rust Api');
       }
-      windowSize = await windowManager.getSize();
+      _windowSize = await windowManager.getSize();
     });
   }
 
@@ -46,15 +46,13 @@ class _HomeViewState extends ConsumerState<HomeView> with WindowListener {
   }
 
   @override
-  void onWindowClose() {
-    ref.read(settingsProvider.notifier).updateWindowSize(windowSize);
-    ref.read(settingsProvider.notifier).saveSettings();
-    super.onWindowClose();
+  void onWindowResize() async {
+    _windowSize = await windowManager.getSize();
   }
 
   @override
-  void onWindowResize() async {
-    windowSize = await windowManager.getSize();
+  void onWindowClose() {
+    ref.read(windowSettingsProvider.notifier).updateWindowSize(_windowSize);
   }
 
   @override
