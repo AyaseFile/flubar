@@ -74,6 +74,17 @@ class TranscodeSettingsModel with _$TranscodeSettingsModel {
 }
 
 @freezed
+class TranscodeWarningsModel with _$TranscodeWarningsModel {
+  const factory TranscodeWarningsModel({
+    @Default(_S.kWarningToLossy) bool toLossy,
+    @Default(_S.kWarningFloatToInt) bool floatToInt,
+  }) = _TranscodeWarnings;
+
+  factory TranscodeWarningsModel.fromJson(Map<String, dynamic> json) =>
+      _$TranscodeWarningsModelFromJson(json);
+}
+
+@freezed
 class WindowSettingsModel with _$WindowSettingsModel {
   const factory WindowSettingsModel({
     @Default(_S.kWindowWidth) double width,

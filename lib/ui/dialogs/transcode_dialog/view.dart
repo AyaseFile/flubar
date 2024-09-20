@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/models/state/settings.dart';
 import 'package:flubar/ui/snackbar/view.dart';
+import 'package:flubar/utils/warnings/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -26,7 +27,7 @@ class _TranscodeDialog extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final transcodeState = ref.watch(transcodeProvider);
     return AlertDialog(
-      title: const Text('转码'),
+      title: const Row(children: [Text('转码'), Spacer(), _WarningIcon()]),
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -378,6 +379,21 @@ class _TranscodeOptionsSelector extends ConsumerWidget {
         ),
       ),
     );
+  }
+}
+
+class _WarningIcon extends ConsumerWidget {
+  const _WarningIcon();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final warning = ref.watch(transcodeWarningUtilProvider);
+    return warning.isEmpty
+        ? const SizedBox.shrink()
+        : Tooltip(
+            message: warning,
+            child: const Icon(Icons.warning, color: Colors.orange),
+          );
   }
 }
 

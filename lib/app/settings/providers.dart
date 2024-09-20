@@ -168,6 +168,45 @@ class TranscodeSettings extends _$TranscodeSettings {
       ref.read(settingsProvider.notifier).saveJson('transcode', state.toJson());
 }
 
+@Riverpod(keepAlive: true)
+class TranscodeWarnings extends _$TranscodeWarnings {
+  @override
+  TranscodeWarningsModel build() {
+    final settings = (() {
+      final str =
+          ref.read(settingsProvider.notifier).getJson('transcodeWarnings');
+      const defaultSettings = TranscodeWarningsModel();
+      try {
+        final loadedSettings = TranscodeWarningsModel.fromJson(
+          jsonDecode(str) as Map<String, dynamic>,
+        );
+        return defaultSettings.copyWith(
+          toLossy: loadedSettings.toLossy,
+          floatToInt: loadedSettings.floatToInt,
+        );
+      } catch (e) {
+        globalTalker.handle(e, null, '无法解析转码警告设置: $str');
+        return defaultSettings;
+      }
+    })();
+    return settings;
+  }
+
+  void updateToLossy(bool toLossy) {
+    state = state.copyWith(toLossy: toLossy);
+    _save();
+  }
+
+  void updateFloatToInt(bool floatToInt) {
+    state = state.copyWith(floatToInt: floatToInt);
+    _save();
+  }
+
+  void _save() => ref
+      .read(settingsProvider.notifier)
+      .saveJson('transcodeWarnings', state.toJson());
+}
+
 @riverpod
 WindowSettingsModel windowSettingsLoaded(WindowSettingsLoadedRef ref) =>
     throw UnimplementedError();

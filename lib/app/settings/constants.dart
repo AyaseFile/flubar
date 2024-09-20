@@ -12,6 +12,8 @@ class DefaultSettings {
   static const kDefaultWavEncoder = FfmpegEncoder.pcm_s16le;
   static const kRememberTranscodeChoice = true;
   static const kOverwriteExistingFiles = false;
+  static const kWarningToLossy = false;
+  static const kWarningFloatToInt = true;
   static const kWindowWidth = 800.0;
   static const kWindowHeight = 600.0;
 }

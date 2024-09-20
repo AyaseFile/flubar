@@ -97,7 +97,7 @@ class _SettingsListView extends ConsumerWidget {
                 ...kExampleTrack.metadata.toJson(),
                 'path': kExampleTrack.path,
               }.toString(),
-              leading: const Icon(Icons.text_fields, color: Colors.transparent),
+              leading: const SizedBox(width: 24),
               processValue: (value) => ref.read(tplUtilProvider).process(
                   metadata: kExampleTrack.metadata, path: kExampleTrack.path),
             ),
@@ -198,6 +198,29 @@ class _SettingsListView extends ConsumerWidget {
               provider: transcodeSettingsProvider,
               selector: (state) => state.wavEncoder.displayName,
               onPressed: (_) => Get.dialog(const WavEncoderDialog()),
+            ),
+          ],
+        ),
+        SettingsSection(
+          title: const Text('转码警告'),
+          tiles: [
+            SwitchSettingsTile<TranscodeWarnings, TranscodeWarningsModel>(
+              title: '使用有损转码',
+              leading: const SizedBox(width: 24),
+              provider: transcodeWarningsProvider,
+              selector: (state) => state.toLossy,
+              onToggle: (value) => ref
+                  .read(transcodeWarningsProvider.notifier)
+                  .updateToLossy(value),
+            ),
+            SwitchSettingsTile<TranscodeWarnings, TranscodeWarningsModel>(
+              title: '浮点数转整数',
+              leading: const SizedBox(width: 24),
+              provider: transcodeWarningsProvider,
+              selector: (state) => state.floatToInt,
+              onToggle: (value) => ref
+                  .read(transcodeWarningsProvider.notifier)
+                  .updateFloatToInt(value),
             ),
           ],
         ),
