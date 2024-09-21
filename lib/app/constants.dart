@@ -1,2 +1,2 @@
 const kAppName = 'flubar';
-const kAppVersion = '0.1.0+1';
+const kAppVersion = '0.2.0+2';
