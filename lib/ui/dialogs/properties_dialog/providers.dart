@@ -65,18 +65,22 @@ class CommonProperties extends _$CommonProperties {
     for (final value in values) {
       if (value != null) {
         countMap[value] = (countMap[value] ?? 0) + 1;
-        totalCount++;
+      } else {
+        countMap[-1] = (countMap[-1] ?? 0) + 1;
       }
+      totalCount++;
     }
 
     if (countMap.isEmpty) return 'Unknown';
     if (countMap.length == 1) {
-      return '${countMap.keys.first}$suffix';
+      return '${countMap.keys.first == -1 ? 'Unknown' : countMap.keys.first}$suffix';
     }
 
     final formattedValues = countMap.entries.map((entry) {
+      final unknown = entry.key == -1;
+      final key = unknown ? 'Unknown' : entry.key.toString();
       final percentage = (entry.value / totalCount * 100).toStringAsFixed(2);
-      return '${entry.key}$suffix ($percentage%)';
+      return unknown ? '$key ($percentage%)' : '$key$suffix ($percentage%)';
     }).toList();
 
     return formattedValues.join(', ');
@@ -91,18 +95,22 @@ class CommonProperties extends _$CommonProperties {
     for (final value in values) {
       if (value != null && value.isNotEmpty) {
         countMap[value] = (countMap[value] ?? 0) + 1;
-        totalCount++;
+      } else {
+        countMap['Unknown'] = (countMap['Unknown'] ?? 0) + 1;
       }
+      totalCount++;
     }
 
     if (countMap.isEmpty) return 'Unknown';
     if (countMap.length == 1) {
-      return '${countMap.keys.first}$suffix';
+      return '${countMap.keys.first == 'Unknown' ? 'Unknown' : countMap.keys.first}$suffix';
     }
 
     final formattedValues = countMap.entries.map((entry) {
+      final unknown = entry.key == 'Unknown';
+      final key = unknown ? 'Unknown' : entry.key;
       final percentage = (entry.value / totalCount * 100).toStringAsFixed(2);
-      return '${entry.key}$suffix ($percentage%)';
+      return unknown ? '$key ($percentage%)' : '$key$suffix ($percentage%)';
     }).toList();
 
     return formattedValues.join(', ');
