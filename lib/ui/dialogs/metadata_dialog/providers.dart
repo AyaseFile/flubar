@@ -1,12 +1,7 @@
-import 'package:flubar/app/talker.dart';
 import 'package:flubar/models/extensions/metadata_extension.dart';
 import 'package:flubar/models/state/common_metadata.dart';
 import 'package:flubar/models/state/track.dart';
-import 'package:flubar/rust/api/id3.dart';
-import 'package:flubar/rust/api/lofty.dart';
 import 'package:flubar/rust/api/models.dart';
-import 'package:flubar/ui/snackbar/view.dart';
-import 'package:flubar/ui/view/playlist_view/providers.dart';
 import 'package:flubar/ui/view/tracklist_view/constants.dart';
 import 'package:flubar/ui/view/tracklist_view/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -60,38 +55,6 @@ class SelectedTracks extends _$SelectedTracks {
       final metadata = _updated(t, rowId, value);
       return t.copyWith(metadata: metadata);
     }).toList();
-  }
-
-  Future<bool> updateMetadata(bool force) async {
-    final id = ref.read(playlistIdProvider).selectedId;
-    final updatedTracks = <Track>[];
-    var failed = 0;
-    await Future.wait(state.map((t) async {
-      try {
-        await loftyWriteMetadata(
-            metadata: t.metadata, file: t.path, force: force);
-        updatedTracks.add(t);
-      } catch (loftyError) {
-        if (force) {
-          failed++;
-          globalTalker.error('无法强制更新元数据: ${t.path}', loftyError);
-          return;
-        }
-        try {
-          await id3WriteMetadata(metadata: t.metadata, file: t.path);
-          updatedTracks.add(t);
-        } catch (id3Error) {
-          failed++;
-          globalTalker.error('无法更新元数据: ${t.path}', [loftyError, id3Error]);
-        }
-      }
-    }));
-    ref.read(playlistsProvider.notifier).updateTracks(id, updatedTracks);
-    if (failed != 0) {
-      showExceptionSnackbar(title: '错误', message: '无法更新 $failed 个文件的元数据');
-      return false;
-    }
-    return true;
   }
 
   Metadata _updated(Track track, int rowId, String? value) {

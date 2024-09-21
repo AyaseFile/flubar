@@ -7,6 +7,7 @@ import 'package:flubar/ui/dialogs/editable_table_view/view.dart';
 import 'package:flubar/ui/dialogs/input_dialog/view.dart';
 import 'package:flubar/ui/view/tracklist_view/advanced_column.dart';
 import 'package:flubar/ui/view/tracklist_view/constants.dart';
+import 'package:flubar/utils/metadata/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -80,22 +81,32 @@ class _EditMetadataDialog extends ConsumerWidget {
                 }),
                 const SizedBox(width: 8),
                 TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: !ref.watch(metadataUtilProvider).isLoading
+                      ? () => Navigator.of(context).pop()
+                      : null,
                   child: const Text('取消'),
                 ),
                 const SizedBox(width: 8),
-                TextButton(
-                  onPressed: () async {
-                    final force = ref.read(metadataSettingsProvider
-                        .select((state) => state.forceWriteMetadata));
-                    final success = await ref
-                        .read(selectedTracksProvider.notifier)
-                        .updateMetadata(force);
-                    if (context.mounted && success) Navigator.of(context).pop();
-                  },
-                  autofocus: true,
-                  child: const Text('保存'),
-                ),
+                ref.watch(metadataUtilProvider).isLoading
+                    ? const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(),
+                        ))
+                    : TextButton(
+                        onPressed: () async {
+                          final success = await ref
+                              .read(metadataUtilProvider.notifier)
+                              .writeMetadata();
+                          if (context.mounted && success) {
+                            Navigator.of(context).pop();
+                          }
+                        },
+                        autofocus: true,
+                        child: const Text('保存'),
+                      ),
               ],
             ),
             body: const MetadataTableView(),

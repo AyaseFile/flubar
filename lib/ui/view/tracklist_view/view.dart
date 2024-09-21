@@ -220,7 +220,8 @@ class TrackRow extends ConsumerWidget {
           image: MenuImage.icon(Icons.edit),
           callback: () async => await ref
               .read(getDialogProvider.notifier)
-              .show<void>((const Dialog(child: EditMetadataDialog()))),
+              .show<void>(const Dialog(child: EditMetadataDialog()),
+                  barrierDismissible: true),
         ),
         Menu(
           title: '编辑封面',
@@ -231,7 +232,9 @@ class TrackRow extends ConsumerWidget {
                 image: MenuImage.icon(Icons.filter_1),
                 callback: () async {
                   const dialog = Dialog(child: CoverDialog(isBatch: false));
-                  await ref.read(getDialogProvider.notifier).show<void>(dialog);
+                  await ref
+                      .read(getDialogProvider.notifier)
+                      .show<void>(dialog, barrierDismissible: true);
                 }),
             MenuAction(
                 title: '批量编辑',
@@ -241,7 +244,9 @@ class TrackRow extends ConsumerWidget {
                 ),
                 callback: () async {
                   const dialog = Dialog(child: CoverDialog(isBatch: true));
-                  await ref.read(getDialogProvider.notifier).show<void>(dialog);
+                  await ref
+                      .read(getDialogProvider.notifier)
+                      .show<void>(dialog, barrierDismissible: true);
                 }),
           ],
         ),

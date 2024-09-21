@@ -1,7 +1,7 @@
-import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/models/state/track_cover.dart';
 import 'package:flubar/ui/constants.dart';
 import 'package:flubar/ui/widgets/cover_drag_widget/view.dart';
+import 'package:flubar/utils/metadata/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
@@ -58,28 +58,30 @@ class CoverDialog extends ConsumerWidget {
                 ),
                 const SizedBox(width: 8),
                 TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: !ref.watch(metadataUtilProvider).isLoading
+                      ? () => Navigator.of(context).pop()
+                      : null,
                   child: const Text('取消'),
                 ),
                 const SizedBox(width: 8),
-                TextButton(
-                  onPressed: () async {
-                    final force = ref.read(metadataSettingsProvider
-                        .select((state) => state.forceWriteMetadata));
-                    if (isBatch) {
-                      await ref
-                          .read(batchedTrackCoverProvider.notifier)
-                          .updateCover(force);
-                    } else {
-                      await ref
-                          .read(groupedTrackCoverProvider.notifier)
-                          .updateCover(force);
-                    }
-                    if (context.mounted) Navigator.of(context).pop();
-                  },
-                  autofocus: true,
-                  child: const Text('保存'),
-                ),
+                ref.watch(metadataUtilProvider).isLoading
+                    ? const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(),
+                        ))
+                    : TextButton(
+                        onPressed: () async {
+                          await ref
+                              .read(metadataUtilProvider.notifier)
+                              .writeCover(isBatch);
+                          if (context.mounted) Navigator.of(context).pop();
+                        },
+                        autofocus: true,
+                        child: const Text('保存'),
+                      ),
               ],
             ),
             body: _buildBody(selectedCovers[coverIndex], ref),
