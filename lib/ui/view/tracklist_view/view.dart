@@ -1,3 +1,4 @@
+import 'package:flubar/models/state/playlist.dart';
 import 'package:flubar/models/state/track.dart';
 import 'package:flubar/ui/constants.dart';
 import 'package:flubar/ui/dialogs/cover_dialog/view.dart';
@@ -115,8 +116,36 @@ class _TrackTableViewState extends ConsumerState<TrackTableView> {
         kDurationColumnId => '时长',
         _ => throw UnimplementedError(),
       };
+      final sortProperty = _getSortProperty(columns[column].id);
+      // 排序图标
+      final icon =
+          ref.watch(currentPlaylistProvider).sortProperty == sortProperty
+              ? ref.watch(currentPlaylistProvider).sortOrder ==
+                      TrackSortOrder.ascending
+                  ? Icons.arrow_upward
+                  : Icons.arrow_downward
+              : null;
       return InkWell(
-        onTap: () => Navigator.of(context)
+        onTap: () {
+          // 点击表头排序
+          final playlist = ref.read(currentPlaylistProvider);
+          if (playlist.sortOrder == TrackSortOrder.descending) {
+            ref
+                .read(currentPlaylistProvider.notifier)
+                .resetSortPropertyAndOrder();
+          } else {
+            final order = playlist.sortProperty == sortProperty
+                ? playlist.sortOrder == TrackSortOrder.ascending
+                    ? TrackSortOrder.descending
+                    : TrackSortOrder.ascending
+                : TrackSortOrder.ascending;
+            ref
+                .read(currentPlaylistProvider.notifier)
+                .setSortProperty(sortProperty);
+            ref.read(currentPlaylistProvider.notifier).setSortOrder(order);
+          }
+        },
+        onLongPress: () => Navigator.of(context)
             .push(_createColumnControlsRoute(context, column)),
         child: Align(
           alignment: Alignment.centerLeft,
@@ -124,12 +153,31 @@ class _TrackTableViewState extends ConsumerState<TrackTableView> {
             padding: kTableTextPadding,
             child: Padding(
               padding: kCellTextPadding,
-              child: Text(text, style: style, overflow: TextOverflow.ellipsis),
+              child: Row(
+                children: [
+                  Text(text, style: style, overflow: TextOverflow.ellipsis),
+                  if (icon != null) ...[
+                    const SizedBox(width: 4),
+                    Icon(icon, size: 18),
+                  ]
+                ],
+              ),
             ),
           ),
         ),
       );
     });
+  }
+
+  TrackSortProperty _getSortProperty(int columnId) {
+    return switch (columnId) {
+      kTrackNumberColumnId => TrackSortProperty.trackNumber,
+      kTrackTitleColumnId => TrackSortProperty.title,
+      kArtistNameColumnId => TrackSortProperty.artist,
+      kAlbumColumnId => TrackSortProperty.album,
+      kDurationColumnId => TrackSortProperty.duration,
+      _ => throw UnimplementedError(),
+    };
   }
 
   ModalRoute<void> _createColumnControlsRoute(

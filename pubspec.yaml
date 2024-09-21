@@ -46,6 +46,7 @@ dependencies:
       url: https://github.com/google/flutter-desktop-embedding.git
       path: plugins/window_size
   hive: ^2.2.3
+  unorm_dart: ^0.3.0
 
 dev_dependencies:
   flutter_test:

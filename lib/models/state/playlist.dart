@@ -5,12 +5,34 @@ import 'track.dart';
 
 part 'playlist.freezed.dart';
 
+enum TrackSortProperty {
+  title,
+  artist,
+  album,
+  albumArtist,
+  trackNumber,
+  trackTotal,
+  discNumber,
+  discTotal,
+  date,
+  genre,
+  duration,
+  none,
+}
+
+enum TrackSortOrder {
+  ascending,
+  descending,
+}
+
 @freezed
 class Playlist with _$Playlist {
   const factory Playlist({
     required int id,
     required String name,
     required List<Track> tracks,
+    @Default(TrackSortProperty.none) TrackSortProperty sortProperty,
+    @Default(TrackSortOrder.ascending) TrackSortOrder sortOrder,
   }) = _Playlist;
 }
 

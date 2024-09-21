@@ -1,6 +1,8 @@
+import 'package:flubar/models/state/playlist.dart';
 import 'package:flubar/models/state/track.dart';
 import 'package:flubar/ui/view/playlist_view/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:unorm_dart/unorm_dart.dart' as unorm;
 
 import 'advanced_column.dart';
 import 'constants.dart';
@@ -38,10 +40,87 @@ class TrackTableColumns extends _$TrackTableColumns {
 
 @Riverpod(keepAlive: true)
 class Tracks extends _$Tracks {
+  List<Track>? _sortedTracks;
+  TrackSortProperty? _lastSortProperty;
+
   @override
   List<Track> build() {
     final playlist = ref.watch(currentPlaylistProvider);
-    return playlist.tracks;
+    final sortProperty = playlist.sortProperty;
+    final sortOrder = playlist.sortOrder;
+
+    if (sortProperty == TrackSortProperty.none) {
+      _sortedTracks = null;
+      _lastSortProperty = null;
+      return playlist.tracks;
+    }
+
+    if (_sortedTracks == null || _lastSortProperty != sortProperty) {
+      _sortedTracks = [...playlist.tracks];
+      _sortedTracks!
+          .sort((a, b) => _compareTracksByProperty(a, b, sortProperty));
+      _lastSortProperty = sortProperty;
+    }
+
+    return sortOrder == TrackSortOrder.ascending
+        ? _sortedTracks!
+        : _sortedTracks!.reversed.toList();
+  }
+
+  int _compareTracksByProperty(Track a, Track b, TrackSortProperty property) {
+    final aMetadata = a.metadata;
+    final bMetadata = b.metadata;
+
+    switch (property) {
+      case TrackSortProperty.title:
+        return _compareNullableStrings(aMetadata.title, bMetadata.title);
+      case TrackSortProperty.artist:
+        return _compareNullableStrings(aMetadata.artist, bMetadata.artist);
+      case TrackSortProperty.album:
+        return _compareNullableStrings(aMetadata.album, bMetadata.album);
+      case TrackSortProperty.albumArtist:
+        return _compareNullableStrings(
+            aMetadata.albumArtist, bMetadata.albumArtist);
+      case TrackSortProperty.trackNumber:
+        return _compareNullableInts(
+            aMetadata.trackNumber, bMetadata.trackNumber);
+      case TrackSortProperty.trackTotal:
+        return _compareNullableInts(aMetadata.trackTotal, bMetadata.trackTotal);
+      case TrackSortProperty.discNumber:
+        return _compareNullableInts(aMetadata.discNumber, bMetadata.discNumber);
+      case TrackSortProperty.discTotal:
+        return _compareNullableInts(aMetadata.discTotal, bMetadata.discTotal);
+      case TrackSortProperty.date:
+        return _compareNullableStrings(aMetadata.date, bMetadata.date);
+      case TrackSortProperty.genre:
+        return _compareNullableStrings(aMetadata.genre, bMetadata.genre);
+      case TrackSortProperty.duration:
+        return _compareNullableDoubles(
+            a.properties.duration, b.properties.duration);
+      case TrackSortProperty.none:
+        return 0;
+    }
+  }
+
+  int _compareNullableStrings(String? a, String? b) {
+    if (a == null && b == null) return 0;
+    if (a == null) return -1;
+    if (b == null) return 1;
+    return unorm.nfkc(a).compareTo(unorm.nfkc(b));
+  }
+
+  int _compareNullableInts(int? a, int? b) {
+    if (a == null && b == null) return 0;
+    if (a == null) return -1;
+    if (b == null) return 1;
+    return a.compareTo(b);
+  }
+
+  int _compareNullableDoubles(double? a, double? b) {
+    if (a == null && b == null) return 0;
+    if (a == null) return -1;
+    if (b == null) return 1;
+    return a.compareTo(b);
   }
 }
 

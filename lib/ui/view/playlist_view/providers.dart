@@ -114,6 +114,20 @@ class CurrentPlaylist extends _$CurrentPlaylist {
     return ref.watch(playlistsProvider).firstWhere((p) => p.id == id,
         orElse: () => throw StateError('No playlist found with id $id'));
   }
+
+  void setSortProperty(TrackSortProperty property) {
+    state = state.copyWith(sortProperty: property);
+  }
+
+  void setSortOrder(TrackSortOrder order) {
+    state = state.copyWith(sortOrder: order);
+  }
+
+  void resetSortPropertyAndOrder() {
+    state = state.copyWith(
+        sortProperty: TrackSortProperty.none,
+        sortOrder: TrackSortOrder.ascending);
+  }
 }
 
 @riverpod

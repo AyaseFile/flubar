@@ -11,11 +11,11 @@ const kDateColumnId = 9;
 const kGenreColumnId = 10;
 const kFileNameColumnId = 11;
 
-const kTrackNumberColumnWidth = 42.0;
+const kTrackNumberColumnWidth = 70.0;
 const kTrackTitleColumnWidth = 192.0;
 const kArtistNameColumnWidth = 144.0;
 const kAlbumColumnWidth = 192.0;
-const kDurationColumnWidth = 58.0;
+const kDurationColumnWidth = 90.0;
 
 const kMinColumnWidth = 40.0;
 
