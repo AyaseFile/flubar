@@ -584,8 +584,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: ef26219
-      resolved-ref: ef2621973b174a5ce999b659f5b2db8241b25a8a
+      ref: "05f3587"
+      resolved-ref: "05f358743fe44e05335296d8ca336610ea97e4d6"
       url: "https://github.com/AyaseFile/just_audio_media_kit.git"
     source: git
     version: "2.0.5"

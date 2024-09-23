@@ -2,6 +2,7 @@
 import 'dart:async';
 
 import 'package:flubar/app/talker.dart';
+import 'package:flubar/models/extensions/properties_extension.dart';
 import 'package:flubar/rust/api/models.dart';
 import 'package:flubar/ui/dialogs/metadata_dialog/providers.dart';
 import 'package:just_audio/just_audio.dart';
@@ -30,10 +31,29 @@ class Player extends _$Player {
   }
 
   Future<void> play() async {
+    await stop();
     final selectedTracks = ref.read(selectedTracksProvider);
-    final sources = selectedTracks
-        .map((track) => AudioSource.file(track.path, tag: track.metadata))
-        .toList();
+    final sources = selectedTracks.map((track) {
+      if (track.properties.isCue()) {
+        final start = Duration(
+            milliseconds: (track.properties.cueStartSec! * 1000).round());
+        final end = track.properties.cueDurationSec != null
+            ? start +
+                Duration(
+                    milliseconds:
+                        (track.properties.cueDurationSec! * 1000).round())
+            : null; // 艺术楼梯
+
+        return ClippingAudioSource(
+          child: AudioSource.file(track.path, tag: track.metadata),
+          start: start,
+          end: end,
+        );
+      } else {
+        return AudioSource.file(track.path, tag: track.metadata);
+      }
+    }).toList();
+
     try {
       await _player.setAudioSource(ConcatenatingAudioSource(children: sources),
           preload: false);
@@ -56,13 +76,54 @@ class Player extends _$Player {
 
   Future<void> next() async => await _player.seekToNext();
 
-  Future<void> seek(Duration position) async => await _player.seek(position);
+  Duration _clampDuration(Duration value, Duration min, Duration max) {
+    if (value < min) return min;
+    if (value > max) return max;
+    return value;
+  }
+
+  Future<void> seek(Duration position) async {
+    final clip = _getCurrentClip();
+    if (clip != null) {
+      final start = clip.start ?? Duration.zero;
+      final end = clip.end ?? _player.duration ?? Duration.zero;
+      final clampedPosition =
+          _clampDuration(position, Duration.zero, end - start);
+      await _player.seek(clampedPosition + start);
+    } else {
+      await _player.seek(position);
+    }
+  }
+
+  ClippingAudioSource? _getCurrentClip() {
+    final currentSource =
+        _player.sequence?.elementAtOrNull(_player.currentIndex ?? -1);
+    return currentSource is ClippingAudioSource ? currentSource : null;
+  }
 
   Stream<PlayerState> get playerStateStream => _player.playerStateStream;
 
-  Stream<Duration> get positionStream => _player.positionStream;
+  Stream<Duration> get positionStream => _player.positionStream.map((position) {
+        final clip = _getCurrentClip();
+        if (clip != null) {
+          final start = clip.start ?? Duration.zero;
+          final end = clip.end ?? position;
+          return _clampDuration(position - start, Duration.zero, end - start);
+        }
+        return position;
+      });
 
-  Stream<Duration?> get durationStream => _player.durationStream;
+  Stream<Duration> get durationStream =>
+      _player.durationStream.map((fullDuration) {
+        fullDuration ??= Duration.zero;
+        final clip = _getCurrentClip();
+        if (clip != null) {
+          final start = clip.start ?? Duration.zero;
+          final end = clip.end ?? fullDuration;
+          return _clampDuration(end - start, Duration.zero, fullDuration);
+        }
+        return fullDuration;
+      });
 
   Stream<SequenceState?> get sequenceStateStream => _player.sequenceStateStream;
 
@@ -104,10 +165,8 @@ Stream<Duration> playerPosition(PlayerPositionRef ref) {
 }
 
 @Riverpod(keepAlive: true)
-Stream<Duration> playerDuration(PlayerDurationRef ref) => ref
-    .read(playerProvider.notifier)
-    .durationStream
-    .map((duration) => duration ?? Duration.zero);
+Stream<Duration> playerDuration(PlayerDurationRef ref) =>
+    ref.read(playerProvider.notifier).durationStream;
 
 @Riverpod(keepAlive: true)
 Stream<bool> playerHasTrack(PlayerHasTrackRef ref) =>
@@ -125,8 +184,15 @@ Stream<bool> playerHasPrevious(PlayerHasPreviousRef ref) =>
 Stream<Metadata?> playerTrackMetadata(PlayerTrackMetadataRef ref) {
   final sequenceStateStream =
       ref.watch(playerProvider.notifier).sequenceStateStream;
-  return sequenceStateStream
-      .map((sequenceState) => sequenceState?.currentSource?.tag as Metadata?);
+  return sequenceStateStream.map((sequenceState) {
+    final currentSource = sequenceState?.currentSource;
+    if (currentSource == null) return null;
+    if (currentSource is ClippingAudioSource) {
+      return currentSource.child.tag as Metadata?;
+    } else {
+      return currentSource.tag as Metadata?;
+    }
+  });
 }
 
 @Riverpod(keepAlive: true)

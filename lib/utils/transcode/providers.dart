@@ -8,6 +8,7 @@ import 'package:flubar/app/talker.dart';
 import 'package:flubar/models/cancel_token/cancel_token.dart';
 import 'package:flubar/models/exceptions/ffmpeg_exception.dart';
 import 'package:flubar/models/extensions/ffmpeg_command.dart';
+import 'package:flubar/models/extensions/properties_extension.dart';
 import 'package:flubar/models/isolate/mixin.dart';
 import 'package:flubar/models/state/track.dart';
 import 'package:flubar/rust/api/lofty.dart';
@@ -145,7 +146,19 @@ class TranscodeUtil extends _$TranscodeUtil
       final newName = _tplProcessor.process(
           metadata: metadata, path: path, extension: _ext);
       final outputFile = p.join(dir, newName);
-      return (_baseCommand, track, outputFile);
+      var command = _baseCommand;
+      if (track.properties.isCue()) {
+        final startSec = track.properties.cueStartSec;
+        final durationSec = track.properties.cueDurationSec;
+        command = command.copyWith(
+          args: [
+            ...command.args,
+            CliArg(name: 'ss', value: startSec.toString()),
+            CliArg(name: 't', value: durationSec.toString()),
+          ],
+        );
+      }
+      return (command, track, outputFile);
     }).toList();
   }
 

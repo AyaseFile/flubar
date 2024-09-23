@@ -7,7 +7,7 @@ import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `new`, `new`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `fmt`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`, `fmt`
 
 class Metadata {
   final String? title;
@@ -69,7 +69,9 @@ class Metadata {
 }
 
 class Properties {
-  final double? duration;
+  final double? durationSec;
+  final double? cueStartSec;
+  final double? cueDurationSec;
   final String? codec;
   final String? sampleFormat;
   final int? sampleRate;
@@ -79,7 +81,9 @@ class Properties {
   final int? channels;
 
   const Properties({
-    this.duration,
+    this.durationSec,
+    this.cueStartSec,
+    this.cueDurationSec,
     this.codec,
     this.sampleFormat,
     this.sampleRate,
@@ -91,7 +95,9 @@ class Properties {
 
   @override
   int get hashCode =>
-      duration.hashCode ^
+      durationSec.hashCode ^
+      cueStartSec.hashCode ^
+      cueDurationSec.hashCode ^
       codec.hashCode ^
       sampleFormat.hashCode ^
       sampleRate.hashCode ^
@@ -105,7 +111,9 @@ class Properties {
       identical(this, other) ||
       other is Properties &&
           runtimeType == other.runtimeType &&
-          duration == other.duration &&
+          durationSec == other.durationSec &&
+          cueStartSec == other.cueStartSec &&
+          cueDurationSec == other.cueDurationSec &&
           codec == other.codec &&
           sampleFormat == other.sampleFormat &&
           sampleRate == other.sampleRate &&

@@ -1,3 +1,4 @@
+import 'package:flubar/models/extensions/properties_extension.dart';
 import 'package:flubar/models/state/common_properties.dart';
 import 'package:flubar/ui/dialogs/metadata_dialog/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

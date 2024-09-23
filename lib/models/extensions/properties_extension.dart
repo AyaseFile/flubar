@@ -3,7 +3,9 @@ import 'package:flubar/rust/api/models.dart';
 extension PropertiesExtension on Properties {
   Map<String, dynamic> toJson() {
     return {
-      'duration': duration,
+      'durationsec': durationSec,
+      'cuestartsec': cueStartSec,
+      'cuedurationsec': cueDurationSec,
       'codec': codec,
       'sampleformat': sampleFormat,
       'bitsperrawsample': bitsPerRawSample,
@@ -13,4 +15,8 @@ extension PropertiesExtension on Properties {
       'channels': channels,
     };
   }
+
+  bool isCue() => durationSec == null && cueStartSec != null;
+
+  double? get duration => isCue() ? cueDurationSec : durationSec;
 }

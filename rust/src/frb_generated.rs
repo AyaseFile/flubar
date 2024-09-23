@@ -37,7 +37,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.3.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 221286559;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1356582635;
 
 // Section: executor
 
@@ -45,6 +45,41 @@ flutter_rust_bridge::frb_generated_default_handler!();
 
 // Section: wire_funcs
 
+fn wire__crate__api__cue__cue_read_file_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "cue_read_file",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_file = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                    (move || {
+                        let output_ok = crate::api::cue::cue_read_file(api_file)?;
+                        Ok(output_ok)
+                    })(),
+                )
+            }
+        },
+    )
+}
 fn wire__crate__api__ffmpeg__init_ffmpeg_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -314,6 +349,28 @@ impl SseDecode for Vec<u8> {
     }
 }
 
+impl SseDecode
+    for Vec<(
+        String,
+        crate::api::models::Metadata,
+        crate::api::models::Properties,
+    )>
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<(
+                String,
+                crate::api::models::Metadata,
+                crate::api::models::Properties,
+            )>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for crate::api::models::Metadata {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -402,7 +459,9 @@ impl SseDecode for Option<Vec<u8>> {
 impl SseDecode for crate::api::models::Properties {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_duration = <Option<f64>>::sse_decode(deserializer);
+        let mut var_durationSec = <Option<f64>>::sse_decode(deserializer);
+        let mut var_cueStartSec = <Option<f64>>::sse_decode(deserializer);
+        let mut var_cueDurationSec = <Option<f64>>::sse_decode(deserializer);
         let mut var_codec = <Option<String>>::sse_decode(deserializer);
         let mut var_sampleFormat = <Option<String>>::sse_decode(deserializer);
         let mut var_sampleRate = <Option<u32>>::sse_decode(deserializer);
@@ -411,7 +470,9 @@ impl SseDecode for crate::api::models::Properties {
         let mut var_bitRate = <Option<u32>>::sse_decode(deserializer);
         let mut var_channels = <Option<u8>>::sse_decode(deserializer);
         return crate::api::models::Properties {
-            duration: var_duration,
+            duration_sec: var_durationSec,
+            cue_start_sec: var_cueStartSec,
+            cue_duration_sec: var_cueDurationSec,
             codec: var_codec,
             sample_format: var_sampleFormat,
             sample_rate: var_sampleRate,
@@ -429,6 +490,22 @@ impl SseDecode for (crate::api::models::Metadata, crate::api::models::Properties
         let mut var_field0 = <crate::api::models::Metadata>::sse_decode(deserializer);
         let mut var_field1 = <crate::api::models::Properties>::sse_decode(deserializer);
         return (var_field0, var_field1);
+    }
+}
+
+impl SseDecode
+    for (
+        String,
+        crate::api::models::Metadata,
+        crate::api::models::Properties,
+    )
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_field0 = <String>::sse_decode(deserializer);
+        let mut var_field1 = <crate::api::models::Metadata>::sse_decode(deserializer);
+        let mut var_field2 = <crate::api::models::Properties>::sse_decode(deserializer);
+        return (var_field0, var_field1, var_field2);
     }
 }
 
@@ -467,12 +544,13 @@ fn pde_ffi_dispatcher_primary_impl(
 ) {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        1 => wire__crate__api__ffmpeg__init_ffmpeg_impl(port, ptr, rust_vec_len, data_len),
-        2 => wire__crate__api__ffmpeg__read_file_impl(port, ptr, rust_vec_len, data_len),
-        3 => wire__crate__api__id3__id3_write_metadata_impl(port, ptr, rust_vec_len, data_len),
-        4 => wire__crate__api__id3__id3_write_picture_impl(port, ptr, rust_vec_len, data_len),
-        5 => wire__crate__api__lofty__lofty_write_metadata_impl(port, ptr, rust_vec_len, data_len),
-        6 => wire__crate__api__lofty__lofty_write_picture_impl(port, ptr, rust_vec_len, data_len),
+        1 => wire__crate__api__cue__cue_read_file_impl(port, ptr, rust_vec_len, data_len),
+        2 => wire__crate__api__ffmpeg__init_ffmpeg_impl(port, ptr, rust_vec_len, data_len),
+        3 => wire__crate__api__ffmpeg__read_file_impl(port, ptr, rust_vec_len, data_len),
+        4 => wire__crate__api__id3__id3_write_metadata_impl(port, ptr, rust_vec_len, data_len),
+        5 => wire__crate__api__id3__id3_write_picture_impl(port, ptr, rust_vec_len, data_len),
+        6 => wire__crate__api__lofty__lofty_write_metadata_impl(port, ptr, rust_vec_len, data_len),
+        7 => wire__crate__api__lofty__lofty_write_picture_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -522,7 +600,9 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::models::Metadata>
 impl flutter_rust_bridge::IntoDart for crate::api::models::Properties {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
-            self.duration.into_into_dart().into_dart(),
+            self.duration_sec.into_into_dart().into_dart(),
+            self.cue_start_sec.into_into_dart().into_dart(),
+            self.cue_duration_sec.into_into_dart().into_dart(),
             self.codec.into_into_dart().into_dart(),
             self.sample_format.into_into_dart().into_dart(),
             self.sample_rate.into_into_dart().into_dart(),
@@ -580,6 +660,26 @@ impl SseEncode for Vec<u8> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <u8>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode
+    for Vec<(
+        String,
+        crate::api::models::Metadata,
+        crate::api::models::Properties,
+    )>
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <(
+                String,
+                crate::api::models::Metadata,
+                crate::api::models::Properties,
+            )>::sse_encode(item, serializer);
         }
     }
 }
@@ -654,7 +754,9 @@ impl SseEncode for Option<Vec<u8>> {
 impl SseEncode for crate::api::models::Properties {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <Option<f64>>::sse_encode(self.duration, serializer);
+        <Option<f64>>::sse_encode(self.duration_sec, serializer);
+        <Option<f64>>::sse_encode(self.cue_start_sec, serializer);
+        <Option<f64>>::sse_encode(self.cue_duration_sec, serializer);
         <Option<String>>::sse_encode(self.codec, serializer);
         <Option<String>>::sse_encode(self.sample_format, serializer);
         <Option<u32>>::sse_encode(self.sample_rate, serializer);
@@ -670,6 +772,21 @@ impl SseEncode for (crate::api::models::Metadata, crate::api::models::Properties
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <crate::api::models::Metadata>::sse_encode(self.0, serializer);
         <crate::api::models::Properties>::sse_encode(self.1, serializer);
+    }
+}
+
+impl SseEncode
+    for (
+        String,
+        crate::api::models::Metadata,
+        crate::api::models::Properties,
+    )
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.0, serializer);
+        <crate::api::models::Metadata>::sse_encode(self.1, serializer);
+        <crate::api::models::Properties>::sse_encode(self.2, serializer);
     }
 }
 

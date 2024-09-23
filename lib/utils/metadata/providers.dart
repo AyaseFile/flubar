@@ -1,6 +1,7 @@
 import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/app/talker.dart';
 import 'package:flubar/models/extensions/metadata_extension.dart';
+import 'package:flubar/models/extensions/properties_extension.dart';
 import 'package:flubar/models/state/track.dart';
 import 'package:flubar/rust/api/id3.dart';
 import 'package:flubar/rust/api/lofty.dart';
@@ -25,6 +26,11 @@ class MetadataUtil extends _$MetadataUtil {
     final updatedTracks = <Track>[];
     var failed = 0;
     await Future.wait(selectedTracks.map((t) async {
+      if (t.properties.isCue()) {
+        // 对于 cue, 不写入元数据, 只更新内存中的元数据
+        updatedTracks.add(t);
+        return;
+      }
       try {
         await loftyWriteMetadata(
             metadata: t.metadata, file: t.path, force: force);
@@ -67,6 +73,10 @@ class MetadataUtil extends _$MetadataUtil {
       final frontCover = cover.newCover;
       await Future.wait(cover.tracks.map((t) async {
         final metadata = t.metadata.copyWith(frontCover: () => frontCover);
+        if (t.properties.isCue()) {
+          updatedTracks.add(t.copyWith(metadata: metadata));
+          return;
+        }
         try {
           await loftyWritePicture(
               file: t.path, picture: frontCover, force: force);

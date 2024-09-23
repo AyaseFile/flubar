@@ -1,3 +1,4 @@
+import 'package:flubar/models/extensions/properties_extension.dart';
 import 'package:flubar/models/state/playlist.dart';
 import 'package:flubar/models/state/track.dart';
 import 'package:flubar/ui/view/playlist_view/providers.dart';

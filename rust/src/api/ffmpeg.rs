@@ -89,7 +89,7 @@ pub fn read_file(file: String) -> Result<(Metadata, Properties)> {
 
     if let Some(stream) = context.streams().best(ffmpeg::media::Type::Audio) {
         let audio_stream = stream.index();
-        properties.duration = Some(stream.duration() as f64 * f64::from(stream.time_base()));
+        properties.duration_sec = Some(stream.duration() as f64 * f64::from(stream.time_base()));
         let codec = ffmpeg::codec::context::Context::from_parameters(stream.parameters())?;
         if let Ok(audio) = codec.decoder().audio() {
             unsafe {
@@ -117,14 +117,14 @@ pub fn read_file(file: String) -> Result<(Metadata, Properties)> {
             }
         }
 
-        if properties.bit_rate.is_none() && properties.duration.is_some() {
+        if properties.bit_rate.is_none() && properties.duration_sec.is_some() {
             let mut total_bytes = 0;
             for (stream, packet) in context.packets() {
                 if stream.index() == audio_stream {
                     total_bytes += packet.size();
                 }
             }
-            let duration = properties.duration.unwrap();
+            let duration = properties.duration_sec.unwrap();
             properties.bit_rate = Some((total_bytes as f64 / duration * 8.0) as u32);
         }
     }
@@ -145,6 +145,59 @@ pub fn read_file(file: String) -> Result<(Metadata, Properties)> {
     }
 
     Ok((metadata, properties))
+}
+
+pub(crate) fn cue_read_properties(file: String) -> Result<Properties> {
+    let mut context = match ffmpeg::format::input(&file) {
+        Ok(context) => context,
+        Err(e) => return Err(anyhow!("Failed to open file: {:?}", e)),
+    };
+
+    let mut properties = Properties::new();
+
+    if let Some(stream) = context.streams().best(ffmpeg::media::Type::Audio) {
+        let audio_stream = stream.index();
+        properties.duration_sec = Some(stream.duration() as f64 * f64::from(stream.time_base()));
+        let codec = ffmpeg::codec::context::Context::from_parameters(stream.parameters())?;
+        if let Ok(audio) = codec.decoder().audio() {
+            unsafe {
+                let audio_ptr = audio.as_ptr();
+                let codec_id = (*audio_ptr).codec_id;
+                let codec = ffmpeg::codec::id::Id::from(codec_id);
+                let sample_format = av_get_sample_fmt_name((*audio_ptr).sample_fmt);
+                let sample_rate = (*audio_ptr).sample_rate;
+                let bits_per_raw_sample = (*audio_ptr).bits_per_raw_sample;
+                let bits_per_coded_sample = (*audio_ptr).bits_per_coded_sample;
+                let bit_rate = (*audio_ptr).bit_rate;
+                let channels = (*audio_ptr).ch_layout.nb_channels;
+
+                properties.codec = Some(codec.name().to_string());
+                properties.sample_format = (!sample_format.is_null()).then(|| {
+                    CStr::from_ptr(sample_format)
+                        .to_string_lossy()
+                        .into_owned()
+                });
+                properties.sample_rate = (sample_rate != 0).then(|| sample_rate as u32);
+                properties.bits_per_raw_sample = (bits_per_raw_sample != 0).then(|| bits_per_raw_sample as u8);
+                properties.bits_per_coded_sample = (bits_per_coded_sample != 0).then(|| bits_per_coded_sample as u8);
+                properties.bit_rate = (bit_rate != 0).then(|| bit_rate as u32);
+                properties.channels = (channels != 0).then(|| channels as u8);
+            }
+        }
+
+        if properties.bit_rate.is_none() && properties.duration_sec.is_some() {
+            let mut total_bytes = 0;
+            for (stream, packet) in context.packets() {
+                if stream.index() == audio_stream {
+                    total_bytes += packet.size();
+                }
+            }
+            let duration = properties.duration_sec.unwrap();
+            properties.bit_rate = Some((total_bytes as f64 / duration * 8.0) as u32);
+        }
+    }
+
+    Ok(properties)
 }
 
 #[inline]

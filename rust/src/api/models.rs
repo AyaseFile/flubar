@@ -31,9 +31,11 @@ impl Metadata {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Properties {
-    pub duration: Option<f64>,
+    pub duration_sec: Option<f64>,
+    pub cue_start_sec: Option<f64>,
+    pub cue_duration_sec: Option<f64>,
     pub codec: Option<String>,
     pub sample_format: Option<String>,
     pub sample_rate: Option<u32>,
@@ -46,7 +48,9 @@ pub struct Properties {
 impl Properties {
     pub(crate) fn new() -> Self {
         Properties {
-            duration: None,
+            duration_sec: None,
+            cue_start_sec: None,
+            cue_duration_sec: None,
             codec: None,
             sample_format: None,
             sample_rate: None,

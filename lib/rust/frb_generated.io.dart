@@ -3,6 +3,7 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
+import 'api/cue.dart';
 import 'api/ffmpeg.dart';
 import 'api/id3.dart';
 import 'api/lofty.dart';
@@ -49,6 +50,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
 
   @protected
+  List<(String, Metadata, Properties)>
+      dco_decode_list_record_string_metadata_properties(dynamic raw);
+
+  @protected
   Metadata dco_decode_metadata(dynamic raw);
 
   @protected
@@ -71,6 +76,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   (Metadata, Properties) dco_decode_record_metadata_properties(dynamic raw);
+
+  @protected
+  (String, Metadata, Properties) dco_decode_record_string_metadata_properties(
+      dynamic raw);
 
   @protected
   int dco_decode_u_32(dynamic raw);
@@ -109,6 +118,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
 
   @protected
+  List<(String, Metadata, Properties)>
+      sse_decode_list_record_string_metadata_properties(
+          SseDeserializer deserializer);
+
+  @protected
   Metadata sse_decode_metadata(SseDeserializer deserializer);
 
   @protected
@@ -131,6 +145,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   (Metadata, Properties) sse_decode_record_metadata_properties(
+      SseDeserializer deserializer);
+
+  @protected
+  (String, Metadata, Properties) sse_decode_record_string_metadata_properties(
       SseDeserializer deserializer);
 
   @protected
@@ -175,6 +193,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       Uint8List self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_record_string_metadata_properties(
+      List<(String, Metadata, Properties)> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_metadata(Metadata self, SseSerializer serializer);
 
   @protected
@@ -199,6 +221,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_record_metadata_properties(
       (Metadata, Properties) self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_record_string_metadata_properties(
+      (String, Metadata, Properties) self, SseSerializer serializer);
 
   @protected
   void sse_encode_u_32(int self, SseSerializer serializer);

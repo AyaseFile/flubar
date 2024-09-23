@@ -7,7 +7,7 @@ import '../frb_generated.dart';
 import 'models.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `get_metadata_value`, `parse_number_total`
+// These functions are ignored because they are not marked as `pub`: `cue_read_properties`, `get_metadata_value`, `parse_number_total`
 
 Future<void> initFfmpeg() => RustLib.instance.api.crateApiFfmpegInitFfmpeg();
 
