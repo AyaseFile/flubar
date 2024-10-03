@@ -74,7 +74,9 @@ class CommonProperties extends _$CommonProperties {
 
     if (countMap.isEmpty) return 'Unknown';
     if (countMap.length == 1) {
-      return '${countMap.keys.first == -1 ? 'Unknown' : countMap.keys.first}$suffix';
+      return countMap.keys.first == -1
+          ? 'Unknown'
+          : '${countMap.keys.first}$suffix';
     }
 
     final formattedValues = countMap.entries.map((entry) {
@@ -104,7 +106,9 @@ class CommonProperties extends _$CommonProperties {
 
     if (countMap.isEmpty) return 'Unknown';
     if (countMap.length == 1) {
-      return '${countMap.keys.first == 'Unknown' ? 'Unknown' : countMap.keys.first}$suffix';
+      return countMap.keys.first == 'Unknown'
+          ? 'Unknown'
+          : '${countMap.keys.first}$suffix';
     }
 
     final formattedValues = countMap.entries.map((entry) {
