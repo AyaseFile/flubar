@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flubar/models/extensions/properties_extension.dart';
 import 'package:flubar/models/state/playlist.dart';
 import 'package:flubar/models/state/track.dart';
@@ -43,24 +44,31 @@ class TrackTableColumns extends _$TrackTableColumns {
 class Tracks extends _$Tracks {
   List<Track>? _sortedTracks;
   TrackSortProperty? _lastSortProperty;
+  List<Track>? _lastTracks;
 
   @override
   List<Track> build() {
     final playlist = ref.watch(currentPlaylistProvider);
     final sortProperty = playlist.sortProperty;
     final sortOrder = playlist.sortOrder;
+    final tracks = playlist.tracks;
 
     if (sortProperty == TrackSortProperty.none) {
       _sortedTracks = null;
       _lastSortProperty = null;
-      return playlist.tracks;
+      _lastTracks = null;
+      return tracks;
     }
 
-    if (_sortedTracks == null || _lastSortProperty != sortProperty) {
-      _sortedTracks = [...playlist.tracks];
+    const listEquality = ListEquality();
+    if (_sortedTracks == null ||
+        _lastSortProperty != sortProperty ||
+        !listEquality.equals(_lastTracks, tracks)) {
+      _sortedTracks = [...tracks];
       _sortedTracks!
           .sort((a, b) => _compareTracksByProperty(a, b, sortProperty));
       _lastSortProperty = sortProperty;
+      _lastTracks = tracks;
     }
 
     return sortOrder == TrackSortOrder.ascending

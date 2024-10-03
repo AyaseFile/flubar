@@ -111,22 +111,27 @@ class CurrentPlaylist extends _$CurrentPlaylist {
   @override
   Playlist build() {
     final id = ref.watch(playlistIdProvider).selectedId;
-    return ref.watch(playlistsProvider).firstWhere((p) => p.id == id,
-        orElse: () => throw StateError('No playlist found with id $id'));
+    return ref.watch(playlistsProvider.select((playlists) =>
+        playlists.firstWhere((p) => p.id == id,
+            orElse: () => throw StateError('No playlist found with id $id'))));
   }
 
   void setSortProperty(TrackSortProperty property) {
-    state = state.copyWith(sortProperty: property);
+    _updatePlaylist(state.copyWith(sortProperty: property));
   }
 
   void setSortOrder(TrackSortOrder order) {
-    state = state.copyWith(sortOrder: order);
+    _updatePlaylist(state.copyWith(sortOrder: order));
   }
 
   void resetSortPropertyAndOrder() {
-    state = state.copyWith(
+    _updatePlaylist(state.copyWith(
         sortProperty: TrackSortProperty.none,
-        sortOrder: TrackSortOrder.ascending);
+        sortOrder: TrackSortOrder.ascending));
+  }
+
+  void _updatePlaylist(Playlist playlist) {
+    ref.read(playlistsProvider.notifier).updatePlaylist(playlist);
   }
 }
 
