@@ -63,7 +63,10 @@ class TranscodeUtil extends _$TranscodeUtil
           final process = await Process.start(cli.executable, cli.args);
           final exitCode = await process.exitCode;
           if (exitCode == 0) {
-            if (!rewrite) return;
+            if (!rewrite) {
+              sendPort.send({'error': null});
+              continue;
+            }
             final metadata = track.metadata;
             await loftyWriteMetadata(
                 file: outputFile,
