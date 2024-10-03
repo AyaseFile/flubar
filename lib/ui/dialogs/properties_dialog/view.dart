@@ -32,15 +32,15 @@ class PropertiesDialog extends ConsumerWidget {
               ),
             ],
           ),
-          body: const PropertiesTableView(),
+          body: const _PropertiesTableView(),
         ),
       ),
     );
   }
 }
 
-class PropertiesTableView extends ConsumerWidget {
-  const PropertiesTableView({super.key});
+class _PropertiesTableView extends ConsumerWidget {
+  const _PropertiesTableView();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
