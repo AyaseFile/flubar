@@ -71,6 +71,7 @@ class MetadataSettings extends _$MetadataSettings {
           jsonDecode(str) as Map<String, dynamic>,
         );
         return defaultSettings.copyWith(
+          writeToMemoryOnly: loadedSettings.writeToMemoryOnly,
           forceWriteMetadata: loadedSettings.forceWriteMetadata,
           fileNameTpl: loadedSettings.fileNameTpl,
         );
@@ -82,8 +83,19 @@ class MetadataSettings extends _$MetadataSettings {
     return settings;
   }
 
+  void updateWriteToMemoryOnly(bool writeToMemoryOnly) {
+    state = state.copyWith(
+      writeToMemoryOnly: writeToMemoryOnly,
+      forceWriteMetadata: writeToMemoryOnly ? false : state.forceWriteMetadata,
+    );
+    _save();
+  }
+
   void updateForceWriteMetadata(bool forceWriteMetadata) {
-    state = state.copyWith(forceWriteMetadata: forceWriteMetadata);
+    state = state.copyWith(
+      forceWriteMetadata: forceWriteMetadata,
+      writeToMemoryOnly: forceWriteMetadata ? false : state.writeToMemoryOnly,
+    );
     _save();
   }
 

@@ -2,6 +2,7 @@ import 'package:flubar/models/state/settings.dart';
 
 class DefaultSettings {
   static const kDarkMode = false;
+  static const kWriteToMemoryOnly = false;
   static const kForceWriteMetadata = false;
   static const kFileNameTpl = '%filename%';
   static const kFfmpegPath = '/usr/bin/ffmpeg';

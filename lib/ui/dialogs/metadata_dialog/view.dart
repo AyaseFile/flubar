@@ -101,6 +101,19 @@ class _SettingsIconButton extends ConsumerWidget {
                   context: context,
                   children: [
                     ListTile(
+                      title: const Text('仅写入内存'),
+                      trailing: Consumer(builder: (context, ref, _) {
+                        final writeToMemory = ref.watch(metadataSettingsProvider
+                            .select((state) => state.writeToMemoryOnly));
+                        return Checkbox(
+                          value: writeToMemory,
+                          onChanged: (value) => ref
+                              .read(metadataSettingsProvider.notifier)
+                              .updateWriteToMemoryOnly(value!),
+                        );
+                      }),
+                    ),
+                    ListTile(
                       title: const Text('强制写入元数据'),
                       trailing: Consumer(builder: (context, ref, _) {
                         final force = ref.watch(metadataSettingsProvider

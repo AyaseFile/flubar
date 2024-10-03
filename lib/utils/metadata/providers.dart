@@ -20,6 +20,16 @@ class MetadataUtil extends _$MetadataUtil {
 
   Future<bool> writeMetadata() async {
     state = const AsyncValue.loading();
+
+    final writeToMemoryOnly =
+        ref.read(metadataSettingsProvider).writeToMemoryOnly;
+    if (writeToMemoryOnly) {
+      final id = ref.read(playlistIdProvider).selectedId;
+      final selectedTracks = ref.read(selectedTracksProvider);
+      ref.read(playlistsProvider.notifier).updateTracks(id, selectedTracks);
+      return true;
+    }
+
     final force = ref.read(metadataSettingsProvider).forceWriteMetadata;
     final id = ref.read(playlistIdProvider).selectedId;
     final selectedTracks = ref.read(selectedTracksProvider);
@@ -61,6 +71,29 @@ class MetadataUtil extends _$MetadataUtil {
 
   Future<void> writeCover(bool batch) async {
     state = const AsyncValue.loading();
+
+    final writeToMemoryOnly =
+        ref.read(metadataSettingsProvider).writeToMemoryOnly;
+    if (writeToMemoryOnly) {
+      final id = ref.read(playlistIdProvider).selectedId;
+      final coverModel = batch
+          ? ref.read(batchedTrackCoverProvider)
+          : ref.read(groupedTrackCoverProvider);
+      final updatedTracks = coverModel
+          .map((cover) {
+            final frontCover = cover.newCover;
+            return cover.tracks.map((t) {
+              final metadata =
+                  t.metadata.copyWith(frontCover: () => frontCover);
+              return t.copyWith(metadata: metadata);
+            });
+          })
+          .expand((element) => element)
+          .toList();
+      ref.read(playlistsProvider.notifier).updateTracks(id, updatedTracks);
+      return;
+    }
+
     final force = ref.read(metadataSettingsProvider).forceWriteMetadata;
     final id = ref.read(playlistIdProvider).selectedId;
     final coverModel = batch
