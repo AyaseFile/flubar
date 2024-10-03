@@ -49,31 +49,7 @@ class _EditMetadataDialog extends ConsumerWidget {
             automaticallyImplyLeading: false,
             title: const Text('编辑元数据'),
             actions: [
-              Builder(builder: (context) {
-                return IconButton(
-                  icon: const Icon(Icons.settings),
-                  onPressed: () {
-                    _showSettingsPopupMenu(
-                      context: context,
-                      children: [
-                        ListTile(
-                          title: const Text('强制写入元数据'),
-                          trailing: Consumer(builder: (context, ref, _) {
-                            final force = ref.watch(metadataSettingsProvider
-                                .select((state) => state.forceWriteMetadata));
-                            return Checkbox(
-                              value: force,
-                              onChanged: (value) => ref
-                                  .read(metadataSettingsProvider.notifier)
-                                  .updateForceWriteMetadata(value!),
-                            );
-                          }),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              }),
+              const _SettingsIconButton(),
               const SizedBox(width: 8),
               TextButton(
                 onPressed: !ref.watch(metadataUtilProvider).isLoading
@@ -104,10 +80,45 @@ class _EditMetadataDialog extends ConsumerWidget {
                     ),
             ],
           ),
-          body: const MetadataTableView(),
+          body: const _MetadataTableView(),
         ),
       ),
     );
+  }
+}
+
+class _SettingsIconButton extends ConsumerWidget {
+  const _SettingsIconButton();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Builder(builder: (context) {
+      return IconButton(
+        icon: const Icon(Icons.settings),
+        onPressed: !ref.watch(metadataUtilProvider).isLoading
+            ? () {
+                _showSettingsPopupMenu(
+                  context: context,
+                  children: [
+                    ListTile(
+                      title: const Text('强制写入元数据'),
+                      trailing: Consumer(builder: (context, ref, _) {
+                        final force = ref.watch(metadataSettingsProvider
+                            .select((state) => state.forceWriteMetadata));
+                        return Checkbox(
+                          value: force,
+                          onChanged: (value) => ref
+                              .read(metadataSettingsProvider.notifier)
+                              .updateForceWriteMetadata(value!),
+                        );
+                      }),
+                    ),
+                  ],
+                );
+              }
+            : null,
+      );
+    });
   }
 
   void _showSettingsPopupMenu({
@@ -143,8 +154,8 @@ class _EditMetadataDialog extends ConsumerWidget {
   }
 }
 
-class MetadataTableView extends ConsumerWidget {
-  const MetadataTableView({super.key});
+class _MetadataTableView extends ConsumerWidget {
+  const _MetadataTableView();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -174,7 +185,7 @@ class MetadataTableView extends ConsumerWidget {
           key: ValueKey(metadata.id),
           child: ProviderScope(
             overrides: [commonMetadataItemProvider.overrideWithValue(metadata)],
-            child: MetadataRow(contentBuilder: contentBuilder),
+            child: _MetadataRow(contentBuilder: contentBuilder),
           ),
         );
       },
@@ -204,10 +215,10 @@ class MetadataTableView extends ConsumerWidget {
   }
 }
 
-class MetadataRow extends ConsumerWidget {
+class _MetadataRow extends ConsumerWidget {
   final TableRowContentBuilder contentBuilder;
 
-  const MetadataRow({super.key, required this.contentBuilder});
+  const _MetadataRow({required this.contentBuilder});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
