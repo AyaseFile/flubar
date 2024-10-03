@@ -1,5 +1,4 @@
 import 'package:file_picker/file_picker.dart';
-import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/models/state/settings.dart';
 import 'package:flubar/ui/dialogs/ratio_dialog/view.dart';
 import 'package:flubar/ui/snackbar/view.dart';
@@ -70,13 +69,6 @@ class _TranscodeDialog extends ConsumerWidget {
           onPressed: transcodeState.isLoading
               ? () => ref.read(transcodeProvider.notifier).cancelTranscode()
               : () async {
-                  final remember = ref.read(transcodeSettingsProvider
-                      .select((state) => state.rememberTranscodeChoice));
-                  if (remember) {
-                    ref.read(transcodeFmtProvider.notifier).saveFormat();
-                    ref.read(transcodeOptsProvider.notifier).saveOptions();
-                    ref.read(overwriteExistingFilesProvider.notifier).save();
-                  }
                   await ref.read(transcodeProvider.notifier).transcodeFiles();
                   final failedCount = ref.read(transcodeFailedCountProvider);
                   if (failedCount != -1) {
@@ -113,10 +105,18 @@ class _TranscodeSettings extends StatelessWidget {
             _OutputDirectorySelector(),
             SizedBox(width: kSpaceBetweenItems),
             _OverwriteExistingFilesCheckbox(),
-            SizedBox(width: kSpaceBetweenItems),
+          ]),
+        ),
+        _SettingRow(
+          label: '附加选项',
+          child: Row(children: [
             _ClearMetadataCheckbox(),
             SizedBox(width: kSpaceBetweenItems),
+            _KeepAudioOnlyCheckbox(),
+            SizedBox(width: kSpaceBetweenItems),
             _RewriteMetadataCheckbox(),
+            SizedBox(width: kSpaceBetweenItems),
+            _RewriteFrontCoverCheckbox(),
           ]),
         ),
         _TranscodeOptionsSelector(),
@@ -191,18 +191,25 @@ class _RememberChoiceCheckbox extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final remember = ref.watch(transcodeSettingsProvider
-        .select((state) => state.rememberTranscodeChoice));
-    return Row(
-      children: [
-        Checkbox(
-          value: remember,
-          onChanged: (_) => ref
-              .read(transcodeSettingsProvider.notifier)
-              .updateRememberTranscodeChoice(!remember),
-        ),
-        const Text('记住选择'),
-      ],
+    return _Checkbox(
+      label: '记住选择',
+      value: ref.watch(rememberTranscodeChoiceProvider),
+      onChanged: (_) =>
+          ref.read(rememberTranscodeChoiceProvider.notifier).toggle(),
+    );
+  }
+}
+
+class _UseOriginalDirectoryCheckbox extends ConsumerWidget {
+  const _UseOriginalDirectoryCheckbox();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return _Checkbox(
+      label: '使用原目录',
+      value: ref.watch(useOriginalDirectoryProvider),
+      onChanged: (_) =>
+          ref.read(useOriginalDirectoryProvider.notifier).toggle(),
     );
   }
 }
@@ -216,12 +223,7 @@ class _OutputDirectorySelector extends ConsumerWidget {
     final outputDir = ref.watch(outputDirectoryProvider);
     return Row(
       children: [
-        Checkbox(
-          value: useOriginal,
-          onChanged: (_) =>
-              ref.read(useOriginalDirectoryProvider.notifier).toggle(),
-        ),
-        const Text('使用原目录'),
+        const _UseOriginalDirectoryCheckbox(),
         if (!useOriginal) ...[
           const SizedBox(width: kSpaceBetweenItems),
           ElevatedButton(
@@ -249,21 +251,39 @@ class _OutputDirectorySelector extends ConsumerWidget {
   }
 }
 
+class _Checkbox extends ConsumerWidget {
+  final String label;
+  final bool value;
+  final void Function(bool?) onChanged;
+
+  const _Checkbox({
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final enabled = !ref.watch(transcodeProvider).isLoading;
+    return Row(
+      children: [
+        Checkbox(value: value, onChanged: enabled ? onChanged : null),
+        Text(label),
+      ],
+    );
+  }
+}
+
 class _OverwriteExistingFilesCheckbox extends ConsumerWidget {
   const _OverwriteExistingFilesCheckbox();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final overwrite = ref.watch(overwriteExistingFilesProvider);
-    return Row(
-      children: [
-        Checkbox(
-          value: overwrite,
-          onChanged: (_) =>
-              ref.read(overwriteExistingFilesProvider.notifier).toggle(),
-        ),
-        const Text('覆盖已有文件'),
-      ],
+    return _Checkbox(
+      label: '覆盖已有文件',
+      value: ref.watch(overwriteExistingFilesProvider),
+      onChanged: (_) =>
+          ref.read(overwriteExistingFilesProvider.notifier).toggle(),
     );
   }
 }
@@ -273,16 +293,25 @@ class _ClearMetadataCheckbox extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final clear = ref.watch(clearMetadataProvider);
-    return Row(
-      children: [
-        Checkbox(
-          value: clear,
-          onChanged: (value) =>
-              ref.read(clearMetadataProvider.notifier).set(value!),
-        ),
-        const Text('清除元数据'),
-      ],
+    return _Checkbox(
+      label: '清除元数据',
+      value: ref.watch(clearMetadataProvider),
+      onChanged: (value) =>
+          ref.read(clearMetadataProvider.notifier).set(value!),
+    );
+  }
+}
+
+class _KeepAudioOnlyCheckbox extends ConsumerWidget {
+  const _KeepAudioOnlyCheckbox();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return _Checkbox(
+      label: '仅保留音频',
+      value: ref.watch(keepAudioOnlyProvider),
+      onChanged: (value) =>
+          ref.read(keepAudioOnlyProvider.notifier).set(value!),
     );
   }
 }
@@ -292,16 +321,25 @@ class _RewriteMetadataCheckbox extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final rewrite = ref.watch(rewriteMetadataProvider);
-    return Row(
-      children: [
-        Checkbox(
-          value: rewrite,
-          onChanged: (value) =>
-              ref.read(rewriteMetadataProvider.notifier).set(value!),
-        ),
-        const Text('重写元数据'),
-      ],
+    return _Checkbox(
+      label: '重写元数据',
+      value: ref.watch(rewriteMetadataProvider),
+      onChanged: (value) =>
+          ref.read(rewriteMetadataProvider.notifier).set(value!),
+    );
+  }
+}
+
+class _RewriteFrontCoverCheckbox extends ConsumerWidget {
+  const _RewriteFrontCoverCheckbox();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return _Checkbox(
+      label: '重写封面',
+      value: ref.watch(rewriteFrontCoverProvider),
+      onChanged: (value) =>
+          ref.read(rewriteFrontCoverProvider.notifier).set(value!),
     );
   }
 }

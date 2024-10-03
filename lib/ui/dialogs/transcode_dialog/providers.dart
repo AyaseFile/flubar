@@ -18,10 +18,6 @@ class TranscodeFmt extends _$TranscodeFmt {
   void setFormat(TranscodeFormat format) {
     state = format;
   }
-
-  void saveFormat() {
-    ref.read(transcodeSettingsProvider.notifier).updateTranscodeFormat(state);
-  }
 }
 
 @riverpod
@@ -71,27 +67,6 @@ class TranscodeOpts extends _$TranscodeOpts {
   void setOptions(TranscodeOptions options) {
     state = options;
   }
-
-  void saveOptions() {
-    state.map(
-      copy: (_) {},
-      mp3: (mp3) {
-        ref
-            .read(transcodeSettingsProvider.notifier)
-            .updateMp3Bitrate(mp3.bitrate);
-      },
-      flac: (flac) {
-        ref
-            .read(transcodeSettingsProvider.notifier)
-            .updateFlacCompressionLevel(flac.compressionLevel);
-      },
-      wav: (wav) {
-        ref
-            .read(transcodeSettingsProvider.notifier)
-            .updateWavEncoder(wav.encoder);
-      },
-    );
-  }
 }
 
 @riverpod
@@ -103,11 +78,13 @@ class TranscodeCmd extends _$TranscodeCmd {
         .watch(transcodeSettingsProvider.select((state) => state.ffmpegPath));
     final overwrite = ref.watch(overwriteExistingFilesProvider);
     final clearMetadata = ref.watch(clearMetadataProvider);
+    final keepAudioOnly = ref.watch(keepAudioOnlyProvider);
     final command = TranscodeUtil.buildFfmpegCommand(
       ffmpegPath: ffmpegPath,
       options: options,
       overwriteExistingFiles: overwrite,
       clearMetadata: clearMetadata,
+      keepAudioOnly: keepAudioOnly,
     ).copyWith(
       inputs: [FfmpegInput.asset('{input_file}')],
       outputFilepath: '{output_file}',
@@ -130,6 +107,22 @@ class Transcode extends _$Transcode {
   AsyncValue<void> build() => const AsyncValue.data(null);
 
   Future<void> transcodeFiles() async {
+    final remember = ref.read(rememberTranscodeChoiceProvider);
+    if (remember) {
+      ref
+          .read(transcodeSettingsProvider.notifier)
+          .updateTranscodeDialogSettings(
+            transcodeFormat: ref.read(transcodeFmtProvider),
+            options: ref.read(transcodeOptsProvider),
+            rememberTranscodeChoice: remember,
+            useOriginalDirectory: ref.read(useOriginalDirectoryProvider),
+            overwriteExistingFiles: ref.read(overwriteExistingFilesProvider),
+            clearMetadata: ref.read(clearMetadataProvider),
+            keepAudioOnly: ref.read(keepAudioOnlyProvider),
+            rewriteMetadata: ref.read(rewriteMetadataProvider),
+            rewriteFrontCover: ref.read(rewriteFrontCoverProvider),
+          );
+    }
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       await ref.read(transcodeUtilProvider.notifier).performTasks();
@@ -149,14 +142,6 @@ class OutputDirectory extends _$OutputDirectory {
 }
 
 @riverpod
-class UseOriginalDirectory extends _$UseOriginalDirectory {
-  @override
-  bool build() => true;
-
-  void toggle() => state = !state;
-}
-
-@riverpod
 class TranscodeFailedCount extends _$TranscodeFailedCount {
   @override
   int build() => 0;
@@ -164,19 +149,6 @@ class TranscodeFailedCount extends _$TranscodeFailedCount {
   void increment() => state++;
 
   void setCancelled() => state = -1;
-}
-
-@riverpod
-class OverwriteExistingFiles extends _$OverwriteExistingFiles {
-  @override
-  bool build() => ref.watch(transcodeSettingsProvider
-      .select((state) => state.overwriteExistingFiles));
-
-  void toggle() => state = !state;
-
-  void save() => ref
-      .read(transcodeSettingsProvider.notifier)
-      .updateOverwriteExistingFiles(state);
 }
 
 @riverpod
@@ -189,9 +161,37 @@ class OutputFileNameTpl extends _$OutputFileNameTpl {
 }
 
 @riverpod
+class RememberTranscodeChoice extends _$RememberTranscodeChoice {
+  @override
+  bool build() => ref.watch(transcodeSettingsProvider
+      .select((state) => state.rememberTranscodeChoice));
+
+  void toggle() => state = !state;
+}
+
+@riverpod
+class UseOriginalDirectory extends _$UseOriginalDirectory {
+  @override
+  bool build() => ref.watch(
+      transcodeSettingsProvider.select((state) => state.useOriginalDirectory));
+
+  void toggle() => state = !state;
+}
+
+@riverpod
+class OverwriteExistingFiles extends _$OverwriteExistingFiles {
+  @override
+  bool build() => ref.watch(transcodeSettingsProvider
+      .select((state) => state.overwriteExistingFiles));
+
+  void toggle() => state = !state;
+}
+
+@riverpod
 class ClearMetadata extends _$ClearMetadata {
   @override
-  bool build() => true;
+  bool build() => ref
+      .watch(transcodeSettingsProvider.select((state) => state.clearMetadata));
 
   void set(bool value) => value ? enable() : disable();
 
@@ -206,15 +206,52 @@ class ClearMetadata extends _$ClearMetadata {
 }
 
 @riverpod
+class KeepAudioOnly extends _$KeepAudioOnly {
+  @override
+  bool build() => ref
+      .watch(transcodeSettingsProvider.select((state) => state.keepAudioOnly));
+
+  void set(bool value) => value ? enable() : disable();
+
+  void enable() {
+    state = true;
+  }
+
+  void disable() {
+    state = false;
+    ref.read(rewriteFrontCoverProvider.notifier).disable();
+  }
+}
+
+@riverpod
 class RewriteMetadata extends _$RewriteMetadata {
   @override
-  bool build() => true;
+  bool build() => ref.watch(
+      transcodeSettingsProvider.select((state) => state.rewriteMetadata));
 
   void set(bool value) => value ? enable() : disable();
 
   void enable() {
     state = true;
     ref.read(clearMetadataProvider.notifier).enable();
+  }
+
+  void disable() {
+    state = false;
+  }
+}
+
+@riverpod
+class RewriteFrontCover extends _$RewriteFrontCover {
+  @override
+  bool build() => ref.watch(
+      transcodeSettingsProvider.select((state) => state.rewriteFrontCover));
+
+  void set(bool value) => value ? enable() : disable();
+
+  void enable() {
+    state = true;
+    ref.read(keepAudioOnlyProvider.notifier).enable();
   }
 
   void disable() {

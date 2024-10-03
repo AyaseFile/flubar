@@ -11,7 +11,12 @@ class DefaultSettings {
   static const kDefaultFlacCompressionLevel = 5;
   static const kDefaultWavEncoder = FfmpegEncoder.pcm_s16le;
   static const kRememberTranscodeChoice = true;
+  static const kUseOriginalDirectory = true;
   static const kOverwriteExistingFiles = false;
+  static const kClearMetadata = true;
+  static const kKeepAudioOnly = true;
+  static const kRewriteMetadata = true;
+  static const kRewriteFrontCover = true;
   static const kWarningToLossy = false;
   static const kWarningFloatToInt = true;
   static const kWindowWidth = 800.0;

@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flubar/app/talker.dart';
 import 'package:flubar/models/state/settings.dart';
+import 'package:flubar/utils/transcode/transcode.dart';
 import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -114,7 +115,12 @@ class TranscodeSettings extends _$TranscodeSettings {
           flacCompressionLevel: loadedSettings.flacCompressionLevel,
           wavEncoder: loadedSettings.wavEncoder,
           rememberTranscodeChoice: loadedSettings.rememberTranscodeChoice,
+          useOriginalDirectory: loadedSettings.useOriginalDirectory,
           overwriteExistingFiles: loadedSettings.overwriteExistingFiles,
+          clearMetadata: loadedSettings.clearMetadata,
+          keepAudioOnly: loadedSettings.keepAudioOnly,
+          rewriteMetadata: loadedSettings.rewriteMetadata,
+          rewriteFrontCover: loadedSettings.rewriteFrontCover,
         );
       } catch (e) {
         globalTalker.handle(e, null, '无法解析转码设置: $str');
@@ -154,13 +160,39 @@ class TranscodeSettings extends _$TranscodeSettings {
     _save();
   }
 
-  void updateRememberTranscodeChoice(bool rememberTranscodeChoice) {
-    state = state.copyWith(rememberTranscodeChoice: rememberTranscodeChoice);
-    _save();
-  }
-
-  void updateOverwriteExistingFiles(bool overwriteExistingFiles) {
-    state = state.copyWith(overwriteExistingFiles: overwriteExistingFiles);
+  void updateTranscodeDialogSettings({
+    required TranscodeFormat transcodeFormat,
+    required TranscodeOptions options,
+    required bool rememberTranscodeChoice,
+    required bool useOriginalDirectory,
+    required bool overwriteExistingFiles,
+    required bool clearMetadata,
+    required bool keepAudioOnly,
+    required bool rewriteMetadata,
+    required bool rewriteFrontCover,
+  }) {
+    state = state.copyWith(
+      transcodeFormat: transcodeFormat,
+      mp3Bitrate: options.maybeMap(
+        mp3: (mp3) => mp3.bitrate,
+        orElse: () => state.mp3Bitrate,
+      ),
+      flacCompressionLevel: options.maybeMap(
+        flac: (flac) => flac.compressionLevel,
+        orElse: () => state.flacCompressionLevel,
+      ),
+      wavEncoder: options.maybeMap(
+        wav: (wav) => wav.encoder,
+        orElse: () => state.wavEncoder,
+      ),
+      rememberTranscodeChoice: rememberTranscodeChoice,
+      useOriginalDirectory: useOriginalDirectory,
+      overwriteExistingFiles: overwriteExistingFiles,
+      clearMetadata: clearMetadata,
+      keepAudioOnly: keepAudioOnly,
+      rewriteMetadata: rewriteMetadata,
+      rewriteFrontCover: rewriteFrontCover,
+    );
     _save();
   }
 

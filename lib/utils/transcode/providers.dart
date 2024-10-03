@@ -38,7 +38,9 @@ class TranscodeUtil extends _$TranscodeUtil
     ref.keepAlive();
   }
 
-  void setIsolateTask({required bool rewrite}) {
+  void setIsolateTask(
+      {required bool rewriteMetadata, required bool rewriteFrontCover}) {
+    final rewrite = rewriteMetadata || rewriteFrontCover;
     isolateTask = (List<dynamic> args) async {
       if (rewrite) await RustLib.init();
       final sendPort = args[0] as SendPort;
@@ -68,12 +70,16 @@ class TranscodeUtil extends _$TranscodeUtil
               continue;
             }
             final metadata = track.metadata;
-            await loftyWriteMetadata(
-                file: outputFile,
-                metadata: metadata,
-                force: true); // 清除了元数据, 需要强制写入
-            await loftyWritePicture(
-                file: outputFile, picture: metadata.frontCover, force: true);
+            if (rewriteMetadata) {
+              await loftyWriteMetadata(
+                  file: outputFile,
+                  metadata: metadata,
+                  force: true); // 清除了元数据, 需要强制写入
+            }
+            if (rewriteFrontCover) {
+              await loftyWritePicture(
+                  file: outputFile, picture: metadata.frontCover, force: true);
+            }
             sendPort.send({'error': null});
           } else {
             final stderr = await process.stderr.transform(utf8.decoder).join();
@@ -95,6 +101,7 @@ class TranscodeUtil extends _$TranscodeUtil
     required TranscodeOptions options,
     required bool overwriteExistingFiles,
     required bool clearMetadata,
+    required bool keepAudioOnly,
   }) {
     final args = <CliArg>[];
 
@@ -124,9 +131,12 @@ class TranscodeUtil extends _$TranscodeUtil
     if (clearMetadata) {
       args.addAll([
         const CliArg(name: 'bitexact'),
-        const CliArg(name: 'map', value: '0:a'),
         const CliArg(name: 'map_metadata', value: '-1'),
       ]);
+    }
+
+    if (keepAudioOnly) {
+      args.add(const CliArg(name: 'map', value: '0:a'));
     }
 
     return FfmpegCommand.simple(
@@ -176,13 +186,19 @@ class TranscodeUtil extends _$TranscodeUtil
         ref.read(transcodeSettingsProvider.select((state) => state.ffmpegPath));
     final overwrite = ref.read(overwriteExistingFilesProvider);
     final clearMetadata = ref.read(clearMetadataProvider);
-    final rewrite = ref.read(rewriteMetadataProvider);
-    setIsolateTask(rewrite: rewrite);
+    final keepAudioOnly = ref.read(keepAudioOnlyProvider);
+    final rewriteMetadata = ref.read(rewriteMetadataProvider);
+    final rewriteFrontCover = ref.read(rewriteFrontCoverProvider);
+    setIsolateTask(
+      rewriteMetadata: rewriteMetadata,
+      rewriteFrontCover: rewriteFrontCover,
+    );
     _baseCommand = buildFfmpegCommand(
       ffmpegPath: ffmpegPath,
       options: options,
       overwriteExistingFiles: overwrite,
       clearMetadata: clearMetadata,
+      keepAudioOnly: keepAudioOnly,
     );
     _ext = options.map(
       copy: (_) => null,
