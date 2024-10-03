@@ -1,4 +1,5 @@
 import 'package:flubar/ui/constants.dart';
+import 'package:flubar/ui/dialogs/fixed_size_dialog/view.dart';
 import 'package:flubar/ui/view/tracklist_view/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,32 +14,25 @@ class PropertiesDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return SizedBox(
+    return FixedSizeDialog(
       width: kDialogWidth,
       height: kDialogHeight,
-      child: Dialog(
-        insetPadding: EdgeInsets.zero,
-        clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Padding(
-          padding: kDoubleViewPadding,
-          child: Scaffold(
-            appBar: AppBar(
-              backgroundColor: Colors.transparent,
-              scrolledUnderElevation: 0,
-              automaticallyImplyLeading: false,
-              title: const Text('属性'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('退出'),
-                ),
-              ],
-            ),
-            body: const PropertiesTableView(),
+      child: Padding(
+        padding: kDoubleViewPadding,
+        child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            scrolledUnderElevation: 0,
+            automaticallyImplyLeading: false,
+            title: const Text('属性'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('退出'),
+              ),
+            ],
           ),
+          body: const PropertiesTableView(),
         ),
       ),
     );

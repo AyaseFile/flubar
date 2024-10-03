@@ -24,9 +24,6 @@ class SettingsView extends StatelessWidget {
     return Dialog(
         insetPadding: EdgeInsets.zero,
         clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
         child: Scaffold(
           appBar: AppBar(title: const Text('设置')),
           body: const _SettingsListView(),

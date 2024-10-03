@@ -1,5 +1,6 @@
 import 'package:flubar/models/state/track_cover.dart';
 import 'package:flubar/ui/constants.dart';
+import 'package:flubar/ui/dialogs/fixed_size_dialog/view.dart';
 import 'package:flubar/ui/widgets/cover_drag_widget/view.dart';
 import 'package:flubar/utils/metadata/providers.dart';
 import 'package:flutter/material.dart';
@@ -21,71 +22,63 @@ class CoverDialog extends ConsumerWidget {
         : ref.watch(groupedTrackCoverProvider);
     final coverIndex = ref.watch(currentTrackCoverIndexProvider);
 
-    return SizedBox(
+    return FixedSizeDialog(
       width: kDialogWidth,
       height: kDialogHeight,
-      child: Dialog(
-        insetPadding: EdgeInsets.zero,
-        clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Padding(
-          padding: kDoubleViewPadding,
-          child: Scaffold(
-            appBar: AppBar(
-              backgroundColor: Colors.transparent,
-              scrolledUnderElevation: 0,
-              automaticallyImplyLeading: false,
-              title: const Text('编辑封面'),
-              actions: [
-                IconButton(
-                  onPressed: coverIndex > 0
-                      ? () => ref
-                          .read(currentTrackCoverIndexProvider.notifier)
-                          .previous()
-                      : null,
-                  icon: const Icon(Icons.arrow_back),
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                  onPressed: coverIndex < selectedCovers.length - 1
-                      ? () => ref
-                          .read(currentTrackCoverIndexProvider.notifier)
-                          .next()
-                      : null,
-                  icon: const Icon(Icons.arrow_forward),
-                ),
-                const SizedBox(width: 8),
-                TextButton(
-                  onPressed: !ref.watch(metadataUtilProvider).isLoading
-                      ? () => Navigator.of(context).pop()
-                      : null,
-                  child: const Text('取消'),
-                ),
-                const SizedBox(width: 8),
-                ref.watch(metadataUtilProvider).isLoading
-                    ? const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(),
-                        ))
-                    : TextButton(
-                        onPressed: () async {
-                          await ref
-                              .read(metadataUtilProvider.notifier)
-                              .writeCover(isBatch);
-                          if (context.mounted) Navigator.of(context).pop();
-                        },
-                        autofocus: true,
-                        child: const Text('保存'),
-                      ),
-              ],
-            ),
-            body: _buildBody(selectedCovers[coverIndex], ref),
+      child: Padding(
+        padding: kDoubleViewPadding,
+        child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            scrolledUnderElevation: 0,
+            automaticallyImplyLeading: false,
+            title: const Text('编辑封面'),
+            actions: [
+              IconButton(
+                onPressed: coverIndex > 0
+                    ? () => ref
+                        .read(currentTrackCoverIndexProvider.notifier)
+                        .previous()
+                    : null,
+                icon: const Icon(Icons.arrow_back),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                onPressed: coverIndex < selectedCovers.length - 1
+                    ? () =>
+                        ref.read(currentTrackCoverIndexProvider.notifier).next()
+                    : null,
+                icon: const Icon(Icons.arrow_forward),
+              ),
+              const SizedBox(width: 8),
+              TextButton(
+                onPressed: !ref.watch(metadataUtilProvider).isLoading
+                    ? () => Navigator.of(context).pop()
+                    : null,
+                child: const Text('取消'),
+              ),
+              const SizedBox(width: 8),
+              ref.watch(metadataUtilProvider).isLoading
+                  ? const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(),
+                      ))
+                  : TextButton(
+                      onPressed: () async {
+                        await ref
+                            .read(metadataUtilProvider.notifier)
+                            .writeCover(isBatch);
+                        if (context.mounted) Navigator.of(context).pop();
+                      },
+                      autofocus: true,
+                      child: const Text('保存'),
+                    ),
+            ],
           ),
+          body: _buildBody(selectedCovers[coverIndex], ref),
         ),
       ),
     );

@@ -4,6 +4,7 @@ import 'package:flubar/ui/constants.dart';
 import 'package:flubar/ui/dialogs/editable_table_view/constants.dart';
 import 'package:flubar/ui/dialogs/editable_table_view/providers.dart';
 import 'package:flubar/ui/dialogs/editable_table_view/view.dart';
+import 'package:flubar/ui/dialogs/fixed_size_dialog/view.dart';
 import 'package:flubar/ui/dialogs/input_dialog/view.dart';
 import 'package:flubar/ui/view/tracklist_view/advanced_column.dart';
 import 'package:flubar/ui/view/tracklist_view/constants.dart';
@@ -36,81 +37,74 @@ class _EditMetadataDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return SizedBox(
+    return FixedSizeDialog(
       width: kDialogWidth,
       height: kDialogHeight,
-      child: Dialog(
-        insetPadding: EdgeInsets.zero,
-        clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Padding(
-          padding: kDoubleViewPadding,
-          child: Scaffold(
-            appBar: AppBar(
-              backgroundColor: Colors.transparent,
-              scrolledUnderElevation: 0,
-              automaticallyImplyLeading: false,
-              title: const Text('编辑元数据'),
-              actions: [
-                Builder(builder: (context) {
-                  return IconButton(
-                    icon: const Icon(Icons.settings),
-                    onPressed: () {
-                      _showSettingsPopupMenu(
-                        context: context,
-                        children: [
-                          ListTile(
-                            title: const Text('强制写入元数据'),
-                            trailing: Consumer(builder: (context, ref, _) {
-                              final force = ref.watch(metadataSettingsProvider
-                                  .select((state) => state.forceWriteMetadata));
-                              return Checkbox(
-                                value: force,
-                                onChanged: (value) => ref
-                                    .read(metadataSettingsProvider.notifier)
-                                    .updateForceWriteMetadata(value!),
-                              );
-                            }),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                }),
-                const SizedBox(width: 8),
-                TextButton(
-                  onPressed: !ref.watch(metadataUtilProvider).isLoading
-                      ? () => Navigator.of(context).pop()
-                      : null,
-                  child: const Text('取消'),
-                ),
-                const SizedBox(width: 8),
-                ref.watch(metadataUtilProvider).isLoading
-                    ? const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(),
-                        ))
-                    : TextButton(
-                        onPressed: () async {
-                          final success = await ref
-                              .read(metadataUtilProvider.notifier)
-                              .writeMetadata();
-                          if (context.mounted && success) {
-                            Navigator.of(context).pop();
-                          }
-                        },
-                        autofocus: true,
-                        child: const Text('保存'),
-                      ),
-              ],
-            ),
-            body: const MetadataTableView(),
+      child: Padding(
+        padding: kDoubleViewPadding,
+        child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            scrolledUnderElevation: 0,
+            automaticallyImplyLeading: false,
+            title: const Text('编辑元数据'),
+            actions: [
+              Builder(builder: (context) {
+                return IconButton(
+                  icon: const Icon(Icons.settings),
+                  onPressed: () {
+                    _showSettingsPopupMenu(
+                      context: context,
+                      children: [
+                        ListTile(
+                          title: const Text('强制写入元数据'),
+                          trailing: Consumer(builder: (context, ref, _) {
+                            final force = ref.watch(metadataSettingsProvider
+                                .select((state) => state.forceWriteMetadata));
+                            return Checkbox(
+                              value: force,
+                              onChanged: (value) => ref
+                                  .read(metadataSettingsProvider.notifier)
+                                  .updateForceWriteMetadata(value!),
+                            );
+                          }),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              }),
+              const SizedBox(width: 8),
+              TextButton(
+                onPressed: !ref.watch(metadataUtilProvider).isLoading
+                    ? () => Navigator.of(context).pop()
+                    : null,
+                child: const Text('取消'),
+              ),
+              const SizedBox(width: 8),
+              ref.watch(metadataUtilProvider).isLoading
+                  ? const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(),
+                      ))
+                  : TextButton(
+                      onPressed: () async {
+                        final success = await ref
+                            .read(metadataUtilProvider.notifier)
+                            .writeMetadata();
+                        if (context.mounted && success) {
+                          Navigator.of(context).pop();
+                        }
+                      },
+                      autofocus: true,
+                      child: const Text('保存'),
+                    ),
+            ],
           ),
+          body: const MetadataTableView(),
         ),
       ),
     );

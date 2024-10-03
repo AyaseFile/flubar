@@ -1,5 +1,6 @@
 import 'package:flubar/ui/constants.dart';
 import 'package:flubar/ui/dialogs/metadata_dialog/providers.dart';
+import 'package:flubar/ui/dialogs/ratio_dialog/view.dart';
 import 'package:flubar/ui/view/tracklist_view/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -18,12 +19,7 @@ class EditableTableDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      insetPadding: EdgeInsets.zero,
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+    return RatioDialog(
       child: Padding(
         padding: kDoubleViewPadding,
         child: Scaffold(

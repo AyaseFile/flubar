@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/models/state/settings.dart';
+import 'package:flubar/ui/dialogs/ratio_dialog/view.dart';
 import 'package:flubar/ui/snackbar/view.dart';
 import 'package:flubar/utils/warnings/providers.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +27,7 @@ class _TranscodeDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final transcodeState = ref.watch(transcodeProvider);
-    return AlertDialog(
+    return RatioAlertDialog(
       title: const Row(children: [Text('转码'), Spacer(), _WarningIcon()]),
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

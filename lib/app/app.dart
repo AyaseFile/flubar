@@ -14,10 +14,20 @@ class FlubarApp extends ConsumerWidget {
       theme: ThemeData(
         brightness: Brightness.light,
         colorSchemeSeed: Colors.lightBlue,
+        dialogTheme: DialogTheme(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
         colorSchemeSeed: Colors.lightBlue,
+        dialogTheme: DialogTheme(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
       ),
       themeMode:
           ref.watch(generalSettingsProvider.select((state) => state.darkMode))
