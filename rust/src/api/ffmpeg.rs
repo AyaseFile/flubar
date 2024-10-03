@@ -88,20 +88,22 @@ pub fn read_file(file: String) -> Result<(Metadata, Properties)> {
     }
 
     let video_stream = context.streams().best(ffmpeg::media::Type::Video).map(|stream| stream.index());
+    let audio_stream = context.streams().best(ffmpeg::media::Type::Audio).map(|stream| stream.index());
 
     let mut packets = Vec::new();
     for (stream, packet) in context.packets() {
         if video_stream.is_some() && stream.index() == video_stream.unwrap() {
             if let Some(data) = packet.data() {
                 metadata.front_cover = Some(data.to_vec());
-                break;
             }
         }
-        packets.push((stream.index(), packet));
+        if audio_stream.is_some() && stream.index() == audio_stream.unwrap() {
+            packets.push(packet);
+        }
     }
 
-    if let Some(stream) = context.streams().best(ffmpeg::media::Type::Audio) {
-        let audio_stream = stream.index();
+    if let Some(stream_index) = audio_stream {
+        let stream = context.stream(stream_index).unwrap();
         properties.duration_sec = Some(stream.duration() as f64 * f64::from(stream.time_base()));
         let codec = ffmpeg::codec::context::Context::from_parameters(stream.parameters())?;
         if let Ok(audio) = codec.decoder().audio() {
@@ -132,10 +134,8 @@ pub fn read_file(file: String) -> Result<(Metadata, Properties)> {
 
         if properties.bit_rate.is_none() && properties.duration_sec.is_some() {
             let mut total_bytes = 0;
-            for (stream, packet) in &packets {
-                if stream == &audio_stream {
-                    total_bytes += packet.size();
-                }
+            for packet in &packets {
+                total_bytes += packet.size();
             }
             let duration = properties.duration_sec.unwrap();
             properties.bit_rate = Some((total_bytes as f64 / duration * 8.0) as u32);
