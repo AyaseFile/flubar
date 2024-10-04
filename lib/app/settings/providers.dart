@@ -230,6 +230,7 @@ class TranscodeWarnings extends _$TranscodeWarnings {
         return defaultSettings.copyWith(
           toLossy: loadedSettings.toLossy,
           floatToInt: loadedSettings.floatToInt,
+          highToLowBit: loadedSettings.highToLowBit,
         );
       } catch (e) {
         globalTalker.handle(e, null, '无法解析转码警告设置: $str');
@@ -246,6 +247,11 @@ class TranscodeWarnings extends _$TranscodeWarnings {
 
   void updateFloatToInt(bool floatToInt) {
     state = state.copyWith(floatToInt: floatToInt);
+    _save();
+  }
+
+  void updateHighToLowBit(bool highToLowBit) {
+    state = state.copyWith(highToLowBit: highToLowBit);
     _save();
   }
 

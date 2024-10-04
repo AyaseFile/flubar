@@ -21,6 +21,7 @@ class DefaultSettings {
   static const kRewriteFrontCover = true;
   static const kWarningToLossy = false;
   static const kWarningFloatToInt = true;
+  static const kWarningHighToLowBit = true;
   static const kWindowWidth = 800.0;
   static const kWindowHeight = 600.0;
 }

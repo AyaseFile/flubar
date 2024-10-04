@@ -85,6 +85,7 @@ class TranscodeWarningsModel with _$TranscodeWarningsModel {
   const factory TranscodeWarningsModel({
     @Default(_S.kWarningToLossy) bool toLossy,
     @Default(_S.kWarningFloatToInt) bool floatToInt,
+    @Default(_S.kWarningHighToLowBit) bool highToLowBit,
   }) = _TranscodeWarnings;
 
   factory TranscodeWarningsModel.fromJson(Map<String, dynamic> json) =>

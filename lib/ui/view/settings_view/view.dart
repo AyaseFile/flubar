@@ -219,6 +219,15 @@ class _SettingsListView extends ConsumerWidget {
                   .read(transcodeWarningsProvider.notifier)
                   .updateFloatToInt(value),
             ),
+            SwitchSettingsTile<TranscodeWarnings, TranscodeWarningsModel>(
+              title: '高位转低位',
+              leading: const SizedBox(width: 24),
+              provider: transcodeWarningsProvider,
+              selector: (state) => state.highToLowBit,
+              onToggle: (value) => ref
+                  .read(transcodeWarningsProvider.notifier)
+                  .updateHighToLowBit(value),
+            ),
           ],
         ),
       ],
