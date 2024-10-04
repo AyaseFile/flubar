@@ -14,6 +14,7 @@ class DefaultSettings {
   static const kRememberTranscodeChoice = true;
   static const kUseOriginalDirectory = true;
   static const kOverwriteExistingFiles = false;
+  static const deleteOriginalFiles = false;
   static const kClearMetadata = true;
   static const kKeepAudioOnly = true;
   static const kRewriteMetadata = true;

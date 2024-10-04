@@ -105,6 +105,8 @@ class _TranscodeSettings extends StatelessWidget {
             _OutputDirectorySelector(),
             SizedBox(width: kSpaceBetweenItems),
             _OverwriteExistingFilesCheckbox(),
+            SizedBox(width: kSpaceBetweenItems),
+            _DeleteOriginalFilesCheckbox(),
           ]),
         ),
         _SettingRow(
@@ -284,6 +286,19 @@ class _OverwriteExistingFilesCheckbox extends ConsumerWidget {
       value: ref.watch(overwriteExistingFilesProvider),
       onChanged: (_) =>
           ref.read(overwriteExistingFilesProvider.notifier).toggle(),
+    );
+  }
+}
+
+class _DeleteOriginalFilesCheckbox extends ConsumerWidget {
+  const _DeleteOriginalFilesCheckbox();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return _Checkbox(
+      label: '删除原文件',
+      value: ref.watch(deleteOriginalFilesProvider),
+      onChanged: (_) => ref.read(deleteOriginalFilesProvider.notifier).toggle(),
     );
   }
 }

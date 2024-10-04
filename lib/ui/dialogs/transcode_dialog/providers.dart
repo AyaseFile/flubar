@@ -117,6 +117,7 @@ class Transcode extends _$Transcode {
             rememberTranscodeChoice: remember,
             useOriginalDirectory: ref.read(useOriginalDirectoryProvider),
             overwriteExistingFiles: ref.read(overwriteExistingFilesProvider),
+            deleteOriginalFiles: ref.read(deleteOriginalFilesProvider),
             clearMetadata: ref.read(clearMetadataProvider),
             keepAudioOnly: ref.read(keepAudioOnlyProvider),
             rewriteMetadata: ref.read(rewriteMetadataProvider),
@@ -183,6 +184,15 @@ class OverwriteExistingFiles extends _$OverwriteExistingFiles {
   @override
   bool build() => ref.watch(transcodeSettingsProvider
       .select((state) => state.overwriteExistingFiles));
+
+  void toggle() => state = !state;
+}
+
+@riverpod
+class DeleteOriginalFiles extends _$DeleteOriginalFiles {
+  @override
+  bool build() => ref.watch(
+      transcodeSettingsProvider.select((state) => state.deleteOriginalFiles));
 
   void toggle() => state = !state;
 }

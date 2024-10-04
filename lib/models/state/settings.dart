@@ -69,6 +69,7 @@ class TranscodeSettingsModel with _$TranscodeSettingsModel {
     @Default(_S.kRememberTranscodeChoice) bool rememberTranscodeChoice,
     @Default(_S.kUseOriginalDirectory) bool useOriginalDirectory,
     @Default(_S.kOverwriteExistingFiles) bool overwriteExistingFiles,
+    @Default(_S.deleteOriginalFiles) bool deleteOriginalFiles,
     @Default(_S.kClearMetadata) bool clearMetadata,
     @Default(_S.kKeepAudioOnly) bool keepAudioOnly,
     @Default(_S.kRewriteMetadata) bool rewriteMetadata,

@@ -38,8 +38,11 @@ class TranscodeUtil extends _$TranscodeUtil
     ref.keepAlive();
   }
 
-  void setIsolateTask(
-      {required bool rewriteMetadata, required bool rewriteFrontCover}) {
+  void setIsolateTask({
+    required bool deleteOriginalFiles,
+    required bool rewriteMetadata,
+    required bool rewriteFrontCover,
+  }) {
     final rewrite = rewriteMetadata || rewriteFrontCover;
     isolateTask = (List<dynamic> args) async {
       if (rewrite) await RustLib.init();
@@ -65,6 +68,9 @@ class TranscodeUtil extends _$TranscodeUtil
           final process = await Process.start(cli.executable, cli.args);
           final exitCode = await process.exitCode;
           if (exitCode == 0) {
+            if (deleteOriginalFiles) {
+              await File(path).delete();
+            }
             if (!rewrite) {
               sendPort.send({'error': null});
               continue;
@@ -185,11 +191,13 @@ class TranscodeUtil extends _$TranscodeUtil
     final ffmpegPath =
         ref.read(transcodeSettingsProvider.select((state) => state.ffmpegPath));
     final overwrite = ref.read(overwriteExistingFilesProvider);
+    final delete = ref.read(deleteOriginalFilesProvider);
     final clearMetadata = ref.read(clearMetadataProvider);
     final keepAudioOnly = ref.read(keepAudioOnlyProvider);
     final rewriteMetadata = ref.read(rewriteMetadataProvider);
     final rewriteFrontCover = ref.read(rewriteFrontCoverProvider);
     setIsolateTask(
+      deleteOriginalFiles: delete,
       rewriteMetadata: rewriteMetadata,
       rewriteFrontCover: rewriteFrontCover,
     );
