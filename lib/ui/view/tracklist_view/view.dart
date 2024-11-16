@@ -270,7 +270,7 @@ class TrackRow extends ConsumerWidget {
           callback: () async => await ref
               .read(getDialogProvider.notifier)
               .show<void>(const Dialog(child: EditMetadataDialog()),
-                  barrierDismissible: true),
+                  barrierDismissible: false),
         ),
         Menu(
           title: '编辑封面',
@@ -283,7 +283,7 @@ class TrackRow extends ConsumerWidget {
                   const dialog = Dialog(child: CoverDialog(isBatch: false));
                   await ref
                       .read(getDialogProvider.notifier)
-                      .show<void>(dialog, barrierDismissible: true);
+                      .show<void>(dialog, barrierDismissible: false);
                 }),
             MenuAction(
                 title: '批量编辑',
@@ -295,7 +295,7 @@ class TrackRow extends ConsumerWidget {
                   const dialog = Dialog(child: CoverDialog(isBatch: true));
                   await ref
                       .read(getDialogProvider.notifier)
-                      .show<void>(dialog, barrierDismissible: true);
+                      .show<void>(dialog, barrierDismissible: false);
                 }),
           ],
         ),

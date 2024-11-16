@@ -323,12 +323,15 @@ class _MetadataRow extends ConsumerWidget {
                 };
                 columns.add(AdvancedColumn(id: columnId, width: columnWidth));
               }
-              Get.dialog(ProviderScope(
-                overrides: [
-                  editableTableColumnsProvider.overrideWithValue(columns)
-                ],
-                child: const EditableTableDialog(),
-              ));
+              Get.dialog(
+                ProviderScope(
+                  overrides: [
+                    editableTableColumnsProvider.overrideWithValue(columns)
+                  ],
+                  child: const EditableTableDialog(),
+                ),
+                barrierDismissible: false,
+              );
             },
           ),
         MenuAction(
