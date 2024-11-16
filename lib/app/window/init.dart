@@ -5,7 +5,7 @@ import 'package:window_manager/window_manager.dart';
 Future<void> initWindow(double width, double height) async {
   await windowManager.ensureInitialized();
 
-  windowManager.waitUntilReadyToShow(
+  return windowManager.waitUntilReadyToShow(
       WindowOptions(
         size: Size(width, height),
         minimumSize: const Size(700, 500),
