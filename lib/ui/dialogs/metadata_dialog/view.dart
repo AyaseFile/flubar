@@ -49,7 +49,7 @@ class _EditMetadataDialog extends ConsumerWidget {
             automaticallyImplyLeading: false,
             title: const Text('编辑元数据'),
             actions: [
-              const _SettingsIconButton(),
+              const MetadataSettingsIconButton(),
               const SizedBox(width: 8),
               TextButton(
                 onPressed: !ref.watch(metadataUtilProvider).isLoading
@@ -87,8 +87,8 @@ class _EditMetadataDialog extends ConsumerWidget {
   }
 }
 
-class _SettingsIconButton extends ConsumerWidget {
-  const _SettingsIconButton();
+class MetadataSettingsIconButton extends ConsumerWidget {
+  const MetadataSettingsIconButton({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -97,7 +97,7 @@ class _SettingsIconButton extends ConsumerWidget {
         icon: const Icon(Icons.settings),
         onPressed: !ref.watch(metadataUtilProvider).isLoading
             ? () {
-                _showSettingsPopupMenu(
+                showSettingsPopupMenu(
                   context: context,
                   children: [
                     ListTile(
@@ -126,7 +126,7 @@ class _SettingsIconButton extends ConsumerWidget {
                         );
                       }),
                     ),
-                  ],
+                  ].map((e) => PopupMenuItem<void>(child: e)).toList(),
                 );
               }
             : null,
@@ -134,9 +134,9 @@ class _SettingsIconButton extends ConsumerWidget {
     });
   }
 
-  void _showSettingsPopupMenu({
+  static void showSettingsPopupMenu({
     required BuildContext context,
-    required List<ListTile> children,
+    required List<PopupMenuItem<void>> children,
   }) {
     final button = context.findRenderObject() as RenderBox;
     final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
@@ -151,18 +151,7 @@ class _SettingsIconButton extends ConsumerWidget {
     showMenu<void>(
       context: context,
       position: position,
-      items: [
-        PopupMenuItem<void>(
-          child: IntrinsicHeight(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: children,
-              ),
-            ),
-          ),
-        ),
-      ],
+      items: children,
     );
   }
 }

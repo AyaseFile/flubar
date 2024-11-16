@@ -1,6 +1,8 @@
+import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/models/state/track_cover.dart';
 import 'package:flubar/ui/constants.dart';
 import 'package:flubar/ui/dialogs/fixed_size_dialog/view.dart';
+import 'package:flubar/ui/dialogs/metadata_dialog/view.dart';
 import 'package:flubar/ui/widgets/cover_drag_widget/view.dart';
 import 'package:flubar/utils/metadata/providers.dart';
 import 'package:flutter/material.dart';
@@ -50,6 +52,8 @@ class CoverDialog extends ConsumerWidget {
                     : null,
                 icon: const Icon(Icons.arrow_forward),
               ),
+              const SizedBox(width: 8),
+              const _CoverSettingsIconButton(),
               const SizedBox(width: 8),
               TextButton(
                 onPressed: !ref.watch(metadataUtilProvider).isLoading
@@ -193,5 +197,53 @@ class CoverDialog extends ConsumerWidget {
     } else {
       return '未知';
     }
+  }
+}
+
+class _CoverSettingsIconButton extends ConsumerWidget {
+  const _CoverSettingsIconButton();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Builder(builder: (context) {
+      return IconButton(
+        icon: const Icon(Icons.settings),
+        onPressed: !ref.watch(metadataUtilProvider).isLoading
+            ? () {
+                MetadataSettingsIconButton.showSettingsPopupMenu(
+                  context: context,
+                  children: [
+                    ListTile(
+                      title: const Text('仅写入内存'),
+                      trailing: Consumer(builder: (context, ref, _) {
+                        final writeToMemory = ref.watch(metadataSettingsProvider
+                            .select((state) => state.writeToMemoryOnly));
+                        return Checkbox(
+                          value: writeToMemory,
+                          onChanged: (value) => ref
+                              .read(metadataSettingsProvider.notifier)
+                              .updateWriteToMemoryOnly(value!),
+                        );
+                      }),
+                    ),
+                    ListTile(
+                      title: const Text('强制写入元数据'),
+                      trailing: Consumer(builder: (context, ref, _) {
+                        final force = ref.watch(metadataSettingsProvider
+                            .select((state) => state.forceWriteMetadata));
+                        return Checkbox(
+                          value: force,
+                          onChanged: (value) => ref
+                              .read(metadataSettingsProvider.notifier)
+                              .updateForceWriteMetadata(value!),
+                        );
+                      }),
+                    ),
+                  ].map((e) => PopupMenuItem<void>(child: e)).toList(),
+                );
+              }
+            : null,
+      );
+    });
   }
 }
