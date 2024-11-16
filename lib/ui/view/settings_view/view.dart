@@ -77,7 +77,7 @@ class _SettingsListView extends ConsumerWidget {
               leading: const Icon(Icons.text_fields),
               provider: metadataSettingsProvider,
               selector: (state) => state.fileNameTpl,
-              onPressed: (_) => Get.dialog(
+              onPressed: (_) => Get.dialog<void>(
                 InputDialog(
                   dialogTitle: '文件名模板',
                   initialValue: ref.read(metadataSettingsProvider
@@ -108,7 +108,7 @@ class _SettingsListView extends ConsumerWidget {
               leading: const Icon(Icons.insert_drive_file),
               provider: transcodeSettingsProvider,
               selector: (state) => state.ffmpegPath,
-              onPressed: (_) => Get.dialog(
+              onPressed: (_) => Get.dialog<void>(
                 InputDialog(
                   dialogTitle: 'FFmpeg 路径',
                   initialValue: ref.read(transcodeSettingsProvider
@@ -126,7 +126,7 @@ class _SettingsListView extends ConsumerWidget {
               selector: (state) => state.isolateCount,
               onPressed: (_) {
                 final int maxIsolates = Platform.numberOfProcessors;
-                Get.dialog(
+                Get.dialog<void>(
                   SliderDialog(
                     title: 'Isolate 数量',
                     min: 1,
@@ -147,14 +147,14 @@ class _SettingsListView extends ConsumerWidget {
               leading: const Icon(Icons.audio_file),
               provider: transcodeSettingsProvider,
               selector: (state) => state.transcodeFormat.displayName,
-              onPressed: (_) => Get.dialog(const TranscodeFormatDialog()),
+              onPressed: (_) => Get.dialog<void>(const TranscodeFormatDialog()),
             ),
             SettingsTile<TranscodeSettings, TranscodeSettingsModel, int>(
               title: 'MP3 比特率',
               leading: const Icon(Icons.equalizer, color: Colors.transparent),
               provider: transcodeSettingsProvider,
               selector: (state) => state.mp3Bitrate,
-              onPressed: (_) => Get.dialog(
+              onPressed: (_) => Get.dialog<void>(
                 SliderDialog(
                   title: 'MP3 比特率',
                   min: 64,
@@ -174,7 +174,7 @@ class _SettingsListView extends ConsumerWidget {
               leading: const Icon(Icons.equalizer, color: Colors.transparent),
               provider: transcodeSettingsProvider,
               selector: (state) => state.flacCompressionLevel,
-              onPressed: (_) => Get.dialog(
+              onPressed: (_) => Get.dialog<void>(
                 SliderDialog(
                   title: 'FLAC 压缩等级',
                   min: 0,
@@ -194,7 +194,7 @@ class _SettingsListView extends ConsumerWidget {
               leading: const Icon(Icons.equalizer, color: Colors.transparent),
               provider: transcodeSettingsProvider,
               selector: (state) => state.wavEncoder.displayName,
-              onPressed: (_) => Get.dialog(const WavEncoderDialog()),
+              onPressed: (_) => Get.dialog<void>(const WavEncoderDialog()),
             ),
           ],
         ),
