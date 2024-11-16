@@ -52,8 +52,7 @@ class TranscodeUtil extends _$TranscodeUtil
         final path = track.path;
         try {
           // 检查输出文件是否存在
-          final file = File(outputFile);
-          if (file.existsSync() &&
+          if (await File(outputFile).exists() &&
               !baseCommand.args.contains(const CliArg(name: 'y'))) {
             sendPort.send({
               'error': '输出文件 $outputFile 已存在',
@@ -68,7 +67,9 @@ class TranscodeUtil extends _$TranscodeUtil
           final process = await Process.start(cli.executable, cli.args);
           final exitCode = await process.exitCode;
           if (exitCode == 0) {
-            if (deleteOriginalFiles) {
+            if (deleteOriginalFiles &&
+                path != outputFile &&
+                !track.properties.isCue()) {
               await File(path).delete();
             }
             if (!rewrite) {
