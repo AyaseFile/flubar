@@ -12,6 +12,7 @@ enum TranscodeFormat {
   copy('Copy'),
   mp3('MP3'),
   flac('FLAC'),
+  wavPack('WavPack'),
   wav('WAV');
 
   final String displayName;

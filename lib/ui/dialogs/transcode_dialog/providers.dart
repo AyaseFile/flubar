@@ -36,6 +36,8 @@ class TranscodeOpts extends _$TranscodeOpts {
         return TranscodeOptions.flac(
             compressionLevel: ref.watch(transcodeSettingsProvider
                 .select((state) => state.flacCompressionLevel)));
+      case TranscodeFormat.wavPack:
+        return const TranscodeOptions.wavPack();
       case TranscodeFormat.wav:
         return TranscodeOptions.wav(
             encoder: ref.watch(

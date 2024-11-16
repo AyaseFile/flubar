@@ -128,6 +128,9 @@ class TranscodeUtil extends _$TranscodeUtil
           CliArg(name: 'compression_level', value: '${flac.compressionLevel}'),
         ]);
       },
+      wavPack: (_) {
+        args.add(const CliArg(name: 'c:a', value: 'wavpack'));
+      },
       wav: (wav) {
         args.add(CliArg(name: 'c:a', value: wav.encoder.displayName));
       },
@@ -213,6 +216,7 @@ class TranscodeUtil extends _$TranscodeUtil
       copy: (_) => null,
       mp3: (_) => '.mp3',
       flac: (_) => '.flac',
+      wavPack: (_) => '.wv',
       wav: (_) => '.wav',
     );
     ref

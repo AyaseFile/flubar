@@ -411,6 +411,7 @@ class _TranscodeOptionsSelector extends ConsumerWidget {
           ],
         ),
       ),
+      wavPack: (_) => const SizedBox(height: kSettingRowVerticalPadding * 2),
       wav: (wav) => _SettingRow(
         label: '编码器',
         expandChild: false,

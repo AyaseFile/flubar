@@ -47,6 +47,7 @@ class TranscodeWarningUtil extends _$TranscodeWarningUtil {
       copy: (_) => 0,
       mp3: (_) => 0,
       flac: (flac) => 24,
+      wavPack: (_) => 0,
       wav: (wav) => switch (wav.encoder) {
         FfmpegEncoder.pcm_u8 => 8,
         FfmpegEncoder.pcm_s16le || FfmpegEncoder.pcm_s16be => 16,
@@ -90,6 +91,7 @@ class TranscodeWarningUtil extends _$TranscodeWarningUtil {
       copy: (_) => false,
       mp3: (_) => true,
       flac: (_) => false,
+      wavPack: (_) => false,
       wav: (_) => false,
     );
   }
@@ -102,6 +104,7 @@ class TranscodeWarningUtil extends _$TranscodeWarningUtil {
       copy: (_) => false,
       mp3: (_) => false,
       flac: (_) => true,
+      wavPack: (_) => false,
       wav: (wav) =>
           wav.encoder == FfmpegEncoder.pcm_u8 ||
           wav.encoder == FfmpegEncoder.pcm_s16le ||
