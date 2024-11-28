@@ -90,7 +90,7 @@ pub fn read_file(file: String) -> Result<(Metadata, Properties)> {
     let video_stream = context.streams().best(ffmpeg::media::Type::Video).map(|stream| stream.index());
     let audio_stream = context.streams().best(ffmpeg::media::Type::Audio).map(|stream| stream.index());
 
-    let mut packets = Vec::new();
+    let mut total_bytes = 0;
     for (stream, packet) in context.packets() {
         if video_stream.is_some() && stream.index() == video_stream.unwrap() {
             if let Some(data) = packet.data() {
@@ -98,7 +98,7 @@ pub fn read_file(file: String) -> Result<(Metadata, Properties)> {
             }
         }
         if audio_stream.is_some() && stream.index() == audio_stream.unwrap() {
-            packets.push(packet);
+            total_bytes += packet.size();
         }
     }
 
@@ -133,10 +133,6 @@ pub fn read_file(file: String) -> Result<(Metadata, Properties)> {
         }
 
         if properties.bit_rate.is_none() && properties.duration_sec.is_some() {
-            let mut total_bytes = 0;
-            for packet in &packets {
-                total_bytes += packet.size();
-            }
             let duration = properties.duration_sec.unwrap();
             properties.bit_rate = Some((total_bytes as f64 / duration * 8.0) as u32);
         }
