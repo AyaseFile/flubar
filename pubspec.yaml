@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  talker_flutter: ^4.4.6
+  talker_flutter: ^4.6.6
   get: ^4.6.6
   freezed_annotation: ^2.4.4
   json_annotation: ^4.9.0
@@ -18,7 +18,7 @@ dependencies:
   flutter_riverpod: ^2.6.1
   riverpod_annotation: ^2.6.1
   multi_split_view: ^3.6.0
-  material_table_view: ^5.0.0
+  material_table_view: ^5.0.1
   window_manager: ^0.4.3
   flutter_hooks: ^0.20.5
   hooks_riverpod: ^2.6.1
@@ -27,10 +27,10 @@ dependencies:
   flutter_settings_ui: ^3.0.1
   desktop_drop: ^0.5.0
   cross_file: ^0.3.4+2
-  file_picker: ^8.1.4
-  collection: ^1.18.0
+  file_picker: ^8.1.7
+  collection: ^1.19.0
   super_context_menu: ^0.8.24
-  just_audio: ^0.9.42
+  just_audio: ^0.9.43
   just_audio_media_kit:
     git:
       url: https://github.com/AyaseFile/just_audio_media_kit.git
@@ -40,7 +40,7 @@ dependencies:
   ffmpeg_cli: ^0.3.0
   rust_lib_flubar:
     path: rust_builder
-  flutter_rust_bridge: 2.6.0
+  flutter_rust_bridge: 2.7.0
   window_size:
     git:
       url: https://github.com/google/flutter-desktop-embedding.git
