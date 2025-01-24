@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flubar/models/state/settings.dart';
 import 'package:flubar/ui/dialogs/ratio_dialog/view.dart';
@@ -485,7 +487,13 @@ class _TplField extends HookConsumerWidget {
         useTextEditingController(text: ref.read(outputFileNameTplProvider));
 
     ref.listen<String>(outputFileNameTplProvider, (previous, next) {
-      tplController.value = TextEditingValue(text: next);
+      final currentSelection = tplController.selection;
+      tplController.value = TextEditingValue(
+        text: next,
+        selection: currentSelection.copyWith(
+            baseOffset: math.min(currentSelection.baseOffset, next.length),
+            extentOffset: math.min(currentSelection.extentOffset, next.length)),
+      );
     });
 
     return TextField(
