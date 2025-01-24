@@ -43,6 +43,7 @@ class _EditMetadataDialog extends ConsumerWidget {
       child: Padding(
         padding: kDoubleViewPadding,
         child: Scaffold(
+          backgroundColor: Colors.transparent,
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             scrolledUnderElevation: 0,
