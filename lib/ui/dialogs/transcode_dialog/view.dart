@@ -500,6 +500,7 @@ class _TplField extends HookConsumerWidget {
       controller: tplController,
       onChanged: (value) =>
           ref.read(outputFileNameTplProvider.notifier).setTpl(value),
+      enabled: !ref.watch(transcodeProvider).isLoading,
       decoration: const InputDecoration(
         labelText: '文件名模板',
         border: OutlineInputBorder(),
