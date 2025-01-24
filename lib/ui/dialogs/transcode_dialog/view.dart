@@ -466,7 +466,8 @@ class _CommandField extends HookConsumerWidget {
 
     return TextField(
       controller: commandController,
-      readOnly: true,
+      enabled: kAllowCustomCommand,
+      readOnly: !kAllowCustomCommand,
       decoration: const InputDecoration(
         labelText: 'FFmpeg 命令',
         border: OutlineInputBorder(),

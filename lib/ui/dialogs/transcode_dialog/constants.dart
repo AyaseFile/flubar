@@ -6,3 +6,4 @@ const double kTranscodeFormatDropdownWidth = 120.0;
 const double kBitrateDisplayWidth = 60.0;
 const double kCompressionLevelDisplayWidth = 20.0;
 const double kEncoderDisplayWidth = 120.0;
+const bool kAllowCustomCommand = false;
