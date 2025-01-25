@@ -70,25 +70,25 @@ class SelectedTracks extends _$SelectedTracks {
 
 final _updateFunctions = {
   kTrackNumberRowId: (Track track, String? value) =>
-      track.metadata.copyWith(trackNumber: () => _parseInt(value)),
+      track.metadata.nullableCopyWith(trackNumber: () => _parseInt(value)),
   kTrackTitleRowId: (Track track, String? value) =>
-      track.metadata.copyWith(title: () => _parseString(value)),
+      track.metadata.nullableCopyWith(title: () => _parseString(value)),
   kArtistNameRowId: (Track track, String? value) =>
-      track.metadata.copyWith(artist: () => _parseString(value)),
+      track.metadata.nullableCopyWith(artist: () => _parseString(value)),
   kAlbumRowId: (Track track, String? value) =>
-      track.metadata.copyWith(album: () => _parseString(value)),
+      track.metadata.nullableCopyWith(album: () => _parseString(value)),
   kAlbumArtistRowId: (Track track, String? value) =>
-      track.metadata.copyWith(albumArtist: () => _parseString(value)),
+      track.metadata.nullableCopyWith(albumArtist: () => _parseString(value)),
   kTrackTotalRowId: (Track track, String? value) =>
-      track.metadata.copyWith(trackTotal: () => _parseInt(value)),
+      track.metadata.nullableCopyWith(trackTotal: () => _parseInt(value)),
   kDiscNumberRowId: (Track track, String? value) =>
-      track.metadata.copyWith(discNumber: () => _parseInt(value)),
+      track.metadata.nullableCopyWith(discNumber: () => _parseInt(value)),
   kDiscTotalRowId: (Track track, String? value) =>
-      track.metadata.copyWith(discTotal: () => _parseInt(value)),
+      track.metadata.nullableCopyWith(discTotal: () => _parseInt(value)),
   kDateRowId: (Track track, String? value) =>
-      track.metadata.copyWith(date: () => _parseString(value)),
+      track.metadata.nullableCopyWith(date: () => _parseString(value)),
   kGenreRowId: (Track track, String? value) =>
-      track.metadata.copyWith(genre: () => _parseString(value)),
+      track.metadata.nullableCopyWith(genre: () => _parseString(value)),
 };
 
 String? _parseString(String? value) {

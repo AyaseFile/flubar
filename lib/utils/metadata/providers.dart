@@ -84,7 +84,7 @@ class MetadataUtil extends _$MetadataUtil {
             final frontCover = cover.newCover;
             return cover.tracks.map((t) {
               final metadata =
-                  t.metadata.copyWith(frontCover: () => frontCover);
+                  t.metadata.nullableCopyWith(frontCover: () => frontCover);
               return t.copyWith(metadata: metadata);
             });
           })
@@ -105,7 +105,8 @@ class MetadataUtil extends _$MetadataUtil {
       if (!cover.updated) return;
       final frontCover = cover.newCover;
       await Future.wait(cover.tracks.map((t) async {
-        final metadata = t.metadata.copyWith(frontCover: () => frontCover);
+        final metadata =
+            t.metadata.nullableCopyWith(frontCover: () => frontCover);
         if (t.properties.isCue()) {
           updatedTracks.add(t.copyWith(metadata: metadata));
           return;

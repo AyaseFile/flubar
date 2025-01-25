@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:flubar/rust/api/models.dart';
 
 extension MetadataExtension on Metadata {
-  Metadata copyWith({
+  Metadata nullableCopyWith({
     // 允许传入 null 以清除值
     String? Function()? title,
     String? Function()? artist,

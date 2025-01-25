@@ -1,4 +1,9 @@
+#![allow(unexpected_cfgs)]
+
+use flutter_rust_bridge::frb;
+
 #[derive(Debug)]
+#[frb(dart_metadata=("freezed"))]
 pub struct Metadata {
     pub title: Option<String>,
     pub artist: Option<String>,
@@ -32,6 +37,7 @@ impl Metadata {
 }
 
 #[derive(Debug, Clone)]
+#[frb(dart_metadata=("freezed"))]
 pub struct Properties {
     pub duration_sec: Option<f64>,
     pub cue_start_sec: Option<f64>,

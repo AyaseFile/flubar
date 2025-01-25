@@ -22,19 +22,19 @@ class Playlists extends _$Playlists {
   void removePlaylist(int id) {
     final selected = ref.read(playlistIdProvider).selectedId == id;
     if (!selected) {
-      state = state.where((playlist) => playlist.id != id).toList();
+      state = state.where((p) => p.id != id).toList();
       return;
     }
-    // 如果删除的是当前选中的播放列表，则选中上一个播放列表 (能保证存在上一个播放列表, 因为默认播放列表不可删除)
+    // 如果删除的是当前选中的播放列表, 则选中上一个播放列表 (能保证存在上一个播放列表, 因为默认播放列表不可删除)
     int? previousId;
-    state = state.where((playlist) {
-      if (playlist.id == id) {
+    state = state.where((p) {
+      if (p.id == id) {
         ref
             .read(playlistIdProvider.notifier)
             .select(previousId ?? kDefaultPlaylistId);
         return false;
       } else {
-        previousId = playlist.id;
+        previousId = p.id;
         return true;
       }
     }).toList();
@@ -56,17 +56,15 @@ class Playlists extends _$Playlists {
   void removeTracks() {
     final id = ref.read(playlistIdProvider).selectedId;
     final trackIds = ref.read(selectedTrackIdsProvider);
-    state = state.map((playlist) {
-      if (playlist.id == id) {
-        final newTracks = playlist.tracks
-            .where((track) => !trackIds.contains(track.id))
-            .toList();
-        final hasChanges = newTracks.length != playlist.tracks.length;
-        return hasChanges ? playlist.copyWith(tracks: newTracks) : playlist;
-      }
-      return playlist;
-    }).toList();
     ref.read(selectedTrackIdsProvider.notifier).clear();
+    state = state.map((p) {
+      if (p.id == id) {
+        final newTracks =
+            p.tracks.where((t) => !trackIds.contains(t.id)).toList();
+        return p.copyWith(tracks: newTracks);
+      }
+      return p;
+    }).toList();
   }
 
   void updateTrack(int id, Track track) {
