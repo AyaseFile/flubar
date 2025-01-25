@@ -4,6 +4,7 @@ import 'package:flubar/models/state/track.dart';
 import 'package:flubar/rust/api/models.dart';
 import 'package:flubar/ui/view/tracklist_view/constants.dart';
 import 'package:flubar/ui/view/tracklist_view/providers.dart';
+import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'constants.dart';
@@ -236,8 +237,7 @@ class CommonMetadata extends _$CommonMetadata {
 }
 
 @riverpod
-CommonMetadataModel commonMetadataItem(CommonMetadataItemRef ref) =>
-    throw UnimplementedError();
+CommonMetadataModel commonMetadataItem(Ref ref) => throw UnimplementedError();
 
 @riverpod
 class LastSelectedCommonMetadataId extends _$LastSelectedCommonMetadataId {

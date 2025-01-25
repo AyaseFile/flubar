@@ -3,6 +3,7 @@ import 'package:flubar/models/extensions/properties_extension.dart';
 import 'package:flubar/models/state/playlist.dart';
 import 'package:flubar/models/state/track.dart';
 import 'package:flubar/ui/view/playlist_view/providers.dart';
+import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:unorm_dart/unorm_dart.dart' as unorm;
 
@@ -134,7 +135,7 @@ class Tracks extends _$Tracks {
 }
 
 @riverpod
-Track trackItem(TrackItemRef ref) => throw UnimplementedError();
+Track trackItem(Ref ref) => throw UnimplementedError();
 
 @Riverpod(keepAlive: true)
 class MaxTrackId extends _$MaxTrackId {

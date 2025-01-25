@@ -1,5 +1,6 @@
 import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/models/state/settings.dart';
+import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'providers.g.dart';
@@ -14,5 +15,4 @@ class Selection extends _$Selection {
 }
 
 @riverpod
-TranscodeFormat selectionItem(SelectionItemRef ref) =>
-    throw UnimplementedError();
+TranscodeFormat selectionItem(Ref ref) => throw UnimplementedError();

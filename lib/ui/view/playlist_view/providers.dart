@@ -1,6 +1,7 @@
 import 'package:flubar/models/state/playlist.dart';
 import 'package:flubar/models/state/track.dart';
 import 'package:flubar/ui/view/tracklist_view/providers.dart';
+import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'constants.dart';
@@ -136,7 +137,7 @@ class CurrentPlaylist extends _$CurrentPlaylist {
 }
 
 @riverpod
-Playlist playlistItem(PlaylistItemRef ref) => throw UnimplementedError();
+Playlist playlistItem(Ref ref) => throw UnimplementedError();
 
 @Riverpod(keepAlive: true)
 class PlaylistId extends _$PlaylistId {

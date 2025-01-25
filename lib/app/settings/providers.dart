@@ -5,12 +5,13 @@ import 'package:flubar/app/talker.dart';
 import 'package:flubar/models/state/settings.dart';
 import 'package:flubar/utils/transcode/transcode.dart';
 import 'package:hive/hive.dart';
+import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'providers.g.dart';
 
 @riverpod
-Box settingsBox(SettingsBoxRef ref) => throw UnimplementedError();
+Box settingsBox(Ref ref) => throw UnimplementedError();
 
 @Riverpod(keepAlive: true)
 class Settings extends _$Settings {
@@ -261,8 +262,7 @@ class TranscodeWarnings extends _$TranscodeWarnings {
 }
 
 @riverpod
-WindowSettingsModel windowSettingsLoaded(WindowSettingsLoadedRef ref) =>
-    throw UnimplementedError();
+WindowSettingsModel windowSettingsLoaded(Ref ref) => throw UnimplementedError();
 
 @Riverpod(keepAlive: true)
 class WindowSettings extends _$WindowSettings {

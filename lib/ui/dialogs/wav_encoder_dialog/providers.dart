@@ -1,5 +1,6 @@
 import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/models/state/settings.dart';
+import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'providers.g.dart';
@@ -14,4 +15,4 @@ class EncoderSelection extends _$EncoderSelection {
 }
 
 @riverpod
-FfmpegEncoder encoderItem(EncoderItemRef ref) => throw UnimplementedError();
+FfmpegEncoder encoderItem(Ref ref) => throw UnimplementedError();

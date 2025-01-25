@@ -6,6 +6,7 @@ import 'package:flubar/models/extensions/properties_extension.dart';
 import 'package:flubar/rust/api/models.dart';
 import 'package:flubar/ui/dialogs/metadata_dialog/providers.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'providers.g.dart';
@@ -140,11 +141,11 @@ class Player extends _$Player {
 }
 
 @Riverpod(keepAlive: true)
-Stream<PlayerState> playerState(PlayerStateRef ref) =>
+Stream<PlayerState> playerState(Ref ref) =>
     ref.read(playerProvider.notifier).playerStateStream;
 
 @Riverpod(keepAlive: true)
-AsyncValue<bool> playerPlaying(PlayerPlayingRef ref) {
+AsyncValue<bool> playerPlaying(Ref ref) {
   final playerState = ref.watch(playerStateProvider);
   final hasTrack = ref.watch(playerHasTrackProvider);
   globalTalker.debug('当前播放器状态: $playerState');
@@ -153,7 +154,7 @@ AsyncValue<bool> playerPlaying(PlayerPlayingRef ref) {
 }
 
 @Riverpod(keepAlive: true)
-Stream<Duration> playerPosition(PlayerPositionRef ref) {
+Stream<Duration> playerPosition(Ref ref) {
   final playing = ref.watch(playerPlayingProvider);
   final positionStream = ref.read(playerProvider.notifier).positionStream;
 
@@ -165,23 +166,23 @@ Stream<Duration> playerPosition(PlayerPositionRef ref) {
 }
 
 @Riverpod(keepAlive: true)
-Stream<Duration> playerDuration(PlayerDurationRef ref) =>
+Stream<Duration> playerDuration(Ref ref) =>
     ref.read(playerProvider.notifier).durationStream;
 
 @Riverpod(keepAlive: true)
-Stream<bool> playerHasTrack(PlayerHasTrackRef ref) =>
+Stream<bool> playerHasTrack(Ref ref) =>
     ref.read(playerProvider.notifier).hasTrack;
 
 @Riverpod(keepAlive: true)
-Stream<bool> playerHasNext(PlayerHasNextRef ref) =>
+Stream<bool> playerHasNext(Ref ref) =>
     ref.read(playerProvider.notifier).hasNext;
 
 @Riverpod(keepAlive: true)
-Stream<bool> playerHasPrevious(PlayerHasPreviousRef ref) =>
+Stream<bool> playerHasPrevious(Ref ref) =>
     ref.read(playerProvider.notifier).hasPrevious;
 
 @Riverpod(keepAlive: true)
-Stream<Metadata?> playerTrackMetadata(PlayerTrackMetadataRef ref) {
+Stream<Metadata?> playerTrackMetadata(Ref ref) {
   final sequenceStateStream =
       ref.watch(playerProvider.notifier).sequenceStateStream;
   return sequenceStateStream.map((sequenceState) {
