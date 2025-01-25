@@ -220,7 +220,7 @@ class TrackRow extends ConsumerWidget {
         },
         child: Container(
           color: selected
-              ? Theme.of(context).colorScheme.primary.withOpacity(0.3)
+              ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)
               : Colors.transparent,
           child: contentBuilder(context, (context, column) {
             final columns = ref.read(trackTableColumnsProvider);

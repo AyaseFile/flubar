@@ -77,7 +77,7 @@ class PlaylistCard extends ConsumerWidget {
         menuProvider: (_) => _buildContextMenu(ref, playlist),
         child: Card(
           color: selected
-              ? Theme.of(context).colorScheme.primary.withOpacity(0.7)
+              ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.7)
               : null,
           child: ListTile(
             shape:
