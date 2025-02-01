@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import 'package:collection/collection.dart';
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flubar/models/extensions/uint8list_extension.dart';
 import 'package:flubar/models/state/track.dart';
 import 'package:flubar/models/state/track_cover.dart';
@@ -12,35 +14,36 @@ part 'providers.g.dart';
 @riverpod
 class GroupedTrackCover extends _$GroupedTrackCover with TrackCoverMixin {
   @override
-  List<TrackCoverModel> build() {
+  IList<TrackCoverModel> build() {
     final selectedTracks = ref.watch(selectedTracksProvider);
     final coverMap = <Uint8List?, List<Track>>{};
+    const listEquality = ListEquality();
 
     for (final track in selectedTracks) {
       final cover = track.metadata.frontCover;
       final existingKey = coverMap.keys.firstWhere(
-        (key) => key?.isContentEqual(cover) ?? (cover == null),
+        (key) => key?.isContentEqual(listEquality, cover) ?? (cover == null),
         orElse: () => cover,
       );
       coverMap.putIfAbsent(existingKey, () => []).add(track);
     }
-    return [
-      for (final entry in coverMap.entries)
-        TrackCoverModel(oldCover: entry.key, tracks: entry.value),
-    ];
+    return IList(
+      coverMap.entries.map((entry) =>
+          TrackCoverModel(oldCover: entry.key, tracks: entry.value.toIList())),
+    );
   }
 }
 
 @riverpod
 class BatchedTrackCover extends _$BatchedTrackCover with TrackCoverMixin {
   @override
-  List<TrackCoverModel> build() {
+  IList<TrackCoverModel> build() {
     final selectedTracks = ref.watch(selectedTracksProvider);
-    return [TrackCoverModel(tracks: selectedTracks)];
+    return IList([TrackCoverModel(tracks: selectedTracks)]);
   }
 }
 
-mixin TrackCoverMixin on AutoDisposeNotifier<List<TrackCoverModel>> {
+mixin TrackCoverMixin on AutoDisposeNotifier<IList<TrackCoverModel>> {
   void useOldCover() {
     final index = ref.read(currentTrackCoverIndexProvider);
     state = state.map((e) {
@@ -48,7 +51,7 @@ mixin TrackCoverMixin on AutoDisposeNotifier<List<TrackCoverModel>> {
         return e.copyWith(updated: false);
       }
       return e;
-    }).toList();
+    }).toIList();
   }
 
   void useNewCover() {
@@ -58,7 +61,7 @@ mixin TrackCoverMixin on AutoDisposeNotifier<List<TrackCoverModel>> {
         return e.copyWith(updated: true);
       }
       return e;
-    }).toList();
+    }).toIList();
   }
 
   void removeCover() {
@@ -68,7 +71,7 @@ mixin TrackCoverMixin on AutoDisposeNotifier<List<TrackCoverModel>> {
         return e.removeCover();
       }
       return e;
-    }).toList();
+    }).toIList();
   }
 
   void updateCoverState(Uint8List cover) {
@@ -78,7 +81,7 @@ mixin TrackCoverMixin on AutoDisposeNotifier<List<TrackCoverModel>> {
         return e.copyWith(updated: true, newCover: cover);
       }
       return e;
-    }).toList();
+    }).toIList();
   }
 }
 

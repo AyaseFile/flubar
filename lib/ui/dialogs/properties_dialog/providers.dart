@@ -1,3 +1,4 @@
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flubar/models/extensions/properties_extension.dart';
 import 'package:flubar/models/state/common_properties.dart';
 import 'package:flubar/ui/dialogs/metadata_dialog/providers.dart';
@@ -11,7 +12,7 @@ part 'providers.g.dart';
 @riverpod
 class CommonProperties extends _$CommonProperties {
   @override
-  List<CommonPropertiesModel> build() {
+  IList<CommonPropertiesModel> build() {
     final selectedTracks = ref.watch(selectedTracksProvider);
     final properties = selectedTracks.map((track) => track.properties);
     var totalDuration = 0.0;
@@ -42,7 +43,7 @@ class CommonProperties extends _$CommonProperties {
     final channels =
         _formatIntProperty(properties.map((property) => property.channels));
 
-    return [
+    return IList([
       CommonPropertiesModel(id: kDurationRowId, key: '时长', value: duration),
       CommonPropertiesModel(id: kCodecRowId, key: '编码', value: codec),
       CommonPropertiesModel(
@@ -55,7 +56,7 @@ class CommonProperties extends _$CommonProperties {
           id: kBitsPerCodedSampleRowId, key: '采样位数', value: bitsPerCodedSample),
       CommonPropertiesModel(id: kBitRateRowId, key: '比特率', value: bitRate),
       CommonPropertiesModel(id: kChannelsRowId, key: '声道', value: channels),
-    ];
+    ]);
   }
 
   String _formatIntProperty(Iterable<int?> values, {String suffix = ''}) {

@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'track.dart';
@@ -12,7 +13,7 @@ class TrackCoverModel with _$TrackCoverModel {
     @Default(false) bool updated,
     @Default(null) Uint8List? oldCover,
     @Default(null) Uint8List? newCover,
-    required List<Track> tracks,
+    required IList<Track> tracks,
   }) = _TrackCover;
 }
 

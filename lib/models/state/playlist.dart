@@ -1,3 +1,4 @@
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flubar/ui/view/playlist_view/constants.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -30,7 +31,7 @@ class Playlist with _$Playlist {
   const factory Playlist({
     required int id,
     required String name,
-    required List<Track> tracks,
+    required IList<Track> tracks,
     @Default(TrackSortProperty.none) TrackSortProperty sortProperty,
     @Default(TrackSortOrder.ascending) TrackSortOrder sortOrder,
   }) = _Playlist;

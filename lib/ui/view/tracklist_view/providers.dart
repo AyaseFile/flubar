@@ -1,4 +1,7 @@
+import 'dart:math' show max, min;
+
 import 'package:collection/collection.dart';
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flubar/models/extensions/properties_extension.dart';
 import 'package:flubar/models/state/playlist.dart';
 import 'package:flubar/models/state/track.dart';
@@ -43,38 +46,22 @@ class TrackTableColumns extends _$TrackTableColumns {
 
 @Riverpod(keepAlive: true)
 class Tracks extends _$Tracks {
-  List<Track>? _sortedTracks;
-  TrackSortProperty? _lastSortProperty;
-  List<Track>? _lastTracks;
-
   @override
-  List<Track> build() {
+  IList<Track> build() {
     final playlist = ref.watch(currentPlaylistProvider);
     final sortProperty = playlist.sortProperty;
     final sortOrder = playlist.sortOrder;
     final tracks = playlist.tracks;
 
     if (sortProperty == TrackSortProperty.none) {
-      _sortedTracks = null;
-      _lastSortProperty = null;
-      _lastTracks = null;
       return tracks;
     }
 
-    const listEquality = ListEquality();
-    if (_sortedTracks == null ||
-        _lastSortProperty != sortProperty ||
-        !listEquality.equals(_lastTracks, tracks)) {
-      _sortedTracks = [...tracks];
-      _sortedTracks!
-          .sort((a, b) => _compareTracksByProperty(a, b, sortProperty));
-      _lastSortProperty = sortProperty;
-      _lastTracks = tracks;
-    }
-
+    final sortedTracks =
+        tracks.sorted((a, b) => _compareTracksByProperty(a, b, sortProperty));
     return sortOrder == TrackSortOrder.ascending
-        ? _sortedTracks!
-        : _sortedTracks!.reversed.toList();
+        ? sortedTracks.toIList()
+        : sortedTracks.reversed.toIList();
   }
 
   int _compareTracksByProperty(Track a, Track b, TrackSortProperty property) {
@@ -162,28 +149,28 @@ class LastSelectedTrackId extends _$LastSelectedTrackId {
 @Riverpod(keepAlive: true)
 class SelectedTrackIds extends _$SelectedTrackIds {
   @override
-  Set<int> build() => {};
+  ISet<int> build() => const ISet.empty();
 
   void toggle(int id) {
     if (state.contains(id)) {
-      state = {...state}..remove(id);
+      state = state.remove(id);
     } else {
-      state = {...state}..add(id);
+      state = state.add(id);
     }
   }
 
   void handleSelectAll() {
     final currentPlayList = ref.read(currentPlaylistProvider);
-    final selectedIds = currentPlayList.tracks.map((t) => t.id).toSet();
+    final selectedIds = currentPlayList.tracks.map((t) => t.id).toISet();
     if (state.length == selectedIds.length) {
-      state = {};
+      state = const ISet.empty();
     } else {
       state = selectedIds;
     }
   }
 
   void clear() {
-    state = {};
+    state = const ISet.empty();
   }
 
   void handleSelection(
@@ -195,9 +182,9 @@ class SelectedTrackIds extends _$SelectedTrackIds {
       // 单选情况
       if (state.length == 1 && state.contains(id)) {
         // 取消选中
-        state = {};
+        state = const ISet.empty();
       } else {
-        state = {id};
+        state = ISet({id});
         ref.read(lastSelectedTrackIdProvider.notifier).set(id);
       }
     } else if (ctrlPressed) {
@@ -206,29 +193,20 @@ class SelectedTrackIds extends _$SelectedTrackIds {
       ref.read(lastSelectedTrackIdProvider.notifier).set(id);
     } else if (shiftPressed) {
       if (state.isEmpty) {
-        state = {id};
+        state = ISet({id});
         ref.read(lastSelectedTrackIdProvider.notifier).set(id);
       } else {
         // 范围选择
         final lastSelectedId = ref.read(lastSelectedTrackIdProvider);
-        final trackIdsSet = ref.read(tracksProvider).map((t) => t.id).toSet();
-        if (trackIdsSet.contains(lastSelectedId) && trackIdsSet.contains(id)) {
-          final trackIds = trackIdsSet.toList();
-          final lastSelectedIndex = trackIds.indexOf(lastSelectedId);
-          final currentIndex = trackIds.indexOf(id);
-          if (currentIndex < lastSelectedIndex) {
-            state = {
-              for (var i = currentIndex; i <= lastSelectedIndex; i++)
-                trackIds[i]
-            };
-          } else {
-            state = {
-              for (var i = lastSelectedIndex; i <= currentIndex; i++)
-                trackIds[i]
-            };
-          }
+        final trackIds = ref.read(tracksProvider).map((t) => t.id).toIList();
+        final lastSelectedIndex = trackIds.indexOf(lastSelectedId);
+        final currentIndex = trackIds.indexOf(id);
+        if (lastSelectedIndex != -1 && currentIndex != -1) {
+          final start = min(currentIndex, lastSelectedIndex);
+          final end = max(currentIndex, lastSelectedIndex);
+          state = trackIds.sublist(start, end + 1).toISet();
         } else {
-          state = {id};
+          state = ISet({id});
           ref.read(lastSelectedTrackIdProvider.notifier).set(id);
         }
       }

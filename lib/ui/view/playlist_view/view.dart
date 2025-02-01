@@ -1,3 +1,4 @@
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flubar/models/state/playlist.dart';
 import 'package:flubar/ui/constants.dart';
 import 'package:flubar/ui/dialogs/get_dialog/providers.dart';
@@ -54,7 +55,7 @@ class PlaylistCardList extends ConsumerWidget {
                   onConfirm: (name) {
                     final id = ref.read(playlistIdProvider.notifier).nextId();
                     ref.read(playlistsProvider.notifier).addPlaylists([
-                      Playlist(id: id, name: name, tracks: []),
+                      Playlist(id: id, name: name, tracks: const IList.empty()),
                     ]);
                   },
                 ),
@@ -100,7 +101,7 @@ class PlaylistCard extends ConsumerWidget {
           title: '删除',
           image: MenuImage.icon(Icons.delete),
           callback: () =>
-              ref.read(playlistsProvider.notifier).removePlaylist(playlist.id),
+              ref.read(playlistsProvider.notifier).removePlaylist(playlist),
         ),
       MenuAction(
         title: '重命名',

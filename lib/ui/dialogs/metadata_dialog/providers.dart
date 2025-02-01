@@ -1,3 +1,6 @@
+import 'dart:math' show max, min;
+
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flubar/models/extensions/metadata_extension.dart';
 import 'package:flubar/models/state/common_metadata.dart';
 import 'package:flubar/models/state/track.dart';
@@ -14,10 +17,10 @@ part 'providers.g.dart';
 @riverpod
 class SelectedTracks extends _$SelectedTracks {
   @override
-  List<Track> build() {
+  IList<Track> build() {
     final selectedIds = ref.watch(selectedTrackIdsProvider);
     final tracks = ref.watch(tracksProvider);
-    return tracks.where((track) => selectedIds.contains(track.id)).toList();
+    return tracks.where((track) => selectedIds.contains(track.id)).toIList();
   }
 
   void updateMetadataState({
@@ -44,7 +47,7 @@ class SelectedTracks extends _$SelectedTracks {
     state = state.map((t) {
       if (t.id == trackId) return t.copyWith(metadata: metadata);
       return t;
-    }).toList();
+    }).toIList();
     // 不需要手动更新 commonMetadataProvider
   }
 
@@ -55,7 +58,7 @@ class SelectedTracks extends _$SelectedTracks {
     state = state.map((t) {
       final metadata = _updated(t, rowId, value);
       return t.copyWith(metadata: metadata);
-    }).toList();
+    }).toIList();
   }
 
   Metadata _updated(Track track, int rowId, String? value) {
@@ -102,7 +105,7 @@ int? _parseInt(String? value) {
 @riverpod
 class CommonMetadata extends _$CommonMetadata {
   @override
-  List<CommonMetadataModel> build() {
+  IList<CommonMetadataModel> build() {
     final selectedTracks = ref.watch(selectedTracksProvider);
     final metadata = selectedTracks.map((track) => track.metadata);
     final titleSet = <String?>{};
@@ -129,7 +132,7 @@ class CommonMetadata extends _$CommonMetadata {
       genreSet.add(m.genre);
     }
 
-    return [
+    return IList([
       CommonMetadataModel(
           id: kTrackTitleRowId,
           key: '标题',
@@ -205,7 +208,7 @@ class CommonMetadata extends _$CommonMetadata {
               .where((genre) => genre != null && genre.isNotEmpty)
               .join(', '),
           multi: genreSet.length > 1),
-    ];
+    ]);
   }
 
   void updateCommonValue(String value) {
@@ -214,7 +217,7 @@ class CommonMetadata extends _$CommonMetadata {
     state = state.map((kv) {
       if (ids.contains(kv.id)) return kv.copyWith(value: value);
       return kv;
-    }).toList();
+    }).toIList();
     // 手动更新 selectedTracksProvider 中的元数据
     final selectedTracksNotifier = ref.read(selectedTracksProvider.notifier);
     for (final id in ids) {
@@ -228,7 +231,7 @@ class CommonMetadata extends _$CommonMetadata {
     state = state.map((kv) {
       if (ids.contains(kv.id)) return kv.copyWith(value: '');
       return kv;
-    }).toList();
+    }).toIList();
     final selectedTracksNotifier = ref.read(selectedTracksProvider.notifier);
     for (final id in ids) {
       selectedTracksNotifier.updateAllMetadataState(rowId: id, value: null);
@@ -252,18 +255,18 @@ class LastSelectedCommonMetadataId extends _$LastSelectedCommonMetadataId {
 @riverpod
 class SelectedCommonMetadataIds extends _$SelectedCommonMetadataIds {
   @override
-  Set<int> build() => {};
+  ISet<int> build() => const ISet.empty();
 
   void toggle(int id) {
     if (state.contains(id)) {
-      state = {...state}..remove(id);
+      state = state.remove(id);
     } else {
-      state = {...state}..add(id);
+      state = state.add(id);
     }
   }
 
   void clear() {
-    state = {};
+    state = const ISet.empty();
   }
 
   void handleSelection(
@@ -273,9 +276,9 @@ class SelectedCommonMetadataIds extends _$SelectedCommonMetadataIds {
   }) {
     if (!ctrlPressed && !shiftPressed) {
       if (state.length == 1 && state.contains(id)) {
-        state = {};
+        state = const ISet.empty();
       } else {
-        state = {id};
+        state = ISet({id});
         ref.read(lastSelectedCommonMetadataIdProvider.notifier).set(id);
       }
     } else if (ctrlPressed) {
@@ -283,30 +286,20 @@ class SelectedCommonMetadataIds extends _$SelectedCommonMetadataIds {
       ref.read(lastSelectedCommonMetadataIdProvider.notifier).set(id);
     } else if (shiftPressed) {
       if (state.isEmpty) {
-        state = {id};
+        state = ISet({id});
         ref.read(lastSelectedCommonMetadataIdProvider.notifier).set(id);
       } else {
         final lastSelectedId = ref.read(lastSelectedCommonMetadataIdProvider);
-        final metadataIdsSet =
-            ref.read(commonMetadataProvider).map((kv) => kv.id).toSet();
-        if (metadataIdsSet.contains(lastSelectedId) &&
-            metadataIdsSet.contains(id)) {
-          final metadataIds = metadataIdsSet.toList();
-          final lastSelectedIndex = metadataIds.indexOf(lastSelectedId);
-          final currentIndex = metadataIds.indexOf(id);
-          if (currentIndex < lastSelectedIndex) {
-            state = {
-              for (var i = currentIndex; i <= lastSelectedIndex; i++)
-                metadataIds[i]
-            };
-          } else {
-            state = {
-              for (var i = lastSelectedIndex; i <= currentIndex; i++)
-                metadataIds[i]
-            };
-          }
+        final metadataIds =
+            ref.read(commonMetadataProvider).map((kv) => kv.id).toIList();
+        final lastSelectedIndex = metadataIds.indexOf(lastSelectedId);
+        final currentIndex = metadataIds.indexOf(id);
+        if (lastSelectedIndex != -1 && currentIndex != -1) {
+          final start = min(currentIndex, lastSelectedIndex);
+          final end = max(currentIndex, lastSelectedIndex);
+          state = metadataIds.sublist(start, end + 1).toISet();
         } else {
-          state = {id};
+          state = ISet({id});
           ref.read(lastSelectedCommonMetadataIdProvider.notifier).set(id);
         }
       }

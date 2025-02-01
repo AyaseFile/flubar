@@ -1,3 +1,4 @@
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flubar/models/state/playlist.dart';
 import 'package:flubar/models/state/track.dart';
 import 'package:flubar/ui/view/tracklist_view/providers.dart';
@@ -11,46 +12,42 @@ part 'providers.g.dart';
 @Riverpod(keepAlive: true)
 class Playlists extends _$Playlists {
   @override
-  List<Playlist> build() => const <Playlist>[
-        Playlist(id: kDefaultPlaylistId, name: kDefaultPlaylistName, tracks: [])
-      ];
+  IList<Playlist> build() => IList([
+        Playlist(
+            id: kDefaultPlaylistId,
+            name: kDefaultPlaylistName,
+            tracks: const IList.empty())
+      ]);
 
   void addPlaylists(Iterable<Playlist> playlists) {
-    state = [...state, ...playlists];
+    state = state.addAll(playlists);
   }
 
-  void removePlaylist(int id) {
-    final selected = ref.read(playlistIdProvider).selectedId == id;
+  void removePlaylist(Playlist playlist) {
+    final selected = ref.read(playlistIdProvider).selectedId == playlist.id;
     if (!selected) {
-      state = state.where((p) => p.id != id).toList();
+      state = state.remove(playlist);
       return;
     }
     // 如果删除的是当前选中的播放列表, 则选中上一个播放列表 (能保证存在上一个播放列表, 因为默认播放列表不可删除)
-    int? previousId;
-    state = state.where((p) {
-      if (p.id == id) {
-        ref
-            .read(playlistIdProvider.notifier)
-            .select(previousId ?? kDefaultPlaylistId);
-        return false;
-      } else {
-        previousId = p.id;
-        return true;
-      }
-    }).toList();
+    final index = state.indexOf(playlist);
+    final prevIndex = index == 0 ? 0 : index - 1;
+    final prevPlaylist = state[prevIndex];
+    ref.read(playlistIdProvider.notifier).select(prevPlaylist.id);
+    state = state.remove(playlist);
   }
 
   void updatePlaylist(Playlist playlist) {
-    state = state.map((p) => p.id == playlist.id ? playlist : p).toList();
+    state = state.map((p) => p.id == playlist.id ? playlist : p).toIList();
   }
 
   void addTracks(int id, Iterable<Track> tracks) {
     state = state.map((p) {
       if (p.id == id) {
-        return p.copyWith(tracks: [...p.tracks, ...tracks]);
+        return p.copyWith(tracks: p.tracks.addAll(tracks));
       }
       return p;
-    }).toList();
+    }).toIList();
   }
 
   void removeTracks() {
@@ -59,49 +56,35 @@ class Playlists extends _$Playlists {
     ref.read(selectedTrackIdsProvider.notifier).clear();
     state = state.map((p) {
       if (p.id == id) {
-        final newTracks =
-            p.tracks.where((t) => !trackIds.contains(t.id)).toList();
-        return p.copyWith(tracks: newTracks);
+        return p.copyWith(
+            tracks: p.tracks.removeWhere((t) => trackIds.contains(t.id)));
       }
       return p;
-    }).toList();
-  }
-
-  void updateTrack(int id, Track track) {
-    state = state.map((p) {
-      if (p.id == id) {
-        final newTracks =
-            p.tracks.map((t) => t.id == track.id ? track : t).toList();
-        return p.copyWith(tracks: newTracks);
-      }
-      return p;
-    }).toList();
+    }).toIList();
   }
 
   void updateTracks(int id, Iterable<Track> tracks) {
     final updateMap = {for (final track in tracks) track.id: track};
     state = state.map((p) {
       if (p.id == id) {
-        final newTracks =
-            p.tracks.map((track) => updateMap[track.id] ?? track).toList();
-        final hasChanged =
-            p.tracks.any((track) => updateMap.containsKey(track.id));
-        return hasChanged ? p.copyWith(tracks: newTracks) : p;
+        final updatedTracks =
+            p.tracks.map((t) => updateMap[t.id] ?? t).toIList();
+        return p.copyWith(tracks: updatedTracks);
       }
       return p;
-    }).toList();
+    }).toIList();
   }
 
   void reorderTracks(int id, int oldIndex, int newIndex) {
     state = state.map((p) {
       if (p.id == id) {
-        final tracks = [...p.tracks];
-        final track = tracks.removeAt(oldIndex);
-        tracks.insert(newIndex, track);
-        return p.copyWith(tracks: tracks);
+        final tracks = p.tracks;
+        final track = tracks[oldIndex];
+        final newTracks = tracks.removeAt(oldIndex).insert(newIndex, track);
+        return p.copyWith(tracks: newTracks);
       }
       return p;
-    }).toList();
+    }).toIList();
   }
 }
 
