@@ -15,7 +15,7 @@ import 'constants.dart';
 
 part 'providers.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class TrackTableColumns extends _$TrackTableColumns {
   @override
   List<AdvancedColumn> build() {
@@ -41,6 +41,19 @@ class TrackTableColumns extends _$TrackTableColumns {
         width: kDurationColumnWidth,
       ),
     ];
+  }
+
+  void translateColumn(int index, double translation) {
+    state[index] = state[index].copyWith(translation: translation);
+  }
+
+  void resizeColumn(int index, double width) {
+    state[index] = state[index].copyWith(width: width);
+  }
+
+  void moveColumn(int oldIndex, int newIndex) {
+    final column = state.removeAt(oldIndex);
+    state.insert(newIndex, column);
   }
 }
 

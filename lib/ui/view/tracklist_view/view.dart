@@ -89,14 +89,18 @@ class _TrackTableViewState extends ConsumerState<TrackTableView> {
         columns: columns,
         rowHeight: kRowHeight,
         rowCount: tracks.length,
-        headerBuilder: _headerBuilder,
+        headerBuilder: (context, contentBuilder) => _headerBuilder(
+            context, contentBuilder, (column) => columns[column].id),
         rowBuilder: (context, row, contentBuilder) {
           final track = tracks[row];
           return KeyedSubtree(
             key: ValueKey(track.id),
             child: ProviderScope(
               overrides: [trackItemProvider.overrideWithValue(track)],
-              child: TrackRow(contentBuilder: contentBuilder),
+              child: TrackRow(
+                contentBuilder: contentBuilder,
+                getColumnId: (column) => columns[column].id,
+              ),
             ),
           );
         },
@@ -105,11 +109,14 @@ class _TrackTableViewState extends ConsumerState<TrackTableView> {
   }
 
   Widget _headerBuilder(
-      BuildContext context, TableRowContentBuilder contentBuilder) {
+    BuildContext context,
+    TableRowContentBuilder contentBuilder,
+    int Function(int) getColumnId,
+  ) {
     const style = TextStyle(fontWeight: FontWeight.bold);
     return contentBuilder(context, (context, column) {
-      final columns = ref.watch(trackTableColumnsProvider);
-      final text = switch (columns[column].id) {
+      final columnId = getColumnId(column);
+      final text = switch (columnId) {
         kTrackNumberColumnId => '音轨',
         kTrackTitleColumnId => '标题',
         kArtistNameColumnId => '艺术家',
@@ -117,7 +124,7 @@ class _TrackTableViewState extends ConsumerState<TrackTableView> {
         kDurationColumnId => '时长',
         _ => throw UnimplementedError(),
       };
-      final sortProperty = _getSortProperty(columns[column].id);
+      final sortProperty = _getSortProperty(columnId);
       // 排序图标
       final icon =
           ref.watch(currentPlaylistProvider).sortProperty == sortProperty
@@ -185,25 +192,30 @@ class _TrackTableViewState extends ConsumerState<TrackTableView> {
     BuildContext cellBuildContext,
     int columnIndex,
   ) {
-    final columns = ref.read(trackTableColumnsProvider);
+    final columnsNotifier = ref.read(trackTableColumnsProvider.notifier);
     return TableColumnControlHandlesPopupRoute.realtime(
       controlCellBuildContext: cellBuildContext,
       columnIndex: columnIndex,
       tableViewChanged: null,
-      onColumnTranslate: (index, translation) => setState(() =>
-          columns[index] = columns[index].copyWith(translation: translation)),
-      onColumnResize: (index, width) => setState(
-          () => columns[index] = columns[index].copyWith(width: width)),
+      onColumnTranslate: (index, translation) =>
+          setState(() => columnsNotifier.translateColumn(index, translation)),
+      onColumnResize: (index, width) =>
+          setState(() => columnsNotifier.resizeColumn(index, width)),
       onColumnMove: (oldIndex, newIndex) =>
-          setState(() => columns.insert(newIndex, columns.removeAt(oldIndex))),
+          columnsNotifier.moveColumn(oldIndex, newIndex),
     );
   }
 }
 
 class TrackRow extends ConsumerWidget {
   final TableRowContentBuilder contentBuilder;
+  final int Function(int) getColumnId;
 
-  const TrackRow({super.key, required this.contentBuilder});
+  const TrackRow({
+    super.key,
+    required this.contentBuilder,
+    required this.getColumnId,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -223,8 +235,8 @@ class TrackRow extends ConsumerWidget {
               ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)
               : Colors.transparent,
           child: contentBuilder(context, (context, column) {
-            final columns = ref.read(trackTableColumnsProvider);
-            final text = switch (columns[column].id) {
+            final columnId = getColumnId(column);
+            final text = switch (columnId) {
               kTrackNumberColumnId =>
                 track.metadata.trackNumber?.toString() ?? '',
               kTrackTitleColumnId => track.metadata.title ?? '',

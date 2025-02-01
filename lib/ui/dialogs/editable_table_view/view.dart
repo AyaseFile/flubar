@@ -68,14 +68,15 @@ class _EditableTableViewState extends ConsumerState<EditableTableView> {
       columns: columns,
       rowHeight: kEditableTableRowHeight,
       rowCount: selectedTracks.length,
-      headerBuilder: _headerBuilder,
+      headerBuilder: (context, contentBuilder) => _headerBuilder(
+          context, contentBuilder, (column) => columns[column].id),
       rowBuilder: (context, row, contentBuilder) {
         final track = selectedTracks[row];
-        return KeyedSubtree(
-          key: ValueKey(track.id),
-          child: ProviderScope(
-            overrides: [editableTrackItemProvider.overrideWithValue(track)],
-            child: EditableTrackRow(contentBuilder: contentBuilder),
+        return ProviderScope(
+          overrides: [editableTrackItemProvider.overrideWithValue(track)],
+          child: EditableTrackRow(
+            contentBuilder: contentBuilder,
+            getColumnId: (column) => columns[column].id,
           ),
         );
       },
@@ -83,11 +84,14 @@ class _EditableTableViewState extends ConsumerState<EditableTableView> {
   }
 
   Widget _headerBuilder(
-      BuildContext context, TableRowContentBuilder contentBuilder) {
+    BuildContext context,
+    TableRowContentBuilder contentBuilder,
+    int Function(int) getColumnId,
+  ) {
     const style = TextStyle(fontWeight: FontWeight.bold);
     return contentBuilder(context, (context, column) {
-      final columns = ref.watch(editableTableColumnsProvider);
-      final text = switch (columns[column].id) {
+      final columnId = getColumnId(column);
+      final text = switch (columnId) {
         kTrackNumberColumnId => '音轨',
         kTrackTitleColumnId => '标题',
         kArtistNameColumnId => '艺术家',
@@ -140,15 +144,20 @@ class _EditableTableViewState extends ConsumerState<EditableTableView> {
 
 class EditableTrackRow extends ConsumerWidget {
   final TableRowContentBuilder contentBuilder;
+  final int Function(int) getColumnId;
 
-  const EditableTrackRow({super.key, required this.contentBuilder});
+  const EditableTrackRow({
+    super.key,
+    required this.contentBuilder,
+    required this.getColumnId,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final track = ref.watch(editableTrackItemProvider);
     return contentBuilder(context, (context, column) {
-      final columns = ref.read(editableTableColumnsProvider);
-      final text = switch (columns[column].id) {
+      final columnId = getColumnId(column);
+      final text = switch (columnId) {
         kTrackNumberColumnId => track.metadata.trackNumber?.toString() ?? '',
         kTrackTitleColumnId => track.metadata.title ?? '',
         kArtistNameColumnId => track.metadata.artist ?? '',
@@ -169,15 +178,15 @@ class EditableTrackRow extends ConsumerWidget {
           child: Padding(
               padding: kCellTextPadding,
               child: TextFieldCell(
-                enabled: columns[column].id != kFileNameColumnId,
+                enabled: columnId != kFileNameColumnId,
                 text: text,
-                onSubmitted: columns[column].id == kFileNameColumnId
+                onSubmitted: columnId == kFileNameColumnId
                     ? null
                     : (text) => ref
                         .read(selectedTracksProvider.notifier)
                         .updateMetadataState(
                           trackId: track.id,
-                          columnId: columns[column].id,
+                          columnId: columnId,
                           value: text,
                         ),
               )),
