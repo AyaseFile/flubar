@@ -20,6 +20,8 @@ class EditableTableDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RatioDialog(
+      widthRatio: kEditableTableWidthRatio,
+      heightRatio: kEditableTableHeightRatio,
       child: Padding(
         padding: kDoubleViewPadding,
         child: Scaffold(
@@ -56,7 +58,7 @@ class _EditableTableViewState extends ConsumerState<EditableTableView> {
     return Card(
         margin: EdgeInsets.zero,
         child: Padding(
-          padding: kViewPadding,
+          padding: kTableViewPadding,
           child: _tableBuilder(),
         ));
   }
@@ -65,6 +67,10 @@ class _EditableTableViewState extends ConsumerState<EditableTableView> {
     final selectedTracks = ref.watch(selectedTracksProvider);
     final columns = ref.read(editableTableColumnsProvider);
     return TableView.builder(
+      style: TableViewStyle(
+        scrollbars: TableViewScrollbarsStyle(
+            vertical: TableViewScrollbarStyle(scrollPadding: false)),
+      ),
       columns: columns,
       rowHeight: kEditableTableRowHeight,
       rowCount: selectedTracks.length,

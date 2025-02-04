@@ -54,6 +54,10 @@ class _PropertiesTableView extends ConsumerWidget {
   Widget _tableBuilder(WidgetRef ref) {
     final allProperties = ref.watch(commonPropertiesProvider);
     return TableView.builder(
+      style: TableViewStyle(
+        scrollbars: TableViewScrollbarsStyle(
+            vertical: TableViewScrollbarStyle(scrollPadding: false)),
+      ),
       columns: kPropertiesColumns,
       rowHeight: kRowHeight,
       rowCount: allProperties.length,

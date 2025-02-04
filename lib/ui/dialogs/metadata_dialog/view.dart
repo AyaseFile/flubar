@@ -178,6 +178,10 @@ class _MetadataTableView extends ConsumerWidget {
   Widget _tableBuilder(WidgetRef ref) {
     final allMetadata = ref.watch(commonMetadataProvider);
     return TableView.builder(
+      style: TableViewStyle(
+        scrollbars: TableViewScrollbarsStyle(
+            vertical: TableViewScrollbarStyle(scrollPadding: false)),
+      ),
       columns: kMetadataColumns,
       rowHeight: kRowHeight,
       rowCount: allMetadata.length,
@@ -297,7 +301,9 @@ class _MetadataRow extends ConsumerWidget {
               final ids = ref.read(selectedCommonMetadataIdsProvider);
               final length = ids.length + 1; // 加上文件名列
               var columnWidth = kEditableTableColumnWidth;
-              final currentWidth = Get.width;
+              final currentWidth = Get.width * kEditableTableWidthRatio -
+                  kDoubleViewPadding.horizontal -
+                  kTableViewPadding.horizontal;
               // 计算列宽度
               final calcWidth = currentWidth / length;
               if (calcWidth < kEditableTableColumnWidth) {

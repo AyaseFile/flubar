@@ -42,7 +42,12 @@ class _TrackTableViewState extends ConsumerState<TrackTableView> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Expanded(child: _tableBuilder()),
+              Expanded(
+                child: Padding(
+                  padding: kTableViewPadding,
+                  child: _tableBuilder(),
+                ),
+              ),
               Container(
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surfaceContainerHigh,
@@ -86,6 +91,10 @@ class _TrackTableViewState extends ConsumerState<TrackTableView> {
     return _shortcutsBuilder(GestureDetector(
       onTap: () => ref.read(selectedTrackIdsProvider.notifier).clear(),
       child: TableView.builder(
+        style: TableViewStyle(
+          scrollbars: TableViewScrollbarsStyle(
+              vertical: TableViewScrollbarStyle(scrollPadding: false)),
+        ),
         columns: columns,
         rowHeight: kRowHeight,
         rowCount: tracks.length,
