@@ -124,11 +124,11 @@ pub fn read_file(file: String) -> Result<(Metadata, Properties)> {
                         .to_string_lossy()
                         .into_owned()
                 });
-                properties.sample_rate = (sample_rate != 0).then(|| sample_rate as u32);
-                properties.bits_per_raw_sample = (bits_per_raw_sample != 0).then(|| bits_per_raw_sample as u8);
-                properties.bits_per_coded_sample = (bits_per_coded_sample != 0).then(|| bits_per_coded_sample as u8);
-                properties.bit_rate = (bit_rate != 0).then(|| bit_rate as u32);
-                properties.channels = (channels != 0).then(|| channels as u8);
+                properties.sample_rate = (sample_rate != 0).then_some(sample_rate as u32);
+                properties.bits_per_raw_sample = (bits_per_raw_sample != 0).then_some(bits_per_raw_sample as u8);
+                properties.bits_per_coded_sample = (bits_per_coded_sample != 0).then_some(bits_per_coded_sample as u8);
+                properties.bit_rate = (bit_rate != 0).then_some(bit_rate as u32);
+                properties.channels = (channels != 0).then_some(channels as u8);
             }
         }
 
@@ -171,11 +171,11 @@ pub(crate) fn cue_read_properties(file: String) -> Result<Properties> {
                         .to_string_lossy()
                         .into_owned()
                 });
-                properties.sample_rate = (sample_rate != 0).then(|| sample_rate as u32);
-                properties.bits_per_raw_sample = (bits_per_raw_sample != 0).then(|| bits_per_raw_sample as u8);
-                properties.bits_per_coded_sample = (bits_per_coded_sample != 0).then(|| bits_per_coded_sample as u8);
-                properties.bit_rate = (bit_rate != 0).then(|| bit_rate as u32);
-                properties.channels = (channels != 0).then(|| channels as u8);
+                properties.sample_rate = (sample_rate != 0).then_some(sample_rate as u32);
+                properties.bits_per_raw_sample = (bits_per_raw_sample != 0).then_some(bits_per_raw_sample as u8);
+                properties.bits_per_coded_sample = (bits_per_coded_sample != 0).then_some(bits_per_coded_sample as u8);
+                properties.bit_rate = (bit_rate != 0).then_some(bit_rate as u32);
+                properties.channels = (channels != 0).then_some(channels as u8);
             }
         }
 
