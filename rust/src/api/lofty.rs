@@ -76,7 +76,7 @@ pub fn lofty_write_picture(file: String, picture: Option<Vec<u8>>, force: bool) 
 
     if let Some(picture) = picture {
         let kind = infer::get(&picture).expect("Failed to get mime type");
-        let mime_type = MimeType::from_str(&kind.mime_type());
+        let mime_type = MimeType::from_str(kind.mime_type());
         let cover_front_index = tag
             .pictures()
             .iter()
