@@ -2,6 +2,7 @@ import subprocess
 
 
 def install_dependencies():
+    subprocess.run("sudo apt-get update", shell=True)
     subprocess.run(
         "sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev",
         shell=True,
