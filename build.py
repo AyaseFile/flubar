@@ -7,7 +7,7 @@ def install_dependencies():
         "sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev",
         shell=True,
     )
-    subprocess.run("sudo apt-get install -y libmpv-dev", shell=True)
+    subprocess.run("sudo apt-get install -y libmpv-dev libcue-dev", shell=True)
     subprocess.run("sudo apt-get install -y pkg-config ffmpeg", shell=True)
 
 
