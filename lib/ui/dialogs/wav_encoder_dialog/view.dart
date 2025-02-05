@@ -55,7 +55,7 @@ class _EncoderItem extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final encoder = ref.watch(encoderItemProvider);
     final selected =
-        ref.watch(encoderSelectionProvider.select((value) => value == encoder));
+        ref.watch(encoderSelectionProvider.select((state) => state == encoder));
     return ListTile(
       title: Text(encoder.displayName),
       contentPadding: EdgeInsets.zero,

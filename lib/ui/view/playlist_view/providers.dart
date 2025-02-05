@@ -92,10 +92,11 @@ class Playlists extends _$Playlists {
 class CurrentPlaylist extends _$CurrentPlaylist {
   @override
   Playlist build() {
-    final id = ref.watch(playlistIdProvider).selectedId;
-    return ref.watch(playlistsProvider.select((playlists) =>
-        playlists.firstWhere((p) => p.id == id,
-            orElse: () => throw StateError('No playlist found with id $id'))));
+    final id =
+        ref.watch(playlistIdProvider.select((state) => state.selectedId));
+    return ref.watch(playlistsProvider.select((state) => state.firstWhere(
+        (p) => p.id == id,
+        orElse: () => throw StateError('No playlist found with id $id'))));
   }
 
   void setSortProperty(TrackSortProperty property) {

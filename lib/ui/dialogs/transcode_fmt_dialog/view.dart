@@ -55,7 +55,7 @@ class _SelectionItem extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final option = ref.watch(selectionItemProvider);
     final selected =
-        ref.watch(selectionProvider.select((value) => value == option));
+        ref.watch(selectionProvider.select((state) => state == option));
     return ListTile(
       title: Text(option.displayName),
       contentPadding: EdgeInsets.zero,

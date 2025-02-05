@@ -135,13 +135,15 @@ class _TrackTableViewState extends ConsumerState<TrackTableView> {
       };
       final sortProperty = _getSortProperty(columnId);
       // 排序图标
-      final icon =
-          ref.watch(currentPlaylistProvider).sortProperty == sortProperty
-              ? ref.watch(currentPlaylistProvider).sortOrder ==
-                      TrackSortOrder.ascending
-                  ? Icons.arrow_upward
-                  : Icons.arrow_downward
-              : null;
+      final icon = ref.watch(currentPlaylistProvider
+                  .select((state) => state.sortProperty)) ==
+              sortProperty
+          ? ref.watch(currentPlaylistProvider
+                      .select((state) => state.sortOrder)) ==
+                  TrackSortOrder.ascending
+              ? Icons.arrow_upward
+              : Icons.arrow_downward
+          : null;
       return InkWell(
         onTap: () {
           // 点击表头排序
