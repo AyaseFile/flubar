@@ -16,7 +16,7 @@ def build_flutter():
     subprocess.run(
         "dart run build_runner build --delete-conflicting-outputs", shell=True
     )
-    subprocess.run("flutter build linux --release", shell=True)
+    subprocess.run("flutter build linux --release -v", shell=True)
 
 
 def compress_build():
