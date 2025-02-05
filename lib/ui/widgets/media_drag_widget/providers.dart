@@ -58,7 +58,7 @@ class MediaDragState extends _$MediaDragState {
     final results = await Future.wait(
       filePaths.map((path) async {
         try {
-          final ext = p.extension(path);
+          final ext = p.extension(path).toLowerCase();
           if (ext == '.cue') {
             final List<(String, Metadata, Properties)> cueTracks =
                 await cueReadFile(file: path);
@@ -111,17 +111,35 @@ class MediaDragState extends _$MediaDragState {
 
   Future<List<String>> _getMediaFiles(String path) async {
     final entity = Directory(path);
-    final files = <String>[];
+    final dirFiles = <String, List<String>>{};
+    final dirCues = <String, List<String>>{};
+
     try {
       await for (final file in entity.list(recursive: true)) {
-        if (file is File && _isAudioFile(file.path)) {
-          files.add(file.path);
+        if (file is File) {
+          final dir = p.dirname(file.path);
+          final ext = p.extension(file.path).toLowerCase();
+          if (ext == '.cue') {
+            dirCues.putIfAbsent(dir, () => []).add(file.path);
+          } else if (_isAudioFile(file.path)) {
+            dirFiles.putIfAbsent(dir, () => []).add(file.path);
+          }
         }
       }
     } catch (e) {
       globalTalker.error('遍历文件夹失败: $path', e, null);
     }
-    return files;
+
+    final result = <String>[];
+    for (final dir in dirFiles.keys) {
+      if (dirCues.containsKey(dir)) {
+        result.addAll(dirCues[dir]!);
+      } else {
+        result.addAll(dirFiles[dir]!);
+      }
+    }
+
+    return result;
   }
 
   bool _isAudioFile(String path) {

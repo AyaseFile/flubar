@@ -17,5 +17,5 @@ const kAudioExtensionsSet = {
   'aac',
   'ogg',
   'alac',
-  'cue'
+  // 'cue'
 };
