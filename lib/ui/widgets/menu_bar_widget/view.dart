@@ -40,14 +40,25 @@ class _MenuBarWidgetState extends ConsumerState<MenuBarWidget> {
         label: '文件',
         menuChildren: [
           MenuEntry(
-            label: '添加',
+            label: '添加文件',
             onPressed: () async {
               final result = await FilePicker.platform.pickFiles(
-                  allowMultiple: true, allowedExtensions: kAudioExtensions);
+                  allowMultiple: true, allowedExtensions: kAudioExtensionsList);
+              if (result != null) {
+                ref.read(mediaDragStateProvider.notifier).addFiles(
+                    result.xFiles.map((e) => e.path),
+                    behavior: DragBehavior.filesOnly);
+              }
+            },
+          ),
+          MenuEntry(
+            label: '添加文件夹',
+            onPressed: () async {
+              final result = await FilePicker.platform.getDirectoryPath();
               if (result != null) {
                 ref
                     .read(mediaDragStateProvider.notifier)
-                    .addFiles(result.xFiles.map((e) => e.path));
+                    .addFiles([result], behavior: DragBehavior.recursive);
               }
             },
           ),

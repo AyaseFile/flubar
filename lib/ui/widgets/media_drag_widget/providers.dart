@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flubar/app/talker.dart';
 import 'package:flubar/models/extensions/metadata_extension.dart';
 import 'package:flubar/models/extensions/properties_extension.dart';
@@ -8,6 +10,7 @@ import 'package:flubar/rust/api/models.dart';
 import 'package:flubar/ui/snackbar/view.dart';
 import 'package:flubar/ui/view/playlist_view/providers.dart';
 import 'package:flubar/ui/view/tracklist_view/providers.dart';
+import 'package:flubar/ui/widgets/menu_bar_widget/constants.dart';
 import 'package:path/path.dart' as p;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -27,19 +30,33 @@ class EnableMediaDrag extends _$EnableMediaDrag {
   }
 }
 
+enum DragBehavior {
+  filesOnly,
+  recursive,
+}
+
 @riverpod
 class MediaDragState extends _$MediaDragState {
   @override
   bool build() => false;
 
-  Future<void> addFiles(Iterable<String> paths) async {
+  Future<void> addFiles(Iterable<String> paths,
+      {DragBehavior behavior = DragBehavior.recursive}) async {
     final id = ref.read(playlistIdProvider).selectedId;
     final maxTrackIdNotifier = ref.read(maxTrackIdProvider.notifier);
     final playlistsNotifier = ref.read(playlistsProvider.notifier);
 
+    final filePaths = await switch (behavior) {
+      DragBehavior.filesOnly => Future.value(paths),
+      DragBehavior.recursive => Future.wait(paths.map((path) async =>
+          await FileSystemEntity.isDirectory(path)
+              ? await _getMediaFiles(path)
+              : [path])).then((lists) => lists.expand((x) => x)),
+    };
+
     var failed = 0;
     final results = await Future.wait(
-      paths.map((path) async {
+      filePaths.map((path) async {
         try {
           final ext = p.extension(path);
           if (ext == '.cue') {
@@ -90,6 +107,26 @@ class MediaDragState extends _$MediaDragState {
     if (failed != 0) {
       showExceptionSnackbar(title: '错误', message: '无法读取 $failed 个文件');
     }
+  }
+
+  Future<List<String>> _getMediaFiles(String path) async {
+    final entity = Directory(path);
+    final files = <String>[];
+    try {
+      await for (final file in entity.list(recursive: true)) {
+        if (file is File && _isAudioFile(file.path)) {
+          files.add(file.path);
+        }
+      }
+    } catch (e) {
+      globalTalker.error('遍历文件夹失败: $path', e, null);
+    }
+    return files;
+  }
+
+  bool _isAudioFile(String path) {
+    final ext = p.extension(path).toLowerCase();
+    return ext.isNotEmpty && kAudioExtensionsSet.contains(ext.substring(1));
   }
 
   void setDragging(bool dragging) {

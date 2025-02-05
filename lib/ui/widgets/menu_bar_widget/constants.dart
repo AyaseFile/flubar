@@ -1,4 +1,4 @@
-const kAudioExtensions = [
+const kAudioExtensionsList = [
   'mp3',
   'wav',
   'flac',
@@ -6,5 +6,16 @@ const kAudioExtensions = [
   'aac',
   'ogg',
   'alac',
-  // 'cue'
+  'cue'
 ];
+
+const kAudioExtensionsSet = {
+  'mp3',
+  'wav',
+  'flac',
+  'm4a',
+  'aac',
+  'ogg',
+  'alac',
+  'cue'
+};
