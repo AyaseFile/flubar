@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:flubar/app/talker.dart';
+import 'package:flubar/models/state/advanced_column_state.dart';
 import 'package:flubar/models/state/settings.dart';
 import 'package:flubar/utils/transcode/transcode.dart';
 import 'package:hive/hive.dart';
@@ -315,6 +316,39 @@ class History extends _$History {
 
   void _save() =>
       ref.read(settingsProvider.notifier).saveJson('history', state.toJson());
+}
+
+@Riverpod(keepAlive: true)
+class TableColumnState extends _$TableColumnState {
+  @override
+  TableColumnStateModel build() {
+    final settings = (() {
+      final str =
+          ref.read(settingsProvider.notifier).getJson('tableColumnState');
+      const defaultSettings = TableColumnStateModel();
+      try {
+        final loadedSettings = TableColumnStateModel.fromJson(
+          jsonDecode(str) as Map<String, dynamic>,
+        );
+        return defaultSettings.copyWith(
+          trackTableColumns: loadedSettings.trackTableColumns,
+        );
+      } catch (e) {
+        globalTalker.handle(e, null, '无法解析表格列设置: $str');
+        return defaultSettings;
+      }
+    })();
+    return settings;
+  }
+
+  void updateTrackTableColumns(List<AdvancedColumnState> trackTableColumns) {
+    state = state.copyWith(trackTableColumns: trackTableColumns);
+    _save();
+  }
+
+  void _save() => ref
+      .read(settingsProvider.notifier)
+      .saveJson('tableColumnState', state.toJson());
 }
 
 Future<String?> getInitialDirectory(String? path) async {

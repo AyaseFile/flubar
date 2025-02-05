@@ -1,4 +1,6 @@
+import 'package:flubar/models/state/advanced_column_state.dart';
 import 'package:flubar/models/state/settings.dart';
+import 'package:flubar/ui/view/tracklist_view/constants.dart';
 
 class DefaultSettings {
   static const kDarkMode = false;
@@ -24,4 +26,26 @@ class DefaultSettings {
   static const kWarningHighToLowBit = true;
   static const kWindowWidth = 800.0;
   static const kWindowHeight = 600.0;
+  static const kTrackTableColumnsState = [
+    AdvancedColumnState(
+      id: kTrackNumberColumnId,
+      width: kTrackNumberColumnWidth,
+    ),
+    AdvancedColumnState(
+      id: kTrackTitleColumnId,
+      width: kTrackTitleColumnWidth,
+    ),
+    AdvancedColumnState(
+      id: kArtistNameColumnId,
+      width: kArtistNameColumnWidth,
+    ),
+    AdvancedColumnState(
+      id: kAlbumColumnId,
+      width: kAlbumColumnWidth,
+    ),
+    AdvancedColumnState(
+      id: kDurationColumnId,
+      width: kDurationColumnWidth,
+    ),
+  ];
 }

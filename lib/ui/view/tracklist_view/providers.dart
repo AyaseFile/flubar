@@ -2,6 +2,7 @@ import 'dart:math' show max, min;
 
 import 'package:collection/collection.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
+import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/models/extensions/properties_extension.dart';
 import 'package:flubar/models/state/playlist.dart';
 import 'package:flubar/models/state/track.dart';
@@ -11,7 +12,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:unorm_dart/unorm_dart.dart' as unorm;
 
 import 'advanced_column.dart';
-import 'constants.dart';
 
 part 'providers.g.dart';
 
@@ -19,28 +19,11 @@ part 'providers.g.dart';
 class TrackTableColumns extends _$TrackTableColumns {
   @override
   List<AdvancedColumn> build() {
-    return [
-      AdvancedColumn(
-        id: kTrackNumberColumnId,
-        width: kTrackNumberColumnWidth,
-      ),
-      AdvancedColumn(
-        id: kTrackTitleColumnId,
-        width: kTrackTitleColumnWidth,
-      ),
-      AdvancedColumn(
-        id: kArtistNameColumnId,
-        width: kArtistNameColumnWidth,
-      ),
-      AdvancedColumn(
-        id: kAlbumColumnId,
-        width: kAlbumColumnWidth,
-      ),
-      AdvancedColumn(
-        id: kDurationColumnId,
-        width: kDurationColumnWidth,
-      ),
-    ];
+    return ref
+        .read(tableColumnStateProvider)
+        .trackTableColumns
+        .map((state) => AdvancedColumn.fromState(state))
+        .toList();
   }
 
   void translateColumn(int index, double translation) {

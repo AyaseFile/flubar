@@ -4,6 +4,7 @@ import 'package:flubar/rust/api/ffmpeg.dart';
 import 'package:flubar/rust/frb_generated.dart';
 import 'package:flubar/ui/constants.dart';
 import 'package:flubar/ui/view/playlist_view/view.dart';
+import 'package:flubar/ui/view/tracklist_view/providers.dart';
 import 'package:flubar/ui/view/tracklist_view/view.dart';
 import 'package:flubar/ui/widgets/media_drag_widget/view.dart';
 import 'package:flubar/ui/widgets/menu_bar_widget/view.dart';
@@ -53,6 +54,10 @@ class _HomeViewState extends ConsumerState<HomeView> with WindowListener {
   @override
   void onWindowClose() {
     ref.read(windowSettingsProvider.notifier).updateWindowSize(_windowSize);
+    ref.read(tableColumnStateProvider.notifier).updateTrackTableColumns(ref
+        .read(trackTableColumnsProvider)
+        .map((column) => column.toState())
+        .toList());
   }
 
   @override

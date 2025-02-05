@@ -1,5 +1,6 @@
 // ignore_for_file: constant_identifier_names
 import 'package:flubar/app/settings/constants.dart';
+import 'package:flubar/models/state/advanced_column_state.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'settings.freezed.dart';
@@ -113,4 +114,15 @@ class HistoryModel with _$HistoryModel {
 
   factory HistoryModel.fromJson(Map<String, dynamic> json) =>
       _$HistoryModelFromJson(json);
+}
+
+@freezed
+class TableColumnStateModel with _$TableColumnStateModel {
+  const factory TableColumnStateModel({
+    @Default(_S.kTrackTableColumnsState)
+    List<AdvancedColumnState> trackTableColumns,
+  }) = _TableColumnStateModel;
+
+  factory TableColumnStateModel.fromJson(Map<String, dynamic> json) =>
+      _$TableColumnStateModelFromJson(json);
 }
