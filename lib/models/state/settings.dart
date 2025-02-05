@@ -103,3 +103,14 @@ class WindowSettingsModel with _$WindowSettingsModel {
   factory WindowSettingsModel.fromJson(Map<String, dynamic> json) =>
       _$WindowSettingsModelFromJson(json);
 }
+
+@freezed
+class HistoryModel with _$HistoryModel {
+  const factory HistoryModel({
+    @Default('') String openPath,
+    @Default('') String outputPath,
+  }) = _History;
+
+  factory HistoryModel.fromJson(Map<String, dynamic> json) =>
+      _$HistoryModelFromJson(json);
+}

@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flubar/app/talker.dart';
 import 'package:flubar/models/state/settings.dart';
 import 'package:flubar/utils/transcode/transcode.dart';
 import 'package:hive/hive.dart';
+import 'package:path/path.dart' as p;
 import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -276,4 +278,49 @@ class WindowSettings extends _$WindowSettings {
 
   void _save() =>
       ref.read(settingsProvider.notifier).saveJson('window', state.toJson());
+}
+
+@Riverpod(keepAlive: true)
+class History extends _$History {
+  @override
+  HistoryModel build() {
+    final settings = (() {
+      final str = ref.read(settingsProvider.notifier).getJson('history');
+      const defaultSettings = HistoryModel();
+      try {
+        final loadedSettings = HistoryModel.fromJson(
+          jsonDecode(str) as Map<String, dynamic>,
+        );
+        return defaultSettings.copyWith(
+          openPath: loadedSettings.openPath,
+          outputPath: loadedSettings.outputPath,
+        );
+      } catch (e) {
+        globalTalker.handle(e, null, '无法解析历史记录设置: $str');
+        return defaultSettings;
+      }
+    })();
+    return settings;
+  }
+
+  void updateOpenPath(String openPath) {
+    state = state.copyWith(openPath: openPath);
+    _save();
+  }
+
+  void updateOutputPath(String outputPath) {
+    state = state.copyWith(outputPath: outputPath);
+    _save();
+  }
+
+  void _save() =>
+      ref.read(settingsProvider.notifier).saveJson('history', state.toJson());
+}
+
+Future<String?> getInitialDirectory(String? path) async {
+  return path != null && await Directory(path).exists()
+      ? path.endsWith(p.separator)
+          ? path
+          : '$path${p.separator}'
+      : null;
 }

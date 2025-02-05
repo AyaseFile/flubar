@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/models/state/settings.dart';
 import 'package:flubar/ui/dialogs/ratio_dialog/view.dart';
 import 'package:flubar/ui/snackbar/view.dart';
@@ -8,6 +9,7 @@ import 'package:flubar/utils/warnings/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:path/path.dart' as p;
 
 import 'constants.dart';
 import 'providers.dart';
@@ -232,8 +234,12 @@ class _OutputDirectorySelector extends ConsumerWidget {
           const SizedBox(width: kSpaceBetweenItems),
           ElevatedButton(
             onPressed: () async {
-              final selectedDir = await FilePicker.platform.getDirectoryPath();
+              final outputPath = ref.read(historyProvider).outputPath;
+              final selectedDir = await FilePicker.platform.getDirectoryPath(
+                  initialDirectory: await getInitialDirectory(outputPath));
               if (selectedDir != null) {
+                final newPath = '${p.dirname(selectedDir)}${p.separator}';
+                ref.read(historyProvider.notifier).updateOutputPath(newPath);
                 ref
                     .read(outputDirectoryProvider.notifier)
                     .setDirectory(selectedDir);

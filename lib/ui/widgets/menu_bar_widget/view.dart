@@ -1,5 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flubar/app/constants.dart';
+import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/app/talker.dart';
 import 'package:flubar/ui/dialogs/get_dialog/providers.dart';
 import 'package:flubar/ui/view/settings_view/view.dart';
@@ -8,6 +9,7 @@ import 'package:flubar/ui/widgets/player_widget/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path/path.dart' as p;
 import 'package:talker_flutter/talker_flutter.dart';
 
 import 'constants.dart';
@@ -42,9 +44,15 @@ class _MenuBarWidgetState extends ConsumerState<MenuBarWidget> {
           MenuEntry(
             label: '添加文件',
             onPressed: () async {
+              final openPath = ref.read(historyProvider).openPath;
               final result = await FilePicker.platform.pickFiles(
-                  allowMultiple: true, allowedExtensions: kAudioExtensionsList);
+                  allowMultiple: true,
+                  allowedExtensions: kAudioExtensionsList,
+                  initialDirectory: await getInitialDirectory(openPath));
               if (result != null) {
+                final newPath =
+                    '${p.dirname(result.xFiles.first.path)}${p.separator}';
+                ref.read(historyProvider.notifier).updateOpenPath(newPath);
                 ref.read(mediaDragStateProvider.notifier).addFiles(
                     result.xFiles.map((e) => e.path),
                     behavior: DragBehavior.filesOnly);
@@ -54,8 +62,12 @@ class _MenuBarWidgetState extends ConsumerState<MenuBarWidget> {
           MenuEntry(
             label: '添加文件夹',
             onPressed: () async {
-              final result = await FilePicker.platform.getDirectoryPath();
+              final openPath = ref.read(historyProvider).openPath;
+              final result = await FilePicker.platform.getDirectoryPath(
+                  initialDirectory: await getInitialDirectory(openPath));
               if (result != null) {
+                final newPath = '${p.dirname(result)}${p.separator}';
+                ref.read(historyProvider.notifier).updateOpenPath(newPath);
                 ref
                     .read(mediaDragStateProvider.notifier)
                     .addFiles([result], behavior: DragBehavior.recursive);
