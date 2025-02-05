@@ -3,7 +3,6 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  desktop_drop
   irondash_engine_context
   media_kit_libs_linux
   screen_retriever_linux

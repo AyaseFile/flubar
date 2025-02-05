@@ -1,4 +1,3 @@
-import 'package:cross_file/cross_file.dart';
 import 'package:flubar/app/talker.dart';
 import 'package:flubar/models/extensions/metadata_extension.dart';
 import 'package:flubar/models/extensions/properties_extension.dart';
@@ -33,15 +32,14 @@ class MediaDragState extends _$MediaDragState {
   @override
   bool build() => false;
 
-  Future<void> addFiles(List<XFile> files) async {
+  Future<void> addFiles(Iterable<String> paths) async {
     final id = ref.read(playlistIdProvider).selectedId;
     final maxTrackIdNotifier = ref.read(maxTrackIdProvider.notifier);
     final playlistsNotifier = ref.read(playlistsProvider.notifier);
 
     var failed = 0;
     final results = await Future.wait(
-      files.map((file) async {
-        final path = file.path;
+      paths.map((path) async {
         try {
           final ext = p.extension(path);
           if (ext == '.cue') {
@@ -61,7 +59,7 @@ class MediaDragState extends _$MediaDragState {
           } else {
             final (metadata, properties) = await readFile(file: path);
             globalTalker.debug(
-                '文件: ${file.path}, 元数据: ${metadata.toJson()}, 属性: ${properties.toJson()}');
+                '文件: $path, 元数据: ${metadata.toJson()}, 属性: ${properties.toJson()}');
             return [
               Track(
                 id: maxTrackIdNotifier.nextId(),
@@ -79,7 +77,7 @@ class MediaDragState extends _$MediaDragState {
               id: maxTrackIdNotifier.nextId(),
               metadata: const Metadata(),
               properties: const Properties(),
-              path: file.path,
+              path: path,
             )
           ];
         }
@@ -87,7 +85,7 @@ class MediaDragState extends _$MediaDragState {
       eagerError: false,
     );
 
-    final tracks = results.expand((tracks) => tracks).toList();
+    final tracks = results.expand((tracks) => tracks);
     playlistsNotifier.addTracks(id, tracks);
     if (failed != 0) {
       showExceptionSnackbar(title: '错误', message: '无法读取 $failed 个文件');

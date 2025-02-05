@@ -47,7 +47,7 @@ class _MenuBarWidgetState extends ConsumerState<MenuBarWidget> {
               if (result != null) {
                 ref
                     .read(mediaDragStateProvider.notifier)
-                    .addFiles(result.xFiles);
+                    .addFiles(result.xFiles.map((e) => e.path));
               }
             },
           ),
