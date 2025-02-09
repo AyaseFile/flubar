@@ -136,79 +136,72 @@ class CommonMetadata extends _$CommonMetadata {
       CommonMetadataModel(
           id: kTrackTitleRowId,
           key: '标题',
-          value: titleSet
-              .where((title) => title != null && title.isNotEmpty)
-              .join(', '),
+          value: _formatValues(titleSet),
           multi: titleSet.length > 1),
       CommonMetadataModel(
           id: kArtistNameRowId,
           key: '艺术家',
-          value: artistSet
-              .where((artist) => artist != null && artist.isNotEmpty)
-              .join(', '),
+          value: _formatValues(artistSet),
           multi: artistSet.length > 1),
       CommonMetadataModel(
           id: kAlbumRowId,
           key: '专辑',
-          value: albumSet
-              .where((album) => album != null && album.isNotEmpty)
-              .join(', '),
+          value: _formatValues(albumSet),
           multi: albumSet.length > 1),
       CommonMetadataModel(
           id: kAlbumArtistRowId,
           key: '专辑艺术家',
-          value: albumArtistSet
-              .where((albumArtist) =>
-                  albumArtist != null && albumArtist.isNotEmpty)
-              .join(', '),
+          value: _formatValues(albumArtistSet),
           multi: albumArtistSet.length > 1),
       CommonMetadataModel(
           id: kTrackNumberRowId,
           key: '音轨',
-          value: trackNumberSet
-              .where((trackNumber) =>
-                  trackNumber != null && trackNumber.toString().isNotEmpty)
-              .join(', '),
+          value: _formatValues(trackNumberSet),
           multi: trackNumberSet.length > 1),
       CommonMetadataModel(
           id: kTrackTotalRowId,
           key: '音轨总数',
-          value: trackTotalSet
-              .where((trackTotal) =>
-                  trackTotal != null && trackTotal.toString().isNotEmpty)
-              .join(', '),
+          value: _formatValues(trackTotalSet),
           multi: trackTotalSet.length > 1),
       CommonMetadataModel(
           id: kDiscNumberRowId,
           key: '碟片',
-          value: discNumberSet
-              .where((discNumber) =>
-                  discNumber != null && discNumber.toString().isNotEmpty)
-              .join(', '),
+          value: _formatValues(discNumberSet),
           multi: discNumberSet.length > 1),
       CommonMetadataModel(
           id: kDiscTotalRowId,
           key: '碟片总数',
-          value: discTotalSet
-              .where((discTotal) =>
-                  discTotal != null && discTotal.toString().isNotEmpty)
-              .join(', '),
+          value: _formatValues(discTotalSet),
           multi: discTotalSet.length > 1),
       CommonMetadataModel(
           id: kDateRowId,
           key: '日期',
-          value: dateSet
-              .where((date) => date != null && date.toString().isNotEmpty)
-              .join(', '),
+          value: _formatValues(dateSet),
           multi: dateSet.length > 1),
       CommonMetadataModel(
           id: kGenreRowId,
           key: '流派',
-          value: genreSet
-              .where((genre) => genre != null && genre.isNotEmpty)
-              .join(', '),
+          value: _formatValues(genreSet),
           multi: genreSet.length > 1),
     ]);
+  }
+
+  String _formatValues<T>(Set<T?> values) {
+    if (values.isEmpty) return '';
+
+    final hasNull = values.any((v) => v == null);
+    final nonNullValues =
+        values.where((v) => v != null && v.toString().isNotEmpty);
+
+    final parts = <String>[];
+    if (hasNull) {
+      parts.add('(空)');
+    }
+    if (nonNullValues.isNotEmpty) {
+      parts.add(nonNullValues.join(', '));
+    }
+
+    return parts.join(', ');
   }
 
   void updateCommonValue(String value) {

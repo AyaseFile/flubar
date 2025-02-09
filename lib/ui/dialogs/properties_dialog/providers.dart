@@ -60,7 +60,7 @@ class CommonProperties extends _$CommonProperties {
   }
 
   String _formatIntProperty(Iterable<int?> values, {String suffix = ''}) {
-    if (values.isEmpty) return 'Unknown';
+    if (values.isEmpty) return '未知';
 
     final Map<int, int> countMap = {};
     int totalCount = 0;
@@ -74,16 +74,14 @@ class CommonProperties extends _$CommonProperties {
       totalCount++;
     }
 
-    if (countMap.isEmpty) return 'Unknown';
+    if (countMap.isEmpty) return '未知';
     if (countMap.length == 1) {
-      return countMap.keys.first == -1
-          ? 'Unknown'
-          : '${countMap.keys.first}$suffix';
+      return countMap.keys.first == -1 ? '未知' : '${countMap.keys.first}$suffix';
     }
 
     final formattedValues = countMap.entries.map((entry) {
       final unknown = entry.key == -1;
-      final key = unknown ? 'Unknown' : entry.key.toString();
+      final key = unknown ? '未知' : entry.key.toString();
       final percentage = (entry.value / totalCount * 100).toStringAsFixed(2);
       return unknown ? '$key ($percentage%)' : '$key$suffix ($percentage%)';
     }).toList();
@@ -92,7 +90,7 @@ class CommonProperties extends _$CommonProperties {
   }
 
   String _formatStringProperty(Iterable<String?> values, {String suffix = ''}) {
-    if (values.isEmpty) return 'Unknown';
+    if (values.isEmpty) return '未知';
 
     final Map<String, int> countMap = {};
     int totalCount = 0;
@@ -101,21 +99,21 @@ class CommonProperties extends _$CommonProperties {
       if (value != null && value.isNotEmpty) {
         countMap[value] = (countMap[value] ?? 0) + 1;
       } else {
-        countMap['Unknown'] = (countMap['Unknown'] ?? 0) + 1;
+        countMap['未知'] = (countMap['未知'] ?? 0) + 1;
       }
       totalCount++;
     }
 
-    if (countMap.isEmpty) return 'Unknown';
+    if (countMap.isEmpty) return '未知';
     if (countMap.length == 1) {
-      return countMap.keys.first == 'Unknown'
-          ? 'Unknown'
+      return countMap.keys.first == '未知'
+          ? '未知'
           : '${countMap.keys.first}$suffix';
     }
 
     final formattedValues = countMap.entries.map((entry) {
-      final unknown = entry.key == 'Unknown';
-      final key = unknown ? 'Unknown' : entry.key;
+      final unknown = entry.key == '未知';
+      final key = unknown ? '未知' : entry.key;
       final percentage = (entry.value / totalCount * 100).toStringAsFixed(2);
       return unknown ? '$key ($percentage%)' : '$key$suffix ($percentage%)';
     }).toList();
