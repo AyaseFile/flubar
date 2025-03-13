@@ -7,7 +7,7 @@ def install_dependencies():
     subprocess.run(
         "sudo apt-get install -y curl git unzip xz-utils zip libglu1-mesa", shell=True)
     subprocess.run(
-        "sudo apt-get install -y clang cmake git ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev",
+        "sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev",
         shell=True,
     )
     subprocess.run(
@@ -29,5 +29,6 @@ def package():
 
 
 if __name__ == "__main__":
+    install_dependencies()
     build()
     package()
