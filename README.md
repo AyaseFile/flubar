@@ -1,6 +1,6 @@
 # flubar
 
-audio helper written in flutter
+audio helper written in flutter and rust.
 
 <div style="display: flex; justify-content: center; align-items: center;">
   <img src="assets/1.jpg" style="width: 48%; height: auto; margin-right: 2%;">
@@ -9,20 +9,13 @@ audio helper written in flutter
 
 ## Build
 
-```bash
-sudo pacman -S base-devel clang cmake ninja gtk3 rustup
-sudo pacman -S mpv pkg-config ffmpeg
-rustup default stable
-cd flubar
-flutter pub get # make sure flutter sdk is installed
-dart run build_runner build --delete-conflicting-outputs
-flutter build linux --release
-```
+see `flake.nix` and `build.py` for details.
 
 ## Thanks
 
-- [flutter_rust_bridge](https://github.com/fzyzcjy/flutter_rust_bridge), MIT
+- [flutter_rust_bridge](https://crates.io/crates/flutter_rust_bridge), MIT
 - [metadata_god](https://github.com/KRTirtho/metadata_god), MIT
 - [lofty](https://crates.io/crates/lofty), MIT or Apache-2.0
 - [id3](https://crates.io/crates/id3), MIT
-- [ffmpeg-next](https://crates.io/crates/ffmpeg-next), WTFPL
+- [cue](https://crates.io/crates/cue), GPL-2.0
+- [symphonia](https://crates.io/crates/symphonia), MPL-2.0
