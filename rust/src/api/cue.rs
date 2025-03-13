@@ -1,11 +1,11 @@
-use crate::api::ffmpeg::cue_read_properties;
 use crate::api::models::{Metadata, Properties};
+use crate::api::symphonia::cue_read_properties;
 use anyhow::{anyhow, Context, Result};
 use cue::cd::CD;
 use cue::cd_text::PTI;
 
-const REM_DATE: usize = 0;
-const FPS: f64 = 75.0;
+pub const REM_DATE: usize = 0;
+pub const FPS: f64 = 75.0;
 
 pub fn cue_read_file(file: String) -> Result<Vec<(String, Metadata, Properties)>> {
     let cue_sheet = std::fs::read_to_string(file.clone())?;

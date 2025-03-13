@@ -41,7 +41,7 @@ dependencies:
   ffmpeg_cli: ^0.3.0
   rust_lib_flubar:
     path: rust_builder
-  flutter_rust_bridge: 2.7.0
+  flutter_rust_bridge: 2.8.0
   window_size:
     git:
       url: https://github.com/google/flutter-desktop-embedding.git

@@ -13,7 +13,6 @@ import 'package:yaml/yaml.dart';
 
 import 'builder.dart';
 import 'environment.dart';
-import 'rustup.dart';
 
 final _log = Logger('options');
 
@@ -47,44 +46,20 @@ class SourceSpanException implements Exception {
   }
 }
 
-enum Toolchain {
-  stable,
-  beta,
-  nightly,
-}
-
 class CargoBuildOptions {
-  final Toolchain toolchain;
   final List<String> flags;
 
   CargoBuildOptions({
-    required this.toolchain,
     required this.flags,
   });
-
-  static Toolchain _toolchainFromNode(YamlNode node) {
-    if (node case YamlScalar(value: String name)) {
-      final toolchain =
-          Toolchain.values.firstWhereOrNull((element) => element.name == name);
-      if (toolchain != null) {
-        return toolchain;
-      }
-    }
-    throw SourceSpanException(
-        'Unknown toolchain. Must be one of ${Toolchain.values.map((e) => e.name)}.',
-        node.span);
-  }
 
   static CargoBuildOptions parse(YamlNode node) {
     if (node is! YamlMap) {
       throw SourceSpanException('Cargo options must be a map', node.span);
     }
-    Toolchain toolchain = Toolchain.stable;
     List<String> flags = [];
     for (final MapEntry(:key, :value) in node.nodes.entries) {
-      if (key case YamlScalar(value: 'toolchain')) {
-        toolchain = _toolchainFromNode(value);
-      } else if (key case YamlScalar(value: 'extra_flags')) {
+      if (key case YamlScalar(value: 'extra_flags')) {
         if (value case YamlList(nodes: List<YamlNode> list)) {
           if (list.every((element) {
             if (element case YamlScalar(value: String _)) {
@@ -104,7 +79,7 @@ class CargoBuildOptions {
             key.span);
       }
     }
-    return CargoBuildOptions(toolchain: toolchain, flags: flags);
+    return CargoBuildOptions(flags: flags);
   }
 }
 
@@ -231,10 +206,15 @@ class CargokitCrateOptions {
 }
 
 class CargokitUserOptions {
-  // When Rustup is installed always build locally unless user opts into
+  // When cargo is installed always build locally unless user opts into
   // using precompiled binaries.
   static bool defaultUsePrecompiledBinaries() {
-    return Rustup.executablePath() == null;
+    try {
+      final result = Process.runSync('cargo', ['--version']);
+      return result.exitCode != 0;
+    } catch (_) {
+      return true;
+    }
   }
 
   CargokitUserOptions({

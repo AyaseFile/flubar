@@ -13,7 +13,6 @@ import 'builder.dart';
 import 'cargo.dart';
 import 'crate_hash.dart';
 import 'options.dart';
-import 'rustup.dart';
 import 'target.dart';
 
 final _log = Logger('precompile_binaries');
@@ -98,8 +97,6 @@ class PrecompileBinaries {
       androidMinSdkVersion: androidMinSdkVersion,
     );
 
-    final rustup = Rustup();
-
     for (final target in targets) {
       final artifactNames = getArtifactNames(
         target: target,
@@ -119,7 +116,6 @@ class PrecompileBinaries {
 
       final builder =
           RustBuilder(target: target, environment: buildEnvironment);
-      builder.prepare(rustup);
       final res = await builder.build();
 
       final assets = <CreateReleaseAsset>[];

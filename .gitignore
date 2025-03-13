@@ -44,3 +44,5 @@ app.*.map.json
 
 *.freezed.dart
 *.g.dart
+
+.direnv

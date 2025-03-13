@@ -12,7 +12,6 @@ import 'builder.dart';
 import 'crate_hash.dart';
 import 'options.dart';
 import 'precompile_binaries.dart';
-import 'rustup.dart';
 import 'target.dart';
 
 class Artifact {
@@ -63,10 +62,8 @@ class ArtifactProvider {
       return result;
     }
 
-    final rustup = Rustup();
     for (final target in targets) {
       final builder = RustBuilder(target: target, environment: environment);
-      builder.prepare(rustup);
       _log.info('Building ${environment.crateInfo.packageName} for $target');
       final targetDir = await builder.build();
       // For local build accept both static and dynamic libraries.

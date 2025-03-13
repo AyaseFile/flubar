@@ -9,7 +9,6 @@ import 'android_environment.dart';
 import 'cargo.dart';
 import 'environment.dart';
 import 'options.dart';
-import 'rustup.dart';
 import 'target.dart';
 import 'util.dart';
 
@@ -115,36 +114,16 @@ class RustBuilder {
     required this.environment,
   });
 
-  void prepare(
-    Rustup rustup,
-  ) {
-    final toolchain = _toolchain;
-    if (rustup.installedTargets(toolchain) == null) {
-      rustup.installToolchain(toolchain);
-    }
-    if (toolchain == 'nightly') {
-      rustup.installRustSrcForNightly();
-    }
-    if (!rustup.installedTargets(toolchain)!.contains(target.rust)) {
-      rustup.installTarget(target.rust, toolchain: toolchain);
-    }
-  }
-
   CargoBuildOptions? get _buildOptions =>
       environment.crateOptions.cargo[environment.configuration];
-
-  String get _toolchain => _buildOptions?.toolchain.name ?? 'stable';
 
   /// Returns the path of directory containing build artifacts.
   Future<String> build() async {
     final extraArgs = _buildOptions?.flags ?? [];
     final manifestPath = path.join(environment.manifestDir, 'Cargo.toml');
     runCommand(
-      'rustup',
+      'cargo',
       [
-        'run',
-        _toolchain,
-        'cargo',
         'build',
         ...extraArgs,
         '--manifest-path',

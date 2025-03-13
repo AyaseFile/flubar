@@ -8,7 +8,6 @@ import 'package:logging/logging.dart';
 import 'package:path/path.dart' as path;
 
 import 'logging.dart';
-import 'rustup.dart';
 
 final log = Logger("process");
 
@@ -160,13 +159,5 @@ class RustupNotFoundException implements Exception {
 }
 
 String _resolveExecutable(String executable) {
-  if (executable == 'rustup') {
-    final resolved = Rustup.executablePath();
-    if (resolved != null) {
-      return resolved;
-    }
-    throw RustupNotFoundException();
-  } else {
-    return executable;
-  }
+  return executable;
 }
