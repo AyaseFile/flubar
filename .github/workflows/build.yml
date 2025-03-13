@@ -12,10 +12,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Setup Flutter SDK
-        uses: flutter-actions/setup-flutter@v3
+        uses: subosito/flutter-action@v2
         with:
           channel: stable
-          version: 3.27.3
+          flutter-version: 3.27.4
       - name: Run build script
         run: python build.py
       - name: Upload artifacts
