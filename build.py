@@ -2,16 +2,19 @@ import subprocess
 
 
 def install_dependencies():
-    subprocess.run("sudo apt-get update", shell=True)
     subprocess.run(
-        "sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev",
+        "sudo apt-get update -y && sudo apt-get upgrade -y", shell=True)
+    subprocess.run(
+        "sudo apt-get install -y curl git unzip xz-utils zip libglu1-mesa", shell=True)
+    subprocess.run(
+        "sudo apt-get install -y clang cmake git ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev",
         shell=True,
     )
-    subprocess.run("sudo apt-get install -y libmpv-dev libcue-dev", shell=True)
-    subprocess.run("sudo apt-get install -y pkg-config ffmpeg", shell=True)
+    subprocess.run(
+        "sudo apt-get install -y pkg-config libmpv-dev libcue-dev", shell=True)
 
 
-def build_flutter():
+def build():
     subprocess.run("flutter pub get", shell=True)
     subprocess.run(
         "dart run build_runner build --delete-conflicting-outputs", shell=True
@@ -19,13 +22,12 @@ def build_flutter():
     subprocess.run("flutter build linux --release -v", shell=True)
 
 
-def compress_build():
+def package():
     subprocess.run(
         "tar -czvf flubar.tar.gz -C build/linux/x64/release/bundle .", shell=True
     )
 
 
 if __name__ == "__main__":
-    install_dependencies()
-    build_flutter()
-    compress_build()
+    build()
+    package()
