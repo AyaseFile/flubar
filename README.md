@@ -17,5 +17,5 @@ see `flake.nix` and `build.py` for details.
 - [metadata_god](https://github.com/KRTirtho/metadata_god), MIT
 - [lofty](https://crates.io/crates/lofty), MIT or Apache-2.0
 - [id3](https://crates.io/crates/id3), MIT
-- [cue](https://crates.io/crates/cue), GPL-2.0
+- [cue](https://crates.io/crates/cue), GPL-2.0 or later
 - [symphonia](https://crates.io/crates/symphonia), MPL-2.0
