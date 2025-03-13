@@ -3,7 +3,7 @@ import subprocess
 
 def install_dependencies():
     subprocess.run(
-        "sudo apt-get update -y && sudo apt-get upgrade -y", shell=True)
+        "sudo apt-get update -y", shell=True)
     subprocess.run(
         "sudo apt-get install -y curl git unzip xz-utils zip libglu1-mesa", shell=True)
     subprocess.run(
