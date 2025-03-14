@@ -84,7 +84,7 @@ SPEC CHECKSUMS:
   just_audio: a42c63806f16995daf5b219ae1d679deb76e6a79
   media_kit_native_event_loop: d20622d35dd6d06fe71223976bd70a2bcf595dce
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
-  rust_lib_flubar: 336120812f65409dea25ad2826b793883a1f4e5c
+  rust_lib_flubar: 932c00d07602a1c4a390a2d6e86255f5bb8c9aa0
   screen_retriever_macos: 776e0fa5d42c6163d2bf772d22478df4b302b161
   share_plus: 1fa619de8392a4398bfaf176d441853922614e89
   super_native_extensions: 85efee3a7495b46b04befcfc86ed12069264ebf3

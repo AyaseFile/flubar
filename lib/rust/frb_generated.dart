@@ -4,10 +4,10 @@
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
 import 'api/cue.dart';
+import 'api/ffmpeg.dart';
 import 'api/id3.dart';
 import 'api/lofty.dart';
 import 'api/models.dart';
-import 'api/symphonia.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
@@ -70,7 +70,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.8.0';
 
   @override
-  int get rustContentHash => 1992357413;
+  int get rustContentHash => 1343086023;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -88,13 +88,13 @@ abstract class RustLibApi extends BaseApi {
   Future<List<(String, Metadata, Properties)>> crateApiCueCueReadFile(
       {required String file});
 
-  Future<Properties> crateApiSymphoniaCueReadProperties({required String file});
-
   Future<void> crateApiId3Id3WriteMetadata(
       {required String file, required Metadata metadata});
 
   Future<void> crateApiId3Id3WritePicture(
       {required String file, Uint8List? picture});
+
+  Future<void> crateApiFfmpegInitFfmpeg();
 
   Future<void> crateApiLoftyLoftyWriteMetadata(
       {required String file, required Metadata metadata, required bool force});
@@ -102,8 +102,7 @@ abstract class RustLibApi extends BaseApi {
   Future<void> crateApiLoftyLoftyWritePicture(
       {required String file, Uint8List? picture, required bool force});
 
-  Future<(Metadata, Properties)> crateApiSymphoniaReadFile(
-      {required String file});
+  Future<(Metadata, Properties)> crateApiFfmpegReadFile({required String file});
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -184,32 +183,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<Properties> crateApiSymphoniaCueReadProperties(
-      {required String file}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(file, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 4, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_properties,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiSymphoniaCueReadPropertiesConstMeta,
-      argValues: [file],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiSymphoniaCueReadPropertiesConstMeta =>
-      const TaskConstMeta(
-        debugName: "cue_read_properties",
-        argNames: ["file"],
-      );
-
-  @override
   Future<void> crateApiId3Id3WriteMetadata(
       {required String file, required Metadata metadata}) {
     return handler.executeNormal(NormalTask(
@@ -218,7 +191,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(file, serializer);
         sse_encode_box_autoadd_metadata(metadata, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 5, port: port_);
+            funcId: 4, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -245,7 +218,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(file, serializer);
         sse_encode_opt_list_prim_u_8_strict(picture, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 6, port: port_);
+            funcId: 5, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -260,6 +233,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiId3Id3WritePictureConstMeta => const TaskConstMeta(
         debugName: "id3_write_picture",
         argNames: ["file", "picture"],
+      );
+
+  @override
+  Future<void> crateApiFfmpegInitFfmpeg() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 6, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiFfmpegInitFfmpegConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiFfmpegInitFfmpegConstMeta => const TaskConstMeta(
+        debugName: "init_ffmpeg",
+        argNames: [],
       );
 
   @override
@@ -319,7 +315,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<(Metadata, Properties)> crateApiSymphoniaReadFile(
+  Future<(Metadata, Properties)> crateApiFfmpegReadFile(
       {required String file}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
@@ -332,13 +328,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_record_metadata_properties,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiSymphoniaReadFileConstMeta,
+      constMeta: kCrateApiFfmpegReadFileConstMeta,
       argValues: [file],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiSymphoniaReadFileConstMeta => const TaskConstMeta(
+  TaskConstMeta get kCrateApiFfmpegReadFileConstMeta => const TaskConstMeta(
         debugName: "read_file",
         argNames: ["file"],
       );

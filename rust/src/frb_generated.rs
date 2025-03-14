@@ -37,7 +37,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.8.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1992357413;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1343086023;
 
 // Section: executor
 
@@ -138,41 +138,6 @@ fn wire__crate__api__cue__cue_read_file_impl(
         },
     )
 }
-fn wire__crate__api__symphonia__cue_read_properties_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "cue_read_properties",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_file = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
-                    (move || {
-                        let output_ok = crate::api::symphonia::cue_read_properties(api_file)?;
-                        Ok(output_ok)
-                    })(),
-                )
-            }
-        },
-    )
-}
 fn wire__crate__api__id3__id3_write_metadata_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -239,6 +204,40 @@ fn wire__crate__api__id3__id3_write_picture_impl(
                 transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
                     (move || {
                         let output_ok = crate::api::id3::id3_write_picture(api_file, api_picture)?;
+                        Ok(output_ok)
+                    })(),
+                )
+            }
+        },
+    )
+}
+fn wire__crate__api__ffmpeg__init_ffmpeg_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "init_ffmpeg",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                    (move || {
+                        let output_ok = crate::api::ffmpeg::init_ffmpeg()?;
                         Ok(output_ok)
                     })(),
                 )
@@ -328,7 +327,7 @@ fn wire__crate__api__lofty__lofty_write_picture_impl(
         },
     )
 }
-fn wire__crate__api__symphonia__read_file_impl(
+fn wire__crate__api__ffmpeg__read_file_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -355,7 +354,7 @@ fn wire__crate__api__symphonia__read_file_impl(
             move |context| {
                 transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
                     (move || {
-                        let output_ok = crate::api::symphonia::read_file(api_file)?;
+                        let output_ok = crate::api::ffmpeg::read_file(api_file)?;
                         Ok(output_ok)
                     })(),
                 )
@@ -611,14 +610,12 @@ fn pde_ffi_dispatcher_primary_impl(
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
         3 => wire__crate__api__cue__cue_read_file_impl(port, ptr, rust_vec_len, data_len),
-        4 => {
-            wire__crate__api__symphonia__cue_read_properties_impl(port, ptr, rust_vec_len, data_len)
-        }
-        5 => wire__crate__api__id3__id3_write_metadata_impl(port, ptr, rust_vec_len, data_len),
-        6 => wire__crate__api__id3__id3_write_picture_impl(port, ptr, rust_vec_len, data_len),
+        4 => wire__crate__api__id3__id3_write_metadata_impl(port, ptr, rust_vec_len, data_len),
+        5 => wire__crate__api__id3__id3_write_picture_impl(port, ptr, rust_vec_len, data_len),
+        6 => wire__crate__api__ffmpeg__init_ffmpeg_impl(port, ptr, rust_vec_len, data_len),
         7 => wire__crate__api__lofty__lofty_write_metadata_impl(port, ptr, rust_vec_len, data_len),
         8 => wire__crate__api__lofty__lofty_write_picture_impl(port, ptr, rust_vec_len, data_len),
-        9 => wire__crate__api__symphonia__read_file_impl(port, ptr, rust_vec_len, data_len),
+        9 => wire__crate__api__ffmpeg__read_file_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }

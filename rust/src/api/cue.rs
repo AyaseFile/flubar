@@ -1,5 +1,5 @@
+use crate::api::ffmpeg::cue_read_properties;
 use crate::api::models::{Metadata, Properties};
-use crate::api::symphonia::cue_read_properties;
 use anyhow::{anyhow, Context, Result};
 use cue::cd::CD;
 use cue::cd_text::PTI;

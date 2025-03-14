@@ -54,34 +54,6 @@
           ];
         in
         {
-          nixos = mkShell {
-            nativeBuildInputs =
-              [
-                flutter_rust_bridge_codegen
-                cargo-expand
-                rust_toolchain
-              ]
-              ++ [
-                cmake
-                ninja
-                bison
-                flex
-                pkg-config
-              ];
-            buildInputs = [
-              flutter
-              mpv-unwrapped
-              gtk3
-              xz
-            ];
-            shellHook = ''
-              export PATH="$HOME/.pub-cache/bin:$PATH"
-              export LD_LIBRARY_PATH="${pkgs.mpv-unwrapped}/lib:$LD_LIBRARY_PATH"
-              ${shellHooks.${system}}
-            '';
-            FLUTTER_ROOT = "${pkgs.flutter}";
-            RUST_SRC_PATH = "${rust_toolchain}/lib/rustlib/src/rust/library";
-          };
           default = mkShellNoCC {
             nativeBuildInputs =
               [
@@ -89,12 +61,14 @@
                 cargo-expand
                 rust_toolchain
                 cmake
+                pkg-config
               ]
               ++ optionals (system == "x86_64-linux") [
+                clang
+                libclang
                 ninja
                 bison
                 flex
-                pkg-config
               ]
               ++ optionals (system == "aarch64-darwin") [
                 cocoapods
@@ -102,20 +76,25 @@
             buildInputs =
               [
                 flutter
-                mpv-unwrapped
+                ffmpeg.dev
               ]
               ++ optionals (system == "x86_64-linux") [
                 gtk3
                 xz
+                mpv-unwrapped
               ]
               ++ optionals (system == "aarch64-darwin") [
                 darwin.libiconv
               ];
             shellHook = ''
               export PATH="$HOME/.pub-cache/bin:$PATH"
-              export LD_LIBRARY_PATH="${pkgs.mpv-unwrapped}/lib:$LD_LIBRARY_PATH"
+              ${optionalString (system == "x86_64-linux") ''
+                export LD_LIBRARY_PATH="${pkgs.mpv-unwrapped}/lib:$LD_LIBRARY_PATH"
+                export LIBCLANG_PATH="${pkgs.libclang.lib}/lib"
+              ''}
               ${optionalString (system == "aarch64-darwin") ''
                 export LIBRARY_PATH="${pkgs.darwin.libiconv}/lib:$LIBRARY_PATH"
+                export FFMPEG_LDFLAGS="$(pkg-config --libs libavcodec libavformat libavdevice)"
               ''}
               ${shellHooks.${system}}
             '';

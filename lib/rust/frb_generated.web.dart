@@ -7,10 +7,10 @@
 // ignore_for_file: argument_type_not_assignable
 
 import 'api/cue.dart';
+import 'api/ffmpeg.dart';
 import 'api/id3.dart';
 import 'api/lofty.dart';
 import 'api/models.dart';
-import 'api/symphonia.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';

@@ -11,7 +11,7 @@ flutter_rust_bridge = "=2.8.0"
 anyhow = "1.0.93"
 lofty = "0.21.1"
 id3 = "1.14.0"
-symphonia = { version = "0.5.4", features = [ "all-codecs", "opt-simd" ] }
+ffmpeg-next = { version = "7.1.0", features = ["codec"] }
 infer = "0.16.0"
 cue = { git = "https://github.com/AyaseFile/libcue.rs" }
 

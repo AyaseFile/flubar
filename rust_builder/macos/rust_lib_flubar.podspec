@@ -39,7 +39,9 @@ A new Flutter FFI plugin project.
     'DEFINES_MODULE' => 'YES',
     # Flutter.framework does not contain a i386 slice.
     'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386',
+    'VALID_ARCHS' => 'arm64',
     'ARCHS' => 'arm64',
-    'OTHER_LDFLAGS' => '-force_load ${BUILT_PRODUCTS_DIR}/librust_lib_flubar.a',
+    'ONLY_ACTIVE_ARCH' => 'YES',
+    'OTHER_LDFLAGS' => '-force_load ${BUILT_PRODUCTS_DIR}/librust_lib_flubar.a ${FFMPEG_LDFLAGS}',
   }
 end

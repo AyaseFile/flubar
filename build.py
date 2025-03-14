@@ -11,7 +11,7 @@ def install_dependencies():
         shell=True,
     )
     subprocess.run(
-        "sudo apt-get install -y pkg-config libmpv-dev libcue-dev", shell=True)
+        "sudo apt-get install -y pkg-config ffmpeg libmpv-dev libcue-dev", shell=True)
 
 
 def build():
