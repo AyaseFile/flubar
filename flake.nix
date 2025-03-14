@@ -60,15 +60,14 @@
                 flutter_rust_bridge_codegen
                 cargo-expand
                 rust_toolchain
-                bison
-                flex
               ]
-              ++ (with pkgs; [
+              ++ [
                 cmake
                 ninja
+                bison
+                flex
                 pkg-config
-              ]);
-
+              ];
             buildInputs = [
               flutter
               mpv-unwrapped
@@ -89,25 +88,23 @@
                 flutter_rust_bridge_codegen
                 cargo-expand
                 rust_toolchain
+                cmake
+              ]
+              ++ optionals (system == "x86_64-linux") [
+                ninja
                 bison
                 flex
+                pkg-config
               ]
-              ++ (
-                with pkgs;
-                [
-                  cmake
-                  ninja
-                  pkg-config
-                ]
-                ++ optionals (system == "aarch64-darwin") [
-                  cocoapods
-                ]
-              );
-
+              ++ optionals (system == "aarch64-darwin") [
+                cocoapods
+              ];
             buildInputs =
               [
                 flutter
                 mpv-unwrapped
+              ]
+              ++ optionals (system == "x86_64-linux") [
                 gtk3
                 xz
               ]
