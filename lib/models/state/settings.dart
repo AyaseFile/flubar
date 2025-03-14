@@ -48,6 +48,16 @@ class GeneralSettingsModel with _$GeneralSettingsModel {
 }
 
 @freezed
+class ScanSettingsModel with _$ScanSettingsModel {
+  const factory ScanSettingsModel({
+    @Default(_S.kCueAsPlaylist) bool cueAsPlaylist,
+  }) = _ScanSettings;
+
+  factory ScanSettingsModel.fromJson(Map<String, dynamic> json) =>
+      _$ScanSettingsModelFromJson(json);
+}
+
+@freezed
 class MetadataSettingsModel with _$MetadataSettingsModel {
   const factory MetadataSettingsModel({
     @Default(_S.kWriteToMemoryOnly) bool writeToMemoryOnly,

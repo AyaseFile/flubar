@@ -1,8 +1,11 @@
 import 'dart:io';
 
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
+import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/app/talker.dart';
 import 'package:flubar/models/extensions/metadata_extension.dart';
 import 'package:flubar/models/extensions/properties_extension.dart';
+import 'package:flubar/models/state/playlist.dart';
 import 'package:flubar/models/state/track.dart';
 import 'package:flubar/rust/api/cue.dart';
 import 'package:flubar/rust/api/ffmpeg.dart';
@@ -103,7 +106,38 @@ class MediaDragState extends _$MediaDragState {
     );
 
     final tracks = results.expand((tracks) => tracks);
-    playlistsNotifier.addTracks(id, tracks);
+    final cueAsPlaylist = ref.read(scanSettingsProvider).cueAsPlaylist;
+    if (cueAsPlaylist) {
+      final (audioTracks, cueTracksByPath) = tracks
+          .fold<(List<Track>, Map<String, List<Track>>)>(([], {}),
+              (acc, track) {
+        final (audioList, cueMap) = acc;
+        if (track.properties.isCue()) {
+          (cueMap[track.path] ??= []).add(track);
+        } else {
+          audioList.add(track);
+        }
+        return (audioList, cueMap);
+      });
+
+      if (audioTracks.isNotEmpty) {
+        playlistsNotifier.addTracks(id, audioTracks);
+      }
+
+      if (cueTracksByPath.isNotEmpty) {
+        playlistsNotifier.addPlaylists(cueTracksByPath.entries.map((entry) {
+          final cueTracks = entry.value;
+          return Playlist(
+            id: maxTrackIdNotifier.nextId(),
+            name: cueTracks.first.metadata.album ?? '未知专辑',
+            tracks: cueTracks.toIList(),
+          );
+        }));
+      }
+    } else {
+      playlistsNotifier.addTracks(id, tracks);
+    }
+
     if (failed != 0) {
       showExceptionSnackbar(title: '错误', message: '无法读取 $failed 个文件');
     }

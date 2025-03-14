@@ -59,6 +59,20 @@ class _SettingsListView extends ConsumerWidget {
           ],
         ),
         SettingsSection(
+          title: const Text('扫描'),
+          tiles: [
+            SwitchSettingsTile<ScanSettings, ScanSettingsModel>(
+              title: 'CUE 作为播放列表',
+              leading: const Icon(Icons.playlist_play),
+              provider: scanSettingsProvider,
+              selector: (state) => state.cueAsPlaylist,
+              onToggle: (value) => ref
+                  .read(scanSettingsProvider.notifier)
+                  .updateCueAsPlaylist(value),
+            ),
+          ],
+        ),
+        SettingsSection(
           title: const Text('元数据'),
           tiles: [
             SwitchSettingsTile<MetadataSettings, MetadataSettingsModel>(

@@ -64,6 +64,37 @@ class GeneralSettings extends _$GeneralSettings {
 }
 
 @Riverpod(keepAlive: true)
+class ScanSettings extends _$ScanSettings {
+  @override
+  ScanSettingsModel build() {
+    final settings = (() {
+      final str = ref.read(settingsProvider.notifier).getJson('scan');
+      const defaultSettings = ScanSettingsModel();
+      try {
+        final loadedSettings = ScanSettingsModel.fromJson(
+          jsonDecode(str) as Map<String, dynamic>,
+        );
+        return defaultSettings.copyWith(
+          cueAsPlaylist: loadedSettings.cueAsPlaylist,
+        );
+      } catch (e) {
+        globalTalker.handle(e, null, '无法解析扫描设置: $str');
+        return defaultSettings;
+      }
+    })();
+    return settings;
+  }
+
+  void updateCueAsPlaylist(bool cueAsPlaylist) {
+    state = state.copyWith(cueAsPlaylist: cueAsPlaylist);
+    _save();
+  }
+
+  void _save() =>
+      ref.read(settingsProvider.notifier).saveJson('scan', state.toJson());
+}
+
+@Riverpod(keepAlive: true)
 class MetadataSettings extends _$MetadataSettings {
   @override
   MetadataSettingsModel build() {
