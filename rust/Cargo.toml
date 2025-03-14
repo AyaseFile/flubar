@@ -14,3 +14,15 @@ id3 = "1.14.0"
 symphonia = { version = "0.5.4", features = [ "all-codecs", "opt-simd" ] }
 infer = "0.16.0"
 cue = { git = "https://github.com/AyaseFile/libcue.rs" }
+
+[profile.dev]
+opt-level = 3
+
+[profile.release]
+opt-level = 3
+debug = false
+strip = "symbols"
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+incremental = false
