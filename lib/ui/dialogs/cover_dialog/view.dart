@@ -3,6 +3,7 @@ import 'package:flubar/models/state/track_cover.dart';
 import 'package:flubar/ui/constants.dart';
 import 'package:flubar/ui/dialogs/fixed_size_dialog/view.dart';
 import 'package:flubar/ui/dialogs/metadata_dialog/view.dart';
+import 'package:flubar/ui/widgets/cover_drag_widget/providers.dart';
 import 'package:flubar/ui/widgets/cover_drag_widget/view.dart';
 import 'package:flubar/utils/metadata/providers.dart';
 import 'package:flutter/material.dart';
@@ -105,8 +106,12 @@ class CoverDialog extends ConsumerWidget {
                       cover,
                       fit: BoxFit.cover,
                     ),
-                  _ => const Center(
-                      child: Icon(Icons.image_not_supported, size: 72)),
+                  _ => Consumer(
+                      builder: (context, ref, _) => ref
+                              .watch(coverDragStateProvider)
+                          ? const SizedBox.shrink()
+                          : const Center(
+                              child: Icon(Icons.image_not_supported, size: 72)))
                 },
               ),
               const CoverDragWidget()
