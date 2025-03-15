@@ -34,11 +34,11 @@ class EditMetadataDialog extends ConsumerWidget {
   }
 }
 
-class _EditMetadataDialog extends ConsumerWidget {
+class _EditMetadataDialog extends StatelessWidget {
   const _EditMetadataDialog();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return FixedSizeDialog(
       width: kDialogWidth,
       height: kDialogHeight,
@@ -54,33 +54,37 @@ class _EditMetadataDialog extends ConsumerWidget {
             actions: [
               const MetadataSettingsIconButton(),
               const SizedBox(width: 8),
-              TextButton(
-                onPressed: !ref.watch(metadataUtilProvider).isLoading
-                    ? () => Navigator.of(context).pop()
-                    : null,
-                child: const Text('取消'),
-              ),
+              Consumer(builder: (context, ref, _) {
+                return TextButton(
+                  onPressed: !ref.watch(metadataUtilProvider).isLoading
+                      ? () => Navigator.of(context).pop()
+                      : null,
+                  child: const Text('取消'),
+                );
+              }),
               const SizedBox(width: 8),
-              ref.watch(metadataUtilProvider).isLoading
-                  ? const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(),
-                      ))
-                  : TextButton(
-                      onPressed: () async {
-                        final success = await ref
-                            .read(metadataUtilProvider.notifier)
-                            .writeMetadata();
-                        if (context.mounted && success) {
-                          Navigator.of(context).pop();
-                        }
-                      },
-                      autofocus: true,
-                      child: const Text('保存'),
-                    ),
+              Consumer(builder: (context, ref, _) {
+                return ref.watch(metadataUtilProvider).isLoading
+                    ? const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(),
+                        ))
+                    : TextButton(
+                        onPressed: () async {
+                          final success = await ref
+                              .read(metadataUtilProvider.notifier)
+                              .writeMetadata();
+                          if (context.mounted && success) {
+                            Navigator.of(context).pop();
+                          }
+                        },
+                        autofocus: true,
+                        child: const Text('保存'),
+                      );
+              })
             ],
           ),
           body: const _MetadataTableView(),

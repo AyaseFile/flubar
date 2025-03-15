@@ -261,7 +261,7 @@ class _OutputDirectorySelector extends ConsumerWidget {
   }
 }
 
-class _Checkbox extends ConsumerWidget {
+class _Checkbox extends StatelessWidget {
   final String label;
   final bool value;
   final void Function(bool?) onChanged;
@@ -273,11 +273,13 @@ class _Checkbox extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final enabled = !ref.watch(transcodeProvider).isLoading;
+  Widget build(BuildContext context) {
     return Row(
       children: [
-        Checkbox(value: value, onChanged: enabled ? onChanged : null),
+        Consumer(builder: (context, ref, _) {
+          final enabled = !ref.watch(transcodeProvider).isLoading;
+          return Checkbox(value: value, onChanged: enabled ? onChanged : null);
+        }),
         Text(label),
       ],
     );

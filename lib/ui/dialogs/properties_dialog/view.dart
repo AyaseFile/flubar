@@ -9,11 +9,11 @@ import 'package:material_table_view/table_view_typedefs.dart';
 import 'constants.dart';
 import 'providers.dart';
 
-class PropertiesDialog extends ConsumerWidget {
+class PropertiesDialog extends StatelessWidget {
   const PropertiesDialog({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return FixedSizeDialog(
       width: kDialogWidth,
       height: kDialogHeight,

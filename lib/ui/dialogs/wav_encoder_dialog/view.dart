@@ -5,11 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'providers.dart';
 
-class WavEncoderDialog extends ConsumerWidget {
+class WavEncoderDialog extends StatelessWidget {
   const WavEncoderDialog({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     const encoders = FfmpegEncoder.values;
     return AlertDialog(
       title: const Text('WAV 编码器'),
@@ -32,17 +32,19 @@ class WavEncoderDialog extends ConsumerWidget {
           onPressed: () => Navigator.pop(context),
           child: const Text('取消'),
         ),
-        TextButton(
-          onPressed: () {
-            final encoder = ref.read(encoderSelectionProvider);
-            ref
-                .read(transcodeSettingsProvider.notifier)
-                .updateWavEncoder(encoder);
-            Navigator.pop(context, encoder);
-          },
-          autofocus: true,
-          child: const Text('确定'),
-        ),
+        Consumer(builder: (context, ref, _) {
+          return TextButton(
+            onPressed: () {
+              final encoder = ref.read(encoderSelectionProvider);
+              ref
+                  .read(transcodeSettingsProvider.notifier)
+                  .updateWavEncoder(encoder);
+              Navigator.pop(context, encoder);
+            },
+            autofocus: true,
+            child: const Text('确定'),
+          );
+        }),
       ],
     );
   }

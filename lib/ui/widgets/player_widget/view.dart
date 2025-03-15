@@ -19,11 +19,11 @@ class PlayerWidget extends ConsumerWidget {
   }
 }
 
-class _PlaybackControls extends ConsumerWidget {
+class _PlaybackControls extends StatelessWidget {
   const _PlaybackControls();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return const Column(
       children: [
         Row(

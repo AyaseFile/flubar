@@ -10,7 +10,7 @@ class SettingsTile<N extends Notifier<T>, T, V>
   final Widget? leading;
   final NotifierProvider<N, T> provider;
   final V Function(T) selector;
-  final void Function(BuildContext)? onPressed;
+  final void Function(WidgetRef, BuildContext)? onPressed;
 
   const SettingsTile({
     super.key,
@@ -34,7 +34,7 @@ class SettingsTile<N extends Notifier<T>, T, V>
         leading: leading,
         trailing: Text(value is String ? value : value.toString(),
             style: const TextStyle(fontSize: 14)),
-        onPressed: onPressed,
+        onPressed: (_) => onPressed?.call(ref, context),
       );
     });
   }
@@ -44,7 +44,7 @@ class ExampleSettingsTile extends settings_ui.AbstractSettingsTile {
   final String title;
   final String? description;
   final Widget? leading;
-  final String Function(String)? processValue;
+  final String Function(WidgetRef, String)? processValue;
 
   const ExampleSettingsTile({
     super.key,
@@ -60,7 +60,7 @@ class ExampleSettingsTile extends settings_ui.AbstractSettingsTile {
       final value = () {
         final value = ref.watch(
             metadataSettingsProvider.select((state) => state.fileNameTpl));
-        return processValue != null ? processValue!(value) : value;
+        return processValue != null ? processValue!(ref, value) : value;
       }();
       return settings_ui.SettingsTile(
         title: Text(title, style: const TextStyle(fontSize: 14)),
@@ -82,7 +82,7 @@ class SwitchSettingsTile<N extends Notifier<T>, T>
   final Widget? leading;
   final NotifierProvider<N, T> provider;
   final bool Function(T) selector;
-  final void Function(bool)? onToggle;
+  final void Function(WidgetRef, bool)? onToggle;
 
   const SwitchSettingsTile({
     super.key,
@@ -99,7 +99,7 @@ class SwitchSettingsTile<N extends Notifier<T>, T>
       final value = ref.watch(provider.select(selector));
       return settings_ui.SettingsTile.switchTile(
         initialValue: value,
-        onToggle: onToggle,
+        onToggle: (value) => onToggle?.call(ref, value),
         title: Text(title, style: const TextStyle(fontSize: 14)),
         leading: leading,
       );

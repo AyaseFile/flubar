@@ -5,11 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'providers.dart';
 
-class TranscodeFormatDialog extends ConsumerWidget {
+class TranscodeFormatDialog extends StatelessWidget {
   const TranscodeFormatDialog({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     const fmtList = TranscodeFormat.values;
     return AlertDialog(
       title: const Text('转码格式'),
@@ -32,17 +32,19 @@ class TranscodeFormatDialog extends ConsumerWidget {
           onPressed: () => Navigator.of(context).pop(),
           child: const Text('取消'),
         ),
-        TextButton(
-          onPressed: () {
-            final fmt = ref.read(selectionProvider);
-            ref
-                .read(transcodeSettingsProvider.notifier)
-                .updateTranscodeFormat(fmt);
-            Navigator.of(context).pop();
-          },
-          autofocus: true,
-          child: const Text('确定'),
-        ),
+        Consumer(builder: (context, ref, _) {
+          return TextButton(
+            onPressed: () {
+              final fmt = ref.read(selectionProvider);
+              ref
+                  .read(transcodeSettingsProvider.notifier)
+                  .updateTranscodeFormat(fmt);
+              Navigator.of(context).pop();
+            },
+            autofocus: true,
+            child: const Text('确定'),
+          );
+        }),
       ],
     );
   }

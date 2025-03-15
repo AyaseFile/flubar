@@ -9,7 +9,6 @@ import 'package:flubar/ui/dialogs/wav_encoder_dialog/view.dart';
 import 'package:flubar/ui/widgets/setting_tile/view.dart';
 import 'package:flubar/utils/template/providers.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart' hide SettingsTile;
 import 'package:get/get.dart';
 
@@ -30,11 +29,11 @@ class SettingsView extends StatelessWidget {
   }
 }
 
-class _SettingsListView extends ConsumerWidget {
+class _SettingsListView extends StatelessWidget {
   const _SettingsListView();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return SettingsList(
       lightTheme:
           const SettingsThemeData(settingsListBackground: Colors.transparent),
@@ -51,7 +50,7 @@ class _SettingsListView extends ConsumerWidget {
               leading: const Icon(Icons.dark_mode),
               provider: generalSettingsProvider,
               selector: (state) => state.darkMode,
-              onToggle: (value) => ref
+              onToggle: (ref, value) => ref
                   .read(generalSettingsProvider.notifier)
                   .updateDarkMode(value),
             ),
@@ -65,7 +64,7 @@ class _SettingsListView extends ConsumerWidget {
               leading: const Icon(Icons.playlist_play),
               provider: scanSettingsProvider,
               selector: (state) => state.cueAsPlaylist,
-              onToggle: (value) => ref
+              onToggle: (ref, value) => ref
                   .read(scanSettingsProvider.notifier)
                   .updateCueAsPlaylist(value),
             ),
@@ -79,7 +78,7 @@ class _SettingsListView extends ConsumerWidget {
               leading: const Icon(Icons.edit),
               provider: metadataSettingsProvider,
               selector: (state) => state.forceWriteMetadata,
-              onToggle: (value) => ref
+              onToggle: (ref, value) => ref
                   .read(metadataSettingsProvider.notifier)
                   .updateForceWriteMetadata(value),
             ),
@@ -90,7 +89,7 @@ class _SettingsListView extends ConsumerWidget {
               leading: const Icon(Icons.text_fields),
               provider: metadataSettingsProvider,
               selector: (state) => state.fileNameTpl,
-              onPressed: (_) => Get.dialog(
+              onPressed: (ref, _) => Get.dialog(
                 InputDialog(
                   dialogTitle: '文件名模板',
                   initialValue: ref.read(metadataSettingsProvider
@@ -108,7 +107,7 @@ class _SettingsListView extends ConsumerWidget {
                 'path': kExampleTrack.path,
               }.toString(),
               leading: const SizedBox(width: 24),
-              processValue: (value) => ref.read(tplUtilProvider).process(
+              processValue: (ref, _) => ref.read(tplUtilProvider).process(
                   metadata: kExampleTrack.metadata, path: kExampleTrack.path),
             ),
           ],
@@ -121,7 +120,7 @@ class _SettingsListView extends ConsumerWidget {
               leading: const Icon(Icons.insert_drive_file),
               provider: transcodeSettingsProvider,
               selector: (state) => state.ffmpegPath,
-              onPressed: (_) => Get.dialog(
+              onPressed: (ref, _) => Get.dialog(
                 InputDialog(
                   dialogTitle: 'FFmpeg 路径',
                   initialValue: ref.read(transcodeSettingsProvider
@@ -137,7 +136,7 @@ class _SettingsListView extends ConsumerWidget {
               leading: const Icon(Icons.device_hub),
               provider: transcodeSettingsProvider,
               selector: (state) => state.isolateCount,
-              onPressed: (_) {
+              onPressed: (ref, _) {
                 final int maxIsolates = Platform.numberOfProcessors;
                 Get.dialog(
                   SliderDialog(
@@ -160,14 +159,14 @@ class _SettingsListView extends ConsumerWidget {
               leading: const Icon(Icons.audio_file),
               provider: transcodeSettingsProvider,
               selector: (state) => state.transcodeFormat.displayName,
-              onPressed: (_) => Get.dialog(const TranscodeFormatDialog()),
+              onPressed: (ref, _) => Get.dialog(const TranscodeFormatDialog()),
             ),
             SettingsTile(
               title: 'MP3 比特率',
               leading: const Icon(Icons.equalizer, color: Colors.transparent),
               provider: transcodeSettingsProvider,
               selector: (state) => state.mp3Bitrate,
-              onPressed: (_) => Get.dialog(
+              onPressed: (ref, _) => Get.dialog(
                 SliderDialog(
                   title: 'MP3 比特率',
                   min: 64,
@@ -187,7 +186,7 @@ class _SettingsListView extends ConsumerWidget {
               leading: const Icon(Icons.equalizer, color: Colors.transparent),
               provider: transcodeSettingsProvider,
               selector: (state) => state.flacCompressionLevel,
-              onPressed: (_) => Get.dialog(
+              onPressed: (ref, _) => Get.dialog(
                 SliderDialog(
                   title: 'FLAC 压缩等级',
                   min: 0,
@@ -207,7 +206,7 @@ class _SettingsListView extends ConsumerWidget {
               leading: const Icon(Icons.equalizer, color: Colors.transparent),
               provider: transcodeSettingsProvider,
               selector: (state) => state.wavEncoder.displayName,
-              onPressed: (_) => Get.dialog(const WavEncoderDialog()),
+              onPressed: (ref, _) => Get.dialog(const WavEncoderDialog()),
             ),
           ],
         ),
@@ -219,7 +218,7 @@ class _SettingsListView extends ConsumerWidget {
               leading: const SizedBox(width: 24),
               provider: transcodeWarningsProvider,
               selector: (state) => state.toLossy,
-              onToggle: (value) => ref
+              onToggle: (ref, value) => ref
                   .read(transcodeWarningsProvider.notifier)
                   .updateToLossy(value),
             ),
@@ -228,7 +227,7 @@ class _SettingsListView extends ConsumerWidget {
               leading: const SizedBox(width: 24),
               provider: transcodeWarningsProvider,
               selector: (state) => state.floatToInt,
-              onToggle: (value) => ref
+              onToggle: (ref, value) => ref
                   .read(transcodeWarningsProvider.notifier)
                   .updateFloatToInt(value),
             ),
@@ -237,7 +236,7 @@ class _SettingsListView extends ConsumerWidget {
               leading: const SizedBox(width: 24),
               provider: transcodeWarningsProvider,
               selector: (state) => state.highToLowBit,
-              onToggle: (value) => ref
+              onToggle: (ref, value) => ref
                   .read(transcodeWarningsProvider.notifier)
                   .updateHighToLowBit(value),
             ),
