@@ -172,9 +172,10 @@ class SelectedTrackIds extends _$SelectedTrackIds {
   void handleSelection(
     int id, {
     required bool ctrlPressed,
+    required bool metaPressed,
     required bool shiftPressed,
   }) {
-    if (!ctrlPressed && !shiftPressed) {
+    if (!ctrlPressed && !metaPressed && !shiftPressed) {
       // 单选情况
       if (state.length == 1 && state.contains(id)) {
         // 取消选中
@@ -183,7 +184,7 @@ class SelectedTrackIds extends _$SelectedTrackIds {
         state = ISet({id});
         ref.read(lastSelectedTrackIdProvider.notifier).set(id);
       }
-    } else if (ctrlPressed) {
+    } else if (ctrlPressed || metaPressed) {
       // 加入集合中
       toggle(id);
       ref.read(lastSelectedTrackIdProvider.notifier).set(id);

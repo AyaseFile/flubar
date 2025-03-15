@@ -261,16 +261,17 @@ class SelectedCommonMetadataIds extends _$SelectedCommonMetadataIds {
   void handleSelection(
     int id, {
     required bool ctrlPressed,
+    required bool metaPressed,
     required bool shiftPressed,
   }) {
-    if (!ctrlPressed && !shiftPressed) {
+    if (!ctrlPressed && !metaPressed && !shiftPressed) {
       if (state.length == 1 && state.contains(id)) {
         state = const ISet.empty();
       } else {
         state = ISet({id});
         ref.read(lastSelectedCommonMetadataIdProvider.notifier).set(id);
       }
-    } else if (ctrlPressed) {
+    } else if (ctrlPressed || metaPressed) {
       toggle(id);
       ref.read(lastSelectedCommonMetadataIdProvider.notifier).set(id);
     } else if (shiftPressed) {

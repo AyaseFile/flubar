@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/models/state/common_metadata.dart';
 import 'package:flubar/ui/constants.dart';
@@ -235,12 +237,17 @@ class _MetadataRow extends ConsumerWidget {
     return ContextMenuWidget(
         child: InkWell(
           onTap: () {
-            final ctrlPressed = HardwareKeyboard.instance.isControlPressed;
+            final ctrlPressed =
+                Platform.isLinux && HardwareKeyboard.instance.isControlPressed;
+            final metaPressed =
+                Platform.isMacOS && HardwareKeyboard.instance.isMetaPressed;
             final shiftPressed = HardwareKeyboard.instance.isShiftPressed;
             ref
                 .read(selectedCommonMetadataIdsProvider.notifier)
                 .handleSelection(metadata.id,
-                    ctrlPressed: ctrlPressed, shiftPressed: shiftPressed);
+                    ctrlPressed: ctrlPressed,
+                    metaPressed: metaPressed,
+                    shiftPressed: shiftPressed);
           },
           child: Container(
             color: selected

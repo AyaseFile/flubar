@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flubar/models/extensions/properties_extension.dart';
 import 'package:flubar/models/state/playlist.dart';
 import 'package:flubar/models/state/track.dart';
@@ -64,9 +66,10 @@ class _TrackTableViewState extends ConsumerState<TrackTableView> {
 
   Widget _shortcutsBuilder(Widget child) {
     return Shortcuts(
-      shortcuts: const {
-        SingleActivator(LogicalKeyboardKey.keyA, control: true):
-            _SelectAllIntent(),
+      shortcuts: {
+        SingleActivator(LogicalKeyboardKey.keyA,
+            control: Platform.isLinux,
+            meta: Platform.isMacOS): _SelectAllIntent(),
         SingleActivator(LogicalKeyboardKey.delete): _DeleteSelectedIntent(),
       },
       child: Actions(
@@ -236,10 +239,15 @@ class TrackRow extends ConsumerWidget {
     return ContextMenuWidget(
       child: InkWell(
         onTap: () {
-          final ctrlPressed = HardwareKeyboard.instance.isControlPressed;
+          final ctrlPressed =
+              Platform.isLinux && HardwareKeyboard.instance.isControlPressed;
+          final metaPressed =
+              Platform.isMacOS && HardwareKeyboard.instance.isMetaPressed;
           final shiftPressed = HardwareKeyboard.instance.isShiftPressed;
           ref.read(selectedTrackIdsProvider.notifier).handleSelection(track.id,
-              ctrlPressed: ctrlPressed, shiftPressed: shiftPressed);
+              ctrlPressed: ctrlPressed,
+              metaPressed: metaPressed,
+              shiftPressed: shiftPressed);
         },
         child: Container(
           color: selected
