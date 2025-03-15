@@ -189,14 +189,10 @@ class CommonMetadata extends _$CommonMetadata {
   String _formatValues<T>(Set<T?> values) {
     if (values.isEmpty) return '';
 
-    final hasNull = values.any((v) => v == null);
     final nonNullValues =
         values.where((v) => v != null && v.toString().isNotEmpty);
 
     final parts = <String>[];
-    if (hasNull) {
-      parts.add('(空)');
-    }
     if (nonNullValues.isNotEmpty) {
       parts.add(nonNullValues.join(', '));
     }
