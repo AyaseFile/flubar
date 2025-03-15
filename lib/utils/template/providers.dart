@@ -4,6 +4,7 @@ import 'dart:isolate';
 import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/app/talker.dart';
 import 'package:flubar/models/cancel_token/cancel_token.dart';
+import 'package:flubar/models/extensions/properties_extension.dart';
 import 'package:flubar/models/isolate/mixin.dart';
 import 'package:flubar/models/state/track.dart';
 import 'package:flubar/ui/dialogs/metadata_dialog/providers.dart';
@@ -50,7 +51,9 @@ class TplUtil extends _$TplUtil with IsolateMixin<(String, String)> {
 
   @override
   List<(String, String)> getData() {
-    final selectedTracks = ref.read(selectedTracksProvider);
+    final selectedTracks = ref
+        .read(selectedTracksProvider)
+        .removeWhere((t) => t.properties.isCue());
     return selectedTracks.map((track) {
       final newName = state.process(metadata: track.metadata, path: track.path);
       final newPath = p.join(p.dirname(track.path), newName);
