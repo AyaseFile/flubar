@@ -94,7 +94,7 @@
               ''}
               ${optionalString (system == "aarch64-darwin") ''
                 export LIBRARY_PATH="${pkgs.darwin.libiconv}/lib:$LIBRARY_PATH"
-                export FFMPEG_LDFLAGS="$(pkg-config --libs libavcodec libavformat libavdevice)"
+                export FFMPEG_LDFLAGS="$(pkg-config --libs libavcodec libavdevice libavfilter libavformat libavutil libswresample libswscale)"
               ''}
               ${shellHooks.${system}}
             '';
