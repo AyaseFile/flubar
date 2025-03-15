@@ -120,7 +120,15 @@ class PropertiesRow extends ConsumerWidget {
           padding: kTableTextPadding,
           child: Padding(
             padding: kCellTextPadding,
-            child: Text(text, overflow: TextOverflow.ellipsis),
+            child: TooltipTheme(
+              data: kTooltipTheme,
+              child: Tooltip(
+                message: text,
+                waitDuration: kWaitDuration,
+                preferBelow: true,
+                child: Text(text, overflow: TextOverflow.ellipsis),
+              ),
+            ),
           ),
         ),
       );
