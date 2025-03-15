@@ -198,6 +198,28 @@ pub(crate) fn cue_read_properties(file: String) -> Result<Properties> {
     Ok(properties)
 }
 
+pub(crate) fn cue_read_front_cover(file: String) -> Result<Option<Vec<u8>>> {
+    let mut context = match ffmpeg::format::input(&file) {
+        Ok(context) => context,
+        Err(e) => return Err(anyhow!("Failed to open file: {:?}", e)),
+    };
+
+    let video_stream = context
+        .streams()
+        .best(ffmpeg::media::Type::Video)
+        .map(|stream| stream.index());
+
+    for (stream, packet) in context.packets() {
+        if video_stream.is_some() && stream.index() == video_stream.unwrap() {
+            if let Some(data) = packet.data() {
+                return Ok(Some(data.to_vec()));
+            }
+        }
+    }
+
+    Ok(None)
+}
+
 #[inline]
 fn get_metadata_value(dict: &ffmpeg::dictionary::Ref, key: &str) -> Option<String> {
     dict.get(key)

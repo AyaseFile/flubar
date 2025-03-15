@@ -1,4 +1,4 @@
-use crate::api::ffmpeg::cue_read_properties;
+use crate::api::ffmpeg::{cue_read_front_cover, cue_read_properties};
 use crate::api::models::{Metadata, Properties};
 use anyhow::{anyhow, Context, Result};
 use cue::cd::CD;
@@ -19,6 +19,8 @@ pub fn cue_read_file(file: String) -> Result<Vec<(String, Metadata, Properties)>
 
     let mut properties_map: std::collections::HashMap<String, Properties> =
         std::collections::HashMap::new();
+    let mut front_cover_map: std::collections::HashMap<String, Option<Vec<u8>>> =
+        std::collections::HashMap::new();
     let mut result: Vec<(String, Metadata, Properties)> = Vec::new();
     let dir = std::path::Path::new(&file)
         .parent()
@@ -28,6 +30,23 @@ pub fn cue_read_file(file: String) -> Result<Vec<(String, Metadata, Properties)>
         let filename = track.get_filename();
         let path = dir.join(&filename);
         let path_str = path.to_string_lossy().to_string();
+
+        let properties = if let Some(properties) = properties_map.get(&filename) {
+            properties.clone()
+        } else {
+            let properties = cue_read_properties(path_str.clone())?;
+            properties_map.insert(filename.clone(), properties.clone());
+            properties
+        };
+
+        let front_cover = if let Some(front_cover) = front_cover_map.get(&filename) {
+            front_cover.clone()
+        } else {
+            let front_cover = cue_read_front_cover(path_str.clone())?;
+            front_cover_map.insert(filename.clone(), front_cover.clone());
+            front_cover
+        };
+
         let title = track.get_cdtext().read(PTI::Title);
         let artist = track.get_cdtext().read(PTI::Performer);
         let track_number = (index as u8) + 1;
@@ -42,15 +61,7 @@ pub fn cue_read_file(file: String) -> Result<Vec<(String, Metadata, Properties)>
             disc_total: None,
             date: date.clone(),
             genre: genre.clone(),
-            front_cover: None,
-        };
-
-        let properties = if let Some(properties) = properties_map.get(&filename) {
-            properties.clone()
-        } else {
-            let properties = cue_read_properties(path_str.clone())?;
-            properties_map.insert(filename.clone(), properties.clone());
-            properties
+            front_cover,
         };
 
         let cue_start = track.get_start() as f64 / FPS;
