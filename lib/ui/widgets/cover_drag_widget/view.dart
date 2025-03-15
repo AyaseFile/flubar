@@ -27,6 +27,7 @@ class CoverDragWidget extends ConsumerWidget {
               onPerformDrop: (event) async {
                 final items = event.session.items;
                 if (items.length == 1) {
+                  ref.read(coverDragStateProvider.notifier).setDragging(false);
                   final uri =
                       await items.first.dataReader!.readValue(Formats.fileUri);
                   if (uri == null) return;

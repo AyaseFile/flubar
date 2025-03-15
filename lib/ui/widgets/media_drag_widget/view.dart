@@ -27,6 +27,7 @@ class MediaDragWidget extends ConsumerWidget {
               onPerformDrop: (event) async {
                 final enableDrag = ref.read(enableMediaDragProvider);
                 if (!enableDrag) return;
+                ref.read(mediaDragStateProvider.notifier).setDragging(false);
                 final paths = await _getPaths(event);
                 await ref.read(mediaDragStateProvider.notifier).addFiles(paths);
               },
