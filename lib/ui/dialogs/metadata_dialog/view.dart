@@ -127,7 +127,7 @@ class MetadataSettingsIconButton extends ConsumerWidget {
                         );
                       }),
                     ),
-                  ].map((e) => PopupMenuItem<void>(child: e)).toList(),
+                  ].map((e) => PopupMenuItem(child: e)).toList(),
                 );
               }
             : null,
@@ -149,7 +149,7 @@ class MetadataSettingsIconButton extends ConsumerWidget {
       ),
       Offset.zero & overlay.size,
     );
-    showMenu<void>(
+    showMenu(
       context: context,
       position: position,
       items: children,
@@ -283,7 +283,7 @@ class _MetadataRow extends ConsumerWidget {
                 ? '批量编辑'
                 : '编辑', // 元数据是否多值, 或为空, 则显示批量编辑
             image: MenuImage.icon(Icons.edit),
-            callback: () => Get.dialog<void>(InputDialog(
+            callback: () => Get.dialog(InputDialog(
               dialogTitle: '编辑 ${metadata.key}',
               initialValue: metadata.value,
               onConfirm: (value) => ref
@@ -330,7 +330,7 @@ class _MetadataRow extends ConsumerWidget {
                 };
                 columns.add(AdvancedColumn(id: columnId, width: columnWidth));
               }
-              Get.dialog<void>(
+              Get.dialog(
                 ProviderScope(
                   overrides: [
                     editableTableColumnsProvider.overrideWithValue(columns)

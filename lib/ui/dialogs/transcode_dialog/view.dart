@@ -171,7 +171,7 @@ class _TranscodeFormatSelector extends ConsumerWidget {
       children: [
         SizedBox(
           width: kTranscodeFormatDropdownWidth,
-          child: DropdownButton<TranscodeFormat>(
+          child: DropdownButton(
             value: fmt,
             isExpanded: true,
             onChanged: (value) =>
@@ -425,7 +425,7 @@ class _TranscodeOptionsSelector extends ConsumerWidget {
         expandChild: false,
         child: SizedBox(
           width: kEncoderDisplayWidth,
-          child: DropdownButton<FfmpegEncoder>(
+          child: DropdownButton(
             value: wav.encoder,
             isExpanded: true,
             onChanged: (value) => ref
@@ -468,7 +468,7 @@ class _CommandField extends HookConsumerWidget {
     final commandController =
         useTextEditingController(text: ref.read(transcodeCmdProvider));
 
-    ref.listen<String>(transcodeCmdProvider, (previous, next) {
+    ref.listen(transcodeCmdProvider, (previous, next) {
       commandController.value = TextEditingValue(text: next);
     });
 
@@ -492,7 +492,7 @@ class _TplField extends HookConsumerWidget {
     final tplController =
         useTextEditingController(text: ref.read(outputFileNameTplProvider));
 
-    ref.listen<String>(outputFileNameTplProvider, (previous, next) {
+    ref.listen(outputFileNameTplProvider, (previous, next) {
       final currentSelection = tplController.selection;
       tplController.value = TextEditingValue(
         text: next,

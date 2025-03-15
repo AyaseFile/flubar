@@ -63,8 +63,7 @@ class MediaDragState extends _$MediaDragState {
         try {
           final ext = p.extension(path).toLowerCase();
           if (ext == '.cue') {
-            final List<(String, Metadata, Properties)> cueTracks =
-                await cueReadFile(file: path);
+            final cueTracks = await cueReadFile(file: path);
             return cueTracks.map((e) {
               final (cueAudio, metadata, properties) = e;
               globalTalker.debug(

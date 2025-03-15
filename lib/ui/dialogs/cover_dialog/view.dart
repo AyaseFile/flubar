@@ -240,7 +240,7 @@ class _CoverSettingsIconButton extends ConsumerWidget {
                         );
                       }),
                     ),
-                  ].map((e) => PopupMenuItem<void>(child: e)).toList(),
+                  ].map((e) => PopupMenuItem(child: e)).toList(),
                 );
               }
             : null,

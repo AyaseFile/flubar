@@ -290,10 +290,9 @@ class TrackRow extends ConsumerWidget {
         MenuAction(
           title: '编辑元数据',
           image: MenuImage.icon(Icons.edit),
-          callback: () async => await ref
-              .read(getDialogProvider.notifier)
-              .show<void>(const Dialog(child: EditMetadataDialog()),
-                  barrierDismissible: false),
+          callback: () async => await ref.read(getDialogProvider.notifier).show(
+              const Dialog(child: EditMetadataDialog()),
+              barrierDismissible: false),
         ),
         Menu(
           title: '编辑封面',
@@ -306,7 +305,7 @@ class TrackRow extends ConsumerWidget {
                   const dialog = Dialog(child: CoverDialog(isBatch: false));
                   await ref
                       .read(getDialogProvider.notifier)
-                      .show<void>(dialog, barrierDismissible: false);
+                      .show(dialog, barrierDismissible: false);
                 }),
             MenuAction(
                 title: '批量编辑',
@@ -318,7 +317,7 @@ class TrackRow extends ConsumerWidget {
                   const dialog = Dialog(child: CoverDialog(isBatch: true));
                   await ref
                       .read(getDialogProvider.notifier)
-                      .show<void>(dialog, barrierDismissible: false);
+                      .show(dialog, barrierDismissible: false);
                 }),
           ],
         ),
@@ -327,7 +326,7 @@ class TrackRow extends ConsumerWidget {
           image: MenuImage.icon(Icons.info),
           callback: () async {
             const dialog = Dialog(child: PropertiesDialog());
-            await ref.read(getDialogProvider.notifier).show<void>(dialog);
+            await ref.read(getDialogProvider.notifier).show(dialog);
           },
         ),
         MenuAction(
@@ -335,15 +334,14 @@ class TrackRow extends ConsumerWidget {
             image: MenuImage.icon(Icons.transit_enterexit),
             callback: () async => await ref
                 .read(getDialogProvider.notifier)
-                .show<void>(const TranscodeDialog(),
-                    barrierDismissible: false)),
+                .show(const TranscodeDialog(), barrierDismissible: false)),
         MenuSeparator(),
         MenuAction(
             title: '重命名',
             image: MenuImage.icon(Icons.drive_file_rename_outline),
             callback: () async => await ref
                 .read(getDialogProvider.notifier)
-                .show<void>(const RenameDialog(), barrierDismissible: false)),
+                .show(const RenameDialog(), barrierDismissible: false)),
         MenuAction(
           title: '移除',
           image: MenuImage.icon(Icons.delete),

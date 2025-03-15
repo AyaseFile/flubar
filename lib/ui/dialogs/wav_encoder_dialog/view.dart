@@ -61,7 +61,7 @@ class _EncoderItem extends ConsumerWidget {
       contentPadding: EdgeInsets.zero,
       leading: Consumer(builder: (context, ref, _) {
         final groupValue = ref.watch(encoderSelectionProvider);
-        return Radio<FfmpegEncoder>(
+        return Radio(
           value: encoder,
           groupValue: groupValue,
           onChanged: (value) =>

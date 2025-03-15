@@ -49,7 +49,7 @@ class PlaylistCardList extends ConsumerWidget {
         title: '添加播放列表',
         image: MenuImage.icon(Icons.add),
         callback: () async {
-          await ref.read(getDialogProvider.notifier).show<void>(
+          await ref.read(getDialogProvider.notifier).show(
                 InputDialog(
                   dialogTitle: '添加播放列表',
                   onConfirm: (name) {
@@ -107,7 +107,7 @@ class PlaylistCard extends ConsumerWidget {
         title: '重命名',
         image: MenuImage.icon(Icons.edit),
         callback: () async {
-          await ref.read(getDialogProvider.notifier).show<void>(
+          await ref.read(getDialogProvider.notifier).show(
                 InputDialog(
                   dialogTitle: '重命名',
                   initialValue: playlist.name,

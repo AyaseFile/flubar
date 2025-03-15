@@ -61,7 +61,7 @@ class _SelectionItem extends ConsumerWidget {
       contentPadding: EdgeInsets.zero,
       leading: Consumer(builder: (context, ref, _) {
         final groupValue = ref.watch(selectionProvider);
-        return Radio<TranscodeFormat>(
+        return Radio(
           value: option,
           groupValue: groupValue,
           onChanged: (value) =>

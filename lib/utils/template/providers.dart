@@ -17,7 +17,7 @@ part 'providers.g.dart';
 
 @riverpod
 class TplUtil extends _$TplUtil with IsolateMixin<(String, String)> {
-  final List<Track> _newTracks = [];
+  final _newTracks = <Track>[];
 
   @override
   TemplateProcessor build() {

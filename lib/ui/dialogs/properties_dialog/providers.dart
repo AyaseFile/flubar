@@ -62,7 +62,7 @@ class CommonProperties extends _$CommonProperties {
   String _formatIntProperty(Iterable<int?> values, {String suffix = ''}) {
     if (values.isEmpty) return '未知';
 
-    final Map<int, int> countMap = {};
+    final countMap = <int, int>{};
     int totalCount = 0;
 
     for (final value in values) {
@@ -92,7 +92,7 @@ class CommonProperties extends _$CommonProperties {
   String _formatStringProperty(Iterable<String?> values, {String suffix = ''}) {
     if (values.isEmpty) return '未知';
 
-    final Map<String, int> countMap = {};
+    final countMap = <String, int>{};
     int totalCount = 0;
 
     for (final value in values) {
