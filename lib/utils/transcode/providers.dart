@@ -110,31 +110,23 @@ class TranscodeUtil extends _$TranscodeUtil
     required bool clearMetadata,
     required bool keepAudioOnly,
   }) {
-    final args = <CliArg>[];
+    final args = <CliArg>[
+      const CliArg(name: 'nostdin'),
+    ];
 
-    options.map(
-      copy: (_) {
-        args.add(const CliArg(name: 'c:a', value: 'copy'));
-      },
-      mp3: (mp3) {
-        args.addAll([
-          const CliArg(name: 'c:a', value: 'libmp3lame'),
-          CliArg(name: 'b:a', value: '${mp3.bitrate}k'),
-        ]);
-      },
-      flac: (flac) {
-        args.addAll([
-          const CliArg(name: 'c:a', value: 'flac'),
-          CliArg(name: 'compression_level', value: '${flac.compressionLevel}'),
-        ]);
-      },
-      wavPack: (_) {
-        args.add(const CliArg(name: 'c:a', value: 'wavpack'));
-      },
-      wav: (wav) {
-        args.add(CliArg(name: 'c:a', value: wav.encoder.displayName));
-      },
-    );
+    args.addAll(options.map(
+      copy: (_) => [const CliArg(name: 'c:a', value: 'copy')],
+      mp3: (mp3) => [
+        const CliArg(name: 'c:a', value: 'libmp3lame'),
+        CliArg(name: 'b:a', value: '${mp3.bitrate}k'),
+      ],
+      flac: (flac) => [
+        const CliArg(name: 'c:a', value: 'flac'),
+        CliArg(name: 'compression_level', value: '${flac.compressionLevel}'),
+      ],
+      wavPack: (_) => [const CliArg(name: 'c:a', value: 'wavpack')],
+      wav: (wav) => [CliArg(name: 'c:a', value: wav.encoder.displayName)],
+    ));
 
     if (overwriteExistingFiles) args.add(const CliArg(name: 'y'));
 
