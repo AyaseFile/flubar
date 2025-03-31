@@ -478,6 +478,7 @@ class _CommandField extends HookConsumerWidget {
       controller: commandController,
       enabled: kAllowCustomCommand,
       readOnly: !kAllowCustomCommand,
+      maxLines: null,
       decoration: const InputDecoration(
         labelText: 'FFmpeg 命令',
         border: OutlineInputBorder(),

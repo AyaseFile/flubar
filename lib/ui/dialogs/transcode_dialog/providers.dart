@@ -88,8 +88,8 @@ class TranscodeCmd extends _$TranscodeCmd {
       clearMetadata: clearMetadata,
       keepAudioOnly: keepAudioOnly,
     ).copyWith(
-      inputs: [FfmpegInput.asset('{input_file}')],
-      outputFilepath: '{output_file}',
+      inputs: [FfmpegInput.asset('<input_file>')],
+      outputFilepath: '<output_file>',
     );
     return command.toCli().preview();
   }
