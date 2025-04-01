@@ -27,7 +27,7 @@ enum TrackSortOrder {
 }
 
 @freezed
-class Playlist with _$Playlist {
+abstract class Playlist with _$Playlist {
   const factory Playlist({
     required int id,
     required String name,
@@ -38,7 +38,7 @@ class Playlist with _$Playlist {
 }
 
 @freezed
-class PlaylistIdState with _$PlaylistIdState {
+abstract class PlaylistIdState with _$PlaylistIdState {
   const factory PlaylistIdState({
     @Default(kDefaultPlaylistId) int selectedId,
     @Default(kDefaultPlaylistId) int maxId,

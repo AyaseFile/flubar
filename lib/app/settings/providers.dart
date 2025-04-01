@@ -222,18 +222,18 @@ class TranscodeSettings extends _$TranscodeSettings {
   }) {
     state = state.copyWith(
       transcodeFormat: transcodeFormat,
-      mp3Bitrate: options.maybeMap(
-        mp3: (mp3) => mp3.bitrate,
-        orElse: () => state.mp3Bitrate,
-      ),
-      flacCompressionLevel: options.maybeMap(
-        flac: (flac) => flac.compressionLevel,
-        orElse: () => state.flacCompressionLevel,
-      ),
-      wavEncoder: options.maybeMap(
-        wav: (wav) => wav.encoder,
-        orElse: () => state.wavEncoder,
-      ),
+      mp3Bitrate: switch (options) {
+        Mp3TranscodeOptions(:final bitrate) => bitrate,
+        _ => state.mp3Bitrate,
+      },
+      flacCompressionLevel: switch (options) {
+        FlacTranscodeOptions(:final compressionLevel) => compressionLevel,
+        _ => state.flacCompressionLevel,
+      },
+      wavEncoder: switch (options) {
+        WavTranscodeOptions(:final encoder) => encoder,
+        _ => state.wavEncoder,
+      },
       rememberTranscodeChoice: rememberTranscodeChoice,
       useOriginalDirectory: useOriginalDirectory,
       overwriteExistingFiles: overwriteExistingFiles,

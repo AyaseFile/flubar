@@ -38,7 +38,7 @@ enum FfmpegEncoder {
 }
 
 @freezed
-class GeneralSettingsModel with _$GeneralSettingsModel {
+abstract class GeneralSettingsModel with _$GeneralSettingsModel {
   const factory GeneralSettingsModel({
     @Default(_S.kDarkMode) bool darkMode,
   }) = _GeneralSettings;
@@ -48,7 +48,7 @@ class GeneralSettingsModel with _$GeneralSettingsModel {
 }
 
 @freezed
-class ScanSettingsModel with _$ScanSettingsModel {
+abstract class ScanSettingsModel with _$ScanSettingsModel {
   const factory ScanSettingsModel({
     @Default(_S.kCueAsPlaylist) bool cueAsPlaylist,
   }) = _ScanSettings;
@@ -58,7 +58,7 @@ class ScanSettingsModel with _$ScanSettingsModel {
 }
 
 @freezed
-class MetadataSettingsModel with _$MetadataSettingsModel {
+abstract class MetadataSettingsModel with _$MetadataSettingsModel {
   const factory MetadataSettingsModel({
     @Default(_S.kWriteToMemoryOnly) bool writeToMemoryOnly,
     @Default(_S.kForceWriteMetadata) bool forceWriteMetadata,
@@ -70,7 +70,7 @@ class MetadataSettingsModel with _$MetadataSettingsModel {
 }
 
 @freezed
-class TranscodeSettingsModel with _$TranscodeSettingsModel {
+abstract class TranscodeSettingsModel with _$TranscodeSettingsModel {
   const factory TranscodeSettingsModel({
     @Default(_S.kFfmpegPath) String ffmpegPath,
     @Default(_S.kIsolateCount) int isolateCount,
@@ -93,7 +93,7 @@ class TranscodeSettingsModel with _$TranscodeSettingsModel {
 }
 
 @freezed
-class TranscodeWarningsModel with _$TranscodeWarningsModel {
+abstract class TranscodeWarningsModel with _$TranscodeWarningsModel {
   const factory TranscodeWarningsModel({
     @Default(_S.kWarningToLossy) bool toLossy,
     @Default(_S.kWarningFloatToInt) bool floatToInt,
@@ -105,7 +105,7 @@ class TranscodeWarningsModel with _$TranscodeWarningsModel {
 }
 
 @freezed
-class WindowSettingsModel with _$WindowSettingsModel {
+abstract class WindowSettingsModel with _$WindowSettingsModel {
   const factory WindowSettingsModel({
     @Default(_S.kWindowWidth) double width,
     @Default(_S.kWindowHeight) double height,
@@ -116,7 +116,7 @@ class WindowSettingsModel with _$WindowSettingsModel {
 }
 
 @freezed
-class HistoryModel with _$HistoryModel {
+abstract class HistoryModel with _$HistoryModel {
   const factory HistoryModel({
     @Default('') String openPath,
     @Default('') String outputPath,
@@ -127,7 +127,7 @@ class HistoryModel with _$HistoryModel {
 }
 
 @freezed
-class TableColumnStateModel with _$TableColumnStateModel {
+abstract class TableColumnStateModel with _$TableColumnStateModel {
   const factory TableColumnStateModel({
     @Default(_S.kTrackTableColumnsState)
     List<AdvancedColumnState> trackTableColumns,

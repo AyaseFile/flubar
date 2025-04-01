@@ -5,6 +5,7 @@ import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/models/state/settings.dart';
 import 'package:flubar/ui/dialogs/ratio_dialog/view.dart';
 import 'package:flubar/ui/snackbar/view.dart';
+import 'package:flubar/utils/transcode/transcode.dart';
 import 'package:flubar/utils/warnings/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -375,75 +376,77 @@ class _TranscodeOptionsSelector extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final options = ref.watch(transcodeOptsProvider);
-    return options.map(
-      copy: (_) => const SizedBox(height: kSettingRowVerticalPadding * 2),
-      mp3: (mp3) => _SettingRow(
-        label: '码率',
-        child: Row(
-          children: [
-            Expanded(
-              child: Slider(
-                min: 64,
-                max: 320,
-                divisions: 256 ~/ 64,
-                value: mp3.bitrate.toDouble(),
-                onChanged: (value) => ref
-                    .read(transcodeOptsProvider.notifier)
-                    .setMp3Options(bitrate: value.toInt()),
+    return switch (options) {
+      CopyTranscodeOptions() =>
+        const SizedBox(height: kSettingRowVerticalPadding * 2),
+      Mp3TranscodeOptions(:final bitrate) => _SettingRow(
+          label: '码率',
+          child: Row(
+            children: [
+              Expanded(
+                child: Slider(
+                  min: 64,
+                  max: 320,
+                  divisions: 256 ~/ 64,
+                  value: bitrate.toDouble(),
+                  onChanged: (value) => ref
+                      .read(transcodeOptsProvider.notifier)
+                      .setMp3Options(bitrate: value.toInt()),
+                ),
               ),
-            ),
-            SizedBox(
-              width: kBitrateDisplayWidth,
-              child: Text('${mp3.bitrate} kbps'),
-            ),
-          ],
-        ),
-      ),
-      flac: (flac) => _SettingRow(
-        label: '压缩级别',
-        child: Row(
-          children: [
-            Expanded(
-              child: Slider(
-                min: 0,
-                max: 8,
-                divisions: 8,
-                value: flac.compressionLevel.toDouble(),
-                onChanged: (value) => ref
-                    .read(transcodeOptsProvider.notifier)
-                    .setFlacOptions(compressionLevel: value.toInt()),
+              SizedBox(
+                width: kBitrateDisplayWidth,
+                child: Text('$bitrate kbps'),
               ),
-            ),
-            SizedBox(
-              width: kCompressionLevelDisplayWidth,
-              child: Text(flac.compressionLevel.toString()),
-            ),
-          ],
-        ),
-      ),
-      wavPack: (_) => const SizedBox(height: kSettingRowVerticalPadding * 2),
-      wav: (wav) => _SettingRow(
-        label: '编码器',
-        expandChild: false,
-        child: SizedBox(
-          width: kEncoderDisplayWidth,
-          child: DropdownButton(
-            value: wav.encoder,
-            isExpanded: true,
-            onChanged: (value) => ref
-                .read(transcodeOptsProvider.notifier)
-                .setWavOptions(encoder: value!),
-            items: FfmpegEncoder.values
-                .map((encoder) => DropdownMenuItem(
-                      value: encoder,
-                      child: Text(encoder.displayName,
-                          style: const TextStyle(fontSize: 14)),
-                    ))
-                .toList(),
+            ],
           ),
         ),
-      ),
-    );
+      FlacTranscodeOptions(:final compressionLevel) => _SettingRow(
+          label: '压缩级别',
+          child: Row(
+            children: [
+              Expanded(
+                child: Slider(
+                  min: 0,
+                  max: 8,
+                  divisions: 8,
+                  value: compressionLevel.toDouble(),
+                  onChanged: (value) => ref
+                      .read(transcodeOptsProvider.notifier)
+                      .setFlacOptions(compressionLevel: value.toInt()),
+                ),
+              ),
+              SizedBox(
+                width: kCompressionLevelDisplayWidth,
+                child: Text(compressionLevel.toString()),
+              ),
+            ],
+          ),
+        ),
+      WavPackTranscodeOptions() =>
+        const SizedBox(height: kSettingRowVerticalPadding * 2),
+      WavTranscodeOptions(:final encoder) => _SettingRow(
+          label: '编码器',
+          expandChild: false,
+          child: SizedBox(
+            width: kEncoderDisplayWidth,
+            child: DropdownButton(
+              value: encoder,
+              isExpanded: true,
+              onChanged: (value) => ref
+                  .read(transcodeOptsProvider.notifier)
+                  .setWavOptions(encoder: value!),
+              items: FfmpegEncoder.values
+                  .map((encoder) => DropdownMenuItem(
+                        value: encoder,
+                        child: Text(encoder.displayName,
+                            style: const TextStyle(fontSize: 14)),
+                      ))
+                  .toList(),
+            ),
+          ),
+        ),
+    };
   }
 }
 

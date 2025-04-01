@@ -43,22 +43,24 @@ class TranscodeWarningUtil extends _$TranscodeWarningUtil {
   }
 
   int _getTranscodeBitDepth(TranscodeOptions opts) {
-    return opts.map(
-      copy: (_) => 0,
-      mp3: (_) => 0,
-      flac: (flac) => 24,
-      wavPack: (_) => 0,
-      wav: (wav) => switch (wav.encoder) {
-        FfmpegEncoder.pcm_u8 => 8,
-        FfmpegEncoder.pcm_s16le || FfmpegEncoder.pcm_s16be => 16,
-        FfmpegEncoder.pcm_s24le || FfmpegEncoder.pcm_s24be => 24,
-        FfmpegEncoder.pcm_s32le ||
-        FfmpegEncoder.pcm_s32be ||
-        FfmpegEncoder.pcm_f32le ||
-        FfmpegEncoder.pcm_f32be =>
-          32,
-      },
-    );
+    return switch (opts) {
+      CopyTranscodeOptions() => 0,
+      Mp3TranscodeOptions() => 0,
+      FlacTranscodeOptions() => 24,
+      WavPackTranscodeOptions() => 0,
+      WavTranscodeOptions(encoder: FfmpegEncoder.pcm_u8) => 8,
+      WavTranscodeOptions(encoder: FfmpegEncoder.pcm_s16le) ||
+      WavTranscodeOptions(encoder: FfmpegEncoder.pcm_s16be) =>
+        16,
+      WavTranscodeOptions(encoder: FfmpegEncoder.pcm_s24le) ||
+      WavTranscodeOptions(encoder: FfmpegEncoder.pcm_s24be) =>
+        24,
+      WavTranscodeOptions(encoder: FfmpegEncoder.pcm_s32le) ||
+      WavTranscodeOptions(encoder: FfmpegEncoder.pcm_s32be) ||
+      WavTranscodeOptions(encoder: FfmpegEncoder.pcm_f32le) ||
+      WavTranscodeOptions(encoder: FfmpegEncoder.pcm_f32be) =>
+        32,
+    };
   }
 
   bool _isHighToLowBit(Properties properties) {
@@ -87,32 +89,30 @@ class TranscodeWarningUtil extends _$TranscodeWarningUtil {
   }
 
   bool _isLossyTranscode(TranscodeOptions opts) {
-    return opts.map(
-      copy: (_) => false,
-      mp3: (_) => true,
-      flac: (_) => false,
-      wavPack: (_) => false,
-      wav: (_) => false,
-    );
+    return switch (opts) {
+      CopyTranscodeOptions() => false,
+      Mp3TranscodeOptions() => true,
+      FlacTranscodeOptions() => false,
+      WavPackTranscodeOptions() => false,
+      WavTranscodeOptions() => false,
+    };
   }
 
   bool _isFloat(String? sampleFormat) =>
       sampleFormat == null ? false : sampleFormat.startsWith('f');
 
   bool _isIntTranscode(TranscodeOptions opts) {
-    return opts.map(
-      copy: (_) => false,
-      mp3: (_) => false,
-      flac: (_) => true,
-      wavPack: (_) => false,
-      wav: (wav) =>
-          wav.encoder == FfmpegEncoder.pcm_u8 ||
-          wav.encoder == FfmpegEncoder.pcm_s16le ||
-          wav.encoder == FfmpegEncoder.pcm_s16be ||
-          wav.encoder == FfmpegEncoder.pcm_s24le ||
-          wav.encoder == FfmpegEncoder.pcm_s24be ||
-          wav.encoder == FfmpegEncoder.pcm_s32le ||
-          wav.encoder == FfmpegEncoder.pcm_s32be,
-    );
+    return switch (opts) {
+      CopyTranscodeOptions() => false,
+      Mp3TranscodeOptions() => false,
+      FlacTranscodeOptions() => true,
+      WavPackTranscodeOptions() => false,
+      WavTranscodeOptions() => switch (opts) {
+          WavTranscodeOptions(encoder: FfmpegEncoder.pcm_f32le) ||
+          WavTranscodeOptions(encoder: FfmpegEncoder.pcm_f32be) =>
+            false,
+          _ => true,
+        },
+    };
   }
 }

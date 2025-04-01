@@ -72,10 +72,11 @@
               ]
               ++ optionals (system == "aarch64-darwin") [
                 cocoapods
+                rsync # fix permissions issue
               ];
             buildInputs =
               [
-                flutter
+                flutter329
                 ffmpeg.dev
               ]
               ++ optionals (system == "x86_64-linux") [

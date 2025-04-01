@@ -12,7 +12,7 @@ dependencies:
     sdk: flutter
   talker_flutter: ^4.6.6
   get: ^4.6.6
-  freezed_annotation: ^2.4.4
+  freezed_annotation: ^3.0.0
   json_annotation: ^4.9.0
   fast_immutable_collections: ^11.0.3
   riverpod: ^2.6.1
@@ -21,14 +21,14 @@ dependencies:
   multi_split_view: ^3.6.0
   material_table_view: ^5.0.1
   window_manager: ^0.4.3
-  flutter_hooks: ^0.20.5
+  flutter_hooks: ^0.21.2
   hooks_riverpod: ^2.6.1
   path: ^1.9.0
   path_provider: ^2.1.5
   flutter_settings_ui: ^3.0.1
   super_drag_and_drop: ^0.8.24
   super_clipboard: ^0.8.24
-  file_picker: ^8.1.7
+  file_picker: ^10.0.0
   collection: ^1.19.0
   super_context_menu: ^0.8.24
   just_audio: ^0.9.43
@@ -41,7 +41,7 @@ dependencies:
   ffmpeg_cli: ^0.3.0
   rust_lib_flubar:
     path: rust_builder
-  flutter_rust_bridge: 2.8.0
+  flutter_rust_bridge: ^2.9.0
   window_size:
     git:
       url: https://github.com/google/flutter-desktop-embedding.git
@@ -54,7 +54,7 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^5.0.0
   build_runner:
-  freezed: ^2.5.2
+  freezed: ^3.0.4
   json_serializable: ^6.8.0
   riverpod_generator: ^2.6.1
   custom_lint:

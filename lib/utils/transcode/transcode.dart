@@ -7,7 +7,7 @@ part 'transcode.freezed.dart';
 typedef _S = DefaultSettings;
 
 @freezed
-class TranscodeOptions with _$TranscodeOptions {
+sealed class TranscodeOptions with _$TranscodeOptions {
   const factory TranscodeOptions.copy() = CopyTranscodeOptions;
 
   const factory TranscodeOptions.mp3({

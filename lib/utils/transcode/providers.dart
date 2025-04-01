@@ -114,19 +114,25 @@ class TranscodeUtil extends _$TranscodeUtil
       const CliArg(name: 'nostdin'),
     ];
 
-    args.addAll(options.map(
-      copy: (_) => [const CliArg(name: 'c:a', value: 'copy')],
-      mp3: (mp3) => [
-        const CliArg(name: 'c:a', value: 'libmp3lame'),
-        CliArg(name: 'b:a', value: '${mp3.bitrate}k'),
-      ],
-      flac: (flac) => [
-        const CliArg(name: 'c:a', value: 'flac'),
-        CliArg(name: 'compression_level', value: '${flac.compressionLevel}'),
-      ],
-      wavPack: (_) => [const CliArg(name: 'c:a', value: 'wavpack')],
-      wav: (wav) => [CliArg(name: 'c:a', value: wav.encoder.displayName)],
-    ));
+    args.addAll(switch (options) {
+      CopyTranscodeOptions() => [
+          const CliArg(name: 'c:a', value: 'copy'),
+        ],
+      Mp3TranscodeOptions(:final bitrate) => [
+          const CliArg(name: 'c:a', value: 'libmp3lame'),
+          CliArg(name: 'b:a', value: '${bitrate}k'),
+        ],
+      FlacTranscodeOptions(:final compressionLevel) => [
+          const CliArg(name: 'c:a', value: 'flac'),
+          CliArg(name: 'compression_level', value: '$compressionLevel'),
+        ],
+      WavPackTranscodeOptions() => [
+          const CliArg(name: 'c:a', value: 'wavpack'),
+        ],
+      WavTranscodeOptions(:final encoder) => [
+          CliArg(name: 'c:a', value: encoder.displayName),
+        ],
+    });
 
     if (overwriteExistingFiles) args.add(const CliArg(name: 'y'));
 
@@ -204,13 +210,13 @@ class TranscodeUtil extends _$TranscodeUtil
       clearMetadata: clearMetadata,
       keepAudioOnly: keepAudioOnly,
     );
-    _ext = options.map(
-      copy: (_) => null,
-      mp3: (_) => '.mp3',
-      flac: (_) => '.flac',
-      wavPack: (_) => '.wv',
-      wav: (_) => '.wav',
-    );
+    _ext = switch (options) {
+      CopyTranscodeOptions() => null,
+      Mp3TranscodeOptions() => '.mp3',
+      FlacTranscodeOptions() => '.flac',
+      WavPackTranscodeOptions() => '.wv',
+      WavTranscodeOptions() => '.wav',
+    };
     ref
         .read(tplUtilProvider.notifier)
         .setTpl(ref.read(outputFileNameTplProvider));

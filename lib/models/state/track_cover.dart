@@ -8,7 +8,7 @@ import 'track.dart';
 part 'track_cover.freezed.dart';
 
 @freezed
-class TrackCoverModel with _$TrackCoverModel {
+abstract class TrackCoverModel with _$TrackCoverModel {
   const factory TrackCoverModel({
     @Default(false) bool updated,
     @Default(null) Uint8List? oldCover,
