@@ -107,10 +107,8 @@ class TranscodeWarningUtil extends _$TranscodeWarningUtil {
       Mp3TranscodeOptions() => false,
       FlacTranscodeOptions() => true,
       WavPackTranscodeOptions() => false,
-      WavTranscodeOptions() => switch (opts) {
-          WavTranscodeOptions(encoder: FfmpegEncoder.pcm_f32le) ||
-          WavTranscodeOptions(encoder: FfmpegEncoder.pcm_f32be) =>
-            false,
+      WavTranscodeOptions(:final encoder) => switch (encoder) {
+          FfmpegEncoder.pcm_f32le || FfmpegEncoder.pcm_f32be => false,
           _ => true,
         },
     };
