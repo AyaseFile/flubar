@@ -48,18 +48,16 @@ class TranscodeWarningUtil extends _$TranscodeWarningUtil {
       Mp3TranscodeOptions() => 0,
       FlacTranscodeOptions() => 24,
       WavPackTranscodeOptions() => 0,
-      WavTranscodeOptions(encoder: FfmpegEncoder.pcm_u8) => 8,
-      WavTranscodeOptions(encoder: FfmpegEncoder.pcm_s16le) ||
-      WavTranscodeOptions(encoder: FfmpegEncoder.pcm_s16be) =>
-        16,
-      WavTranscodeOptions(encoder: FfmpegEncoder.pcm_s24le) ||
-      WavTranscodeOptions(encoder: FfmpegEncoder.pcm_s24be) =>
-        24,
-      WavTranscodeOptions(encoder: FfmpegEncoder.pcm_s32le) ||
-      WavTranscodeOptions(encoder: FfmpegEncoder.pcm_s32be) ||
-      WavTranscodeOptions(encoder: FfmpegEncoder.pcm_f32le) ||
-      WavTranscodeOptions(encoder: FfmpegEncoder.pcm_f32be) =>
-        32,
+      WavTranscodeOptions(:final encoder) => switch (encoder) {
+          FfmpegEncoder.pcm_u8 => 8,
+          FfmpegEncoder.pcm_s16le || FfmpegEncoder.pcm_s16be => 16,
+          FfmpegEncoder.pcm_s24le || FfmpegEncoder.pcm_s24be => 24,
+          FfmpegEncoder.pcm_s32le ||
+          FfmpegEncoder.pcm_s32be ||
+          FfmpegEncoder.pcm_f32le ||
+          FfmpegEncoder.pcm_f32be =>
+            32,
+        },
     };
   }
 
