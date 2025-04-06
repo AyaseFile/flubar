@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 mixin IsolateMixin<T> {
   late CancelToken _token;
   void Function(List<dynamic>)? isolateTask;
+  ReceivePort? _receivePort;
 
   Future<void> performTasks() async {
     _token = CancelToken();
@@ -22,24 +23,28 @@ mixin IsolateMixin<T> {
     }
   }
 
-  void cancelTasks([String? reason]) => _token.cancel(reason);
+  void cancelTasks([String? reason]) {
+    _token.cancel(reason);
+    _receivePort?.close();
+    _receivePort = null;
+  }
 
   Future<void> _executeIsolates() async {
     init();
     assert(isolateTask != null);
     final data = getData();
     final dataLength = data.length;
-    final receivePort = ReceivePort();
+    _receivePort = ReceivePort();
     final chunks = _buildChunks(data);
 
     var processedCount = 0;
-    final futures = chunks.map(
-        (chunk) => Isolate.spawn(isolateTask!, [receivePort.sendPort, chunk]));
+    final futures = chunks.map((chunk) =>
+        Isolate.spawn(isolateTask!, [_receivePort!.sendPort, chunk]));
     final startTimestamp = DateTime.now();
     final isolates = await Future.wait(futures);
 
     try {
-      await for (final message in receivePort.take(dataLength)) {
+      await for (final message in _receivePort!.take(dataLength)) {
         if (message is Map<String, dynamic>) {
           processedCount++;
           onProgress(processedCount / dataLength);
@@ -57,7 +62,8 @@ mixin IsolateMixin<T> {
     } finally {
       final endTimestamp = DateTime.now();
       onIsolatesCompletion(isolates);
-      receivePort.close();
+      _receivePort?.close();
+      _receivePort = null;
       onCompletion(endTimestamp.difference(startTimestamp));
     }
   }
