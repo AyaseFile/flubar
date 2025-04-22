@@ -18,14 +18,14 @@ class Player extends _$Player {
   @override
   void build() {
     // 添加空的播放列表
-    _player.setAudioSource(ConcatenatingAudioSource(children: []));
+    _player.setAudioSources([]);
     ref.onDispose(() => _player.dispose());
   }
 
   static Future<void> handleError() async {
     try {
       await _player.stop();
-      await _player.setAudioSource(ConcatenatingAudioSource(children: []));
+      await _player.setAudioSources([]);
     } on PlayerException catch (e) {
       globalTalker.handle(e, null, '无法停止播放器');
     }
@@ -56,8 +56,7 @@ class Player extends _$Player {
     }).toList();
 
     try {
-      await _player.setAudioSource(ConcatenatingAudioSource(children: sources),
-          preload: false);
+      await _player.setAudioSources(sources, preload: false);
       await _player.play();
     } on PlayerException catch (e) {
       globalTalker.handle(e, null, '无法播放音频');
@@ -70,7 +69,7 @@ class Player extends _$Player {
 
   Future<void> stop() async {
     await _player.stop();
-    await _player.setAudioSource(ConcatenatingAudioSource(children: []));
+    await _player.setAudioSources([]);
   }
 
   Future<void> previous() async => await _player.seekToPrevious();
@@ -98,7 +97,7 @@ class Player extends _$Player {
 
   ClippingAudioSource? _getCurrentClip() {
     final currentSource =
-        _player.sequence?.elementAtOrNull(_player.currentIndex ?? -1);
+        _player.sequence.elementAtOrNull(_player.currentIndex ?? -1);
     return currentSource is ClippingAudioSource ? currentSource : null;
   }
 
@@ -130,11 +129,11 @@ class Player extends _$Player {
 
   Stream<bool> get hasTrack => sequenceStateStream.map((state) =>
       state?.sequence.isNotEmpty == true &&
-      state!.currentIndex < state.sequence.length);
+      state!.currentIndex! < state.sequence.length);
 
   Stream<bool> get hasNext => sequenceStateStream.map((state) =>
       state?.sequence.isNotEmpty == true &&
-      state!.currentIndex < state.sequence.length - 1);
+      state!.currentIndex! < state.sequence.length - 1);
 
   Stream<bool> get hasPrevious =>
       sequenceStateStream.map((state) => (state?.currentIndex ?? 0) > 0);

@@ -81,7 +81,8 @@ class _ErrorHandler {
 
   void handleError(Object e, StackTrace? st) async {
     if (st != null && st.toString().contains('MediaKitPlayer')) {
-      globalTalker.handle(PlayerException(0721, e.toString()), st, '捕获到播放器异常');
+      globalTalker.handle(
+          PlayerException(0721, e.toString(), 0), st, '捕获到播放器异常');
       await Player.handleError();
     } else {
       globalTalker.handle(e, st, '捕获到未处理的异常');
