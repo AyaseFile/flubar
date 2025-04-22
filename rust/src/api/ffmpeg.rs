@@ -1,8 +1,10 @@
-use crate::api::models::{Metadata, Properties};
+use std::ffi::CStr;
+
 use anyhow::{anyhow, Result};
 use ffmpeg_next as ffmpeg;
 use ffmpeg_next::ffi::av_get_sample_fmt_name;
-use std::ffi::CStr;
+
+use super::models::{Metadata, Properties};
 
 pub fn init_ffmpeg() -> Result<()> {
     ffmpeg::init().map_err(|e| anyhow!("Failed to initialize FFmpeg: {:?}", e))

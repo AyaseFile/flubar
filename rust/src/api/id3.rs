@@ -1,8 +1,10 @@
-use crate::api::models::Metadata;
-use anyhow::Result;
-use id3::{Tag, TagLike, Timestamp};
 use std::path::Path;
 use std::str::FromStr;
+
+use anyhow::Result;
+use id3::{Tag, TagLike, Timestamp};
+
+use super::models::Metadata;
 
 pub fn id3_write_metadata(file: String, metadata: Metadata) -> Result<()> {
     let path = Path::new(&file);
@@ -57,9 +59,7 @@ pub fn id3_write_metadata(file: String, metadata: Metadata) -> Result<()> {
     }
 
     if let Some(date) = metadata.date {
-        tag.set_date_recorded(Timestamp::from_str(&date)
-            .expect("Failed to parse date")
-        );
+        tag.set_date_recorded(Timestamp::from_str(&date).expect("Failed to parse date"));
     } else {
         tag.remove_year();
     }
@@ -69,7 +69,6 @@ pub fn id3_write_metadata(file: String, metadata: Metadata) -> Result<()> {
     } else {
         tag.remove_genre();
     }
-
 
     tag.write_to_path(path, id3::Version::Id3v24)?;
     Ok(())

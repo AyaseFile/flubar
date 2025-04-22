@@ -1,8 +1,9 @@
-use crate::api::ffmpeg::{cue_read_front_cover, cue_read_properties};
-use crate::api::models::{Metadata, Properties};
 use anyhow::{anyhow, Context, Result};
 use cue::cd::CD;
 use cue::cd_text::PTI;
+
+use super::ffmpeg::{cue_read_front_cover, cue_read_properties};
+use super::models::{Metadata, Properties};
 
 pub const REM_DATE: usize = 0;
 pub const FPS: f64 = 75.0;

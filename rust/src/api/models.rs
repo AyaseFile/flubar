@@ -19,8 +19,8 @@ pub struct Metadata {
 }
 
 impl Metadata {
-    pub(crate) fn new() -> Self {
-        Metadata {
+    pub(crate) const fn new() -> Self {
+        Self {
             title: None,
             artist: None,
             album: None,
@@ -52,8 +52,8 @@ pub struct Properties {
 }
 
 impl Properties {
-    pub(crate) fn new() -> Self {
-        Properties {
+    pub(crate) const fn new() -> Self {
+        Self {
             duration_sec: None,
             cue_start_sec: None,
             cue_duration_sec: None,
