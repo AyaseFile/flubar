@@ -147,7 +147,7 @@ Stream<PlayerState> playerState(Ref ref) =>
 AsyncValue<bool> playerPlaying(Ref ref) {
   final playerState = ref.watch(playerStateProvider);
   final hasTrack = ref.watch(playerHasTrackProvider);
-  globalTalker.debug('当前播放器状态: $playerState');
+  // globalTalker.debug('当前播放器状态: $playerState');
   return playerState
       .whenData((state) => hasTrack.valueOrNull == true && state.playing);
 }
@@ -155,7 +155,7 @@ AsyncValue<bool> playerPlaying(Ref ref) {
 @Riverpod(keepAlive: true)
 Stream<Duration> playerPosition(Ref ref) {
   final playing = ref.watch(playerPlayingProvider);
-  final positionStream = ref.read(playerProvider.notifier).positionStream;
+  final positionStream = ref.watch(playerProvider.notifier).positionStream;
 
   return playing.when(
     data: (playing) => playing ? positionStream : Stream.value(Duration.zero),
