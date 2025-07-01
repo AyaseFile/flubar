@@ -14,7 +14,7 @@ class FlubarApp extends ConsumerWidget {
       theme: ThemeData(
         brightness: Brightness.light,
         colorSchemeSeed: Colors.lightBlue,
-        dialogTheme: DialogTheme(
+        dialogTheme: DialogThemeData(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -23,7 +23,7 @@ class FlubarApp extends ConsumerWidget {
       darkTheme: ThemeData(
         brightness: Brightness.dark,
         colorSchemeSeed: Colors.lightBlue,
-        dialogTheme: DialogTheme(
+        dialogTheme: DialogThemeData(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
