@@ -55,34 +55,34 @@
         in
         {
           default = mkShellNoCC {
-            nativeBuildInputs =
-              [
-                flutter329
-                flutter_rust_bridge_codegen
-                cargo-expand
-                rust_toolchain
-                cmake
-                pkg-config
-              ]
-              ++ optionals (system == "x86_64-linux") [
-                clang
-                libclang
-                ninja
-                bison
-                flex
-                # gtk3
-                xz
-              ]
-              ++ optionals (system == "aarch64-darwin") [
-                darwin.libiconv
-                cocoapods
-                rsync # fix permissions issue
-              ];
-            buildInputs =
-              [ ffmpeg.dev ]
-              ++ optionals (system == "x86_64-linux") [
-                mpv-unwrapped
-              ];
+            nativeBuildInputs = [
+              flutter335
+              flutter_rust_bridge_codegen
+              cargo-expand
+              rust_toolchain
+              cmake
+              pkg-config
+            ]
+            ++ optionals (system == "x86_64-linux") [
+              clang
+              libclang
+              ninja
+              bison
+              flex
+              # gtk3
+              xz
+            ]
+            ++ optionals (system == "aarch64-darwin") [
+              darwin.libiconv
+              cocoapods
+              rsync # fix permissions issue
+            ];
+            buildInputs = [
+              ffmpeg.dev
+            ]
+            ++ optionals (system == "x86_64-linux") [
+              mpv-unwrapped
+            ];
             shellHook = ''
               export PATH="$HOME/.pub-cache/bin:$PATH"
               ${optionalString (system == "x86_64-linux") ''
