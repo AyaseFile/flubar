@@ -17,8 +17,10 @@ class GetDialog extends _$GetDialog {
     dragNotifier.disable();
 
     try {
-      final result =
-          await Get.dialog<T>(widget, barrierDismissible: barrierDismissible);
+      final result = await Get.dialog<T>(
+        widget,
+        barrierDismissible: barrierDismissible,
+      );
       return result;
     } finally {
       dragNotifier.enable();

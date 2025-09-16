@@ -9,7 +9,8 @@ part 'providers.g.dart';
 class Selection extends _$Selection {
   @override
   TranscodeFormat build() => ref.watch(
-      transcodeSettingsProvider.select((state) => state.transcodeFormat));
+    transcodeSettingsProvider.select((state) => state.transcodeFormat),
+  );
 
   void select(TranscodeFormat value) => state = value;
 }

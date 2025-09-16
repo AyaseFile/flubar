@@ -11,10 +11,7 @@ class PlayerWidget extends ConsumerWidget {
     ref.watch(playerProvider); // 保证播放器已经初始化
     return const Column(
       mainAxisSize: MainAxisSize.min,
-      children: [
-        _PlaybackControls(),
-        _ProgressSlider(),
-      ],
+      children: [_PlaybackControls(), _ProgressSlider()],
     );
   }
 }
@@ -53,7 +50,7 @@ class _TrackMetadataWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final track = ref.watch(playerTrackMetadataProvider).valueOrNull;
+    final track = ref.watch(playerTrackMetadataProvider).value;
     return track != null
         ? Padding(
             padding: const EdgeInsets.only(left: 10.0),
@@ -71,8 +68,7 @@ class _PreviousButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final hasPrevious =
-        ref.watch(playerHasPreviousProvider).valueOrNull ?? false;
+    final hasPrevious = ref.watch(playerHasPreviousProvider).value ?? false;
     return IconButton(
       icon: const Icon(Icons.skip_previous),
       onPressed: hasPrevious
@@ -87,8 +83,8 @@ class _PlayPauseButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playing = ref.watch(playerPlayingProvider).valueOrNull ?? false;
-    final hasTrack = ref.watch(playerHasTrackProvider).valueOrNull ?? false;
+    final playing = ref.watch(playerPlayingProvider).value ?? false;
+    final hasTrack = ref.watch(playerHasTrackProvider).value ?? false;
     return IconButton(
       icon: Icon(playing ? Icons.pause : Icons.play_arrow),
       onPressed: hasTrack
@@ -106,8 +102,8 @@ class _StopButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playing = ref.watch(playerPlayingProvider).valueOrNull ?? false;
-    final hasTrack = ref.watch(playerHasTrackProvider).valueOrNull ?? false;
+    final playing = ref.watch(playerPlayingProvider).value ?? false;
+    final hasTrack = ref.watch(playerHasTrackProvider).value ?? false;
     return IconButton(
       icon: const Icon(Icons.stop),
       onPressed: hasTrack && playing
@@ -122,7 +118,7 @@ class _NextButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final hasNext = ref.watch(playerHasNextProvider).valueOrNull ?? false;
+    final hasNext = ref.watch(playerHasNextProvider).value ?? false;
     return IconButton(
       icon: const Icon(Icons.skip_next),
       onPressed: hasNext
@@ -137,10 +133,8 @@ class _ProgressSlider extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final position =
-        ref.watch(playerPositionProvider).valueOrNull ?? Duration.zero;
-    final duration =
-        ref.watch(playerDurationProvider).valueOrNull ?? Duration.zero;
+    final position = ref.watch(playerPositionProvider).value ?? Duration.zero;
+    final duration = ref.watch(playerDurationProvider).value ?? Duration.zero;
     final dragValue = ref.watch(progressDragValueProvider);
 
     final durationSeconds = duration.inSeconds;
@@ -153,12 +147,14 @@ class _ProgressSlider extends ConsumerWidget {
         overlayShape: const RoundSliderOverlayShape(overlayRadius: 12.0),
       ),
       child: Slider(
-        value:
-            durationSeconds > 0 ? (dragValue ?? positionSeconds.toDouble()) : 0,
+        value: durationSeconds > 0
+            ? (dragValue ?? positionSeconds.toDouble())
+            : 0,
         max: durationSeconds.toDouble(),
         onChanged: durationSeconds > 0
-            ? (value) =>
-                ref.read(progressDragValueProvider.notifier).setDragValue(value)
+            ? (value) => ref
+                  .read(progressDragValueProvider.notifier)
+                  .setDragValue(value)
             : null,
         onChangeEnd: (_) async {
           if (dragValue != null) {

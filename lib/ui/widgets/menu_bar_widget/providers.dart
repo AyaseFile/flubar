@@ -1,6 +1,5 @@
 import 'package:flubar/ui/view/playlist_view/providers.dart';
 import 'package:flubar/ui/view/tracklist_view/providers.dart';
-import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'providers.g.dart';

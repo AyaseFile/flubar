@@ -63,10 +63,7 @@ class RatioAlertDialog extends StatelessWidget {
     final maxHeight = screenHeight * heightRatio;
     return Dialog(
       child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: maxWidth,
-          maxHeight: maxHeight,
-        ),
+        constraints: BoxConstraints(maxWidth: maxWidth, maxHeight: maxHeight),
         child: IntrinsicHeight(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -75,8 +72,9 @@ class RatioAlertDialog extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 16.0),
                 child: DefaultTextStyle(
-                  style: textTheme.headlineSmall!
-                      .copyWith(color: colorScheme.onSurface),
+                  style: textTheme.headlineSmall!.copyWith(
+                    color: colorScheme.onSurface,
+                  ),
                   child: title,
                 ),
               ),
@@ -84,8 +82,9 @@ class RatioAlertDialog extends StatelessWidget {
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.fromLTRB(24.0, 0.0, 24.0, 24.0),
                   child: DefaultTextStyle(
-                    style: textTheme.bodyMedium!
-                        .copyWith(color: colorScheme.onSurfaceVariant),
+                    style: textTheme.bodyMedium!.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                     child: content,
                   ),
                 ),

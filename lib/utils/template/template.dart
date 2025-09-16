@@ -13,8 +13,8 @@ class TemplateProcessor {
   final List<String> _keys;
 
   TemplateProcessor(String template)
-      : _parts = _compile(template)._parts,
-        _keys = _compile(template)._keys;
+    : _parts = _compile(template)._parts,
+      _keys = _compile(template)._keys;
 
   static _CompileResult _compile(String template) {
     final parts = <String>[];
@@ -33,8 +33,11 @@ class TemplateProcessor {
     return _CompileResult(parts, keys);
   }
 
-  String process(
-      {required String path, required Metadata metadata, String? extension}) {
+  String process({
+    required String path,
+    required Metadata metadata,
+    String? extension,
+  }) {
     final ext = p.extension(path);
     final buffer = StringBuffer();
 

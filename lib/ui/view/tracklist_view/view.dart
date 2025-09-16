@@ -67,9 +67,11 @@ class _TrackTableViewState extends ConsumerState<TrackTableView> {
   Widget _shortcutsBuilder(Widget child) {
     return Shortcuts(
       shortcuts: {
-        SingleActivator(LogicalKeyboardKey.keyA,
-            control: Platform.isLinux,
-            meta: Platform.isMacOS): _SelectAllIntent(),
+        SingleActivator(
+          LogicalKeyboardKey.keyA,
+          control: Platform.isLinux,
+          meta: Platform.isMacOS,
+        ): _SelectAllIntent(),
         SingleActivator(LogicalKeyboardKey.delete): _DeleteSelectedIntent(),
       },
       child: Actions(
@@ -91,33 +93,39 @@ class _TrackTableViewState extends ConsumerState<TrackTableView> {
   Widget _tableBuilder() {
     final tracks = ref.watch(tracksProvider);
     final columns = ref.read(trackTableColumnsProvider);
-    return _shortcutsBuilder(GestureDetector(
-      onTap: () => ref.read(selectedTrackIdsProvider.notifier).clear(),
-      child: TableView.builder(
-        style: TableViewStyle(
-          scrollbars: TableViewScrollbarsStyle(
-              vertical: TableViewScrollbarStyle(scrollPadding: false)),
-        ),
-        columns: columns,
-        rowHeight: kRowHeight,
-        rowCount: tracks.length,
-        headerBuilder: (context, contentBuilder) => _headerBuilder(
-            context, contentBuilder, (column) => columns[column].id),
-        rowBuilder: (context, row, contentBuilder) {
-          final track = tracks[row];
-          return KeyedSubtree(
-            key: ValueKey(track.id),
-            child: ProviderScope(
-              overrides: [trackItemProvider.overrideWithValue(track)],
-              child: TrackRow(
-                contentBuilder: contentBuilder,
-                getColumnId: (column) => columns[column].id,
-              ),
+    return _shortcutsBuilder(
+      GestureDetector(
+        onTap: () => ref.read(selectedTrackIdsProvider.notifier).clear(),
+        child: TableView.builder(
+          style: TableViewStyle(
+            scrollbars: TableViewScrollbarsStyle(
+              vertical: TableViewScrollbarStyle(scrollPadding: false),
             ),
-          );
-        },
+          ),
+          columns: columns,
+          rowHeight: kRowHeight,
+          rowCount: tracks.length,
+          headerBuilder: (context, contentBuilder) => _headerBuilder(
+            context,
+            contentBuilder,
+            (column) => columns[column].id,
+          ),
+          rowBuilder: (context, row, contentBuilder) {
+            final track = tracks[row];
+            return KeyedSubtree(
+              key: ValueKey(track.id),
+              child: ProviderScope(
+                overrides: [trackItemProvider.overrideWithValue(track)],
+                child: TrackRow(
+                  contentBuilder: contentBuilder,
+                  getColumnId: (column) => columns[column].id,
+                ),
+              ),
+            );
+          },
+        ),
       ),
-    ));
+    );
   }
 
   Widget _headerBuilder(
@@ -138,14 +146,19 @@ class _TrackTableViewState extends ConsumerState<TrackTableView> {
       };
       final sortProperty = _getSortProperty(columnId);
       // 排序图标
-      final icon = ref.watch(currentPlaylistProvider
-                  .select((state) => state.sortProperty)) ==
+      final icon =
+          ref.watch(
+                currentPlaylistProvider.select((state) => state.sortProperty),
+              ) ==
               sortProperty
-          ? ref.watch(currentPlaylistProvider
-                      .select((state) => state.sortOrder)) ==
-                  TrackSortOrder.ascending
-              ? Icons.arrow_upward
-              : Icons.arrow_downward
+          ? ref.watch(
+                      currentPlaylistProvider.select(
+                        (state) => state.sortOrder,
+                      ),
+                    ) ==
+                    TrackSortOrder.ascending
+                ? Icons.arrow_upward
+                : Icons.arrow_downward
           : null;
       return InkWell(
         onTap: () {
@@ -158,8 +171,8 @@ class _TrackTableViewState extends ConsumerState<TrackTableView> {
           } else {
             final order = playlist.sortProperty == sortProperty
                 ? playlist.sortOrder == TrackSortOrder.ascending
-                    ? TrackSortOrder.descending
-                    : TrackSortOrder.ascending
+                      ? TrackSortOrder.descending
+                      : TrackSortOrder.ascending
                 : TrackSortOrder.ascending;
             ref
                 .read(currentPlaylistProvider.notifier)
@@ -167,8 +180,9 @@ class _TrackTableViewState extends ConsumerState<TrackTableView> {
             ref.read(currentPlaylistProvider.notifier).setSortOrder(order);
           }
         },
-        onLongPress: () => Navigator.of(context)
-            .push(_createColumnControlsRoute(context, column)),
+        onLongPress: () => Navigator.of(
+          context,
+        ).push(_createColumnControlsRoute(context, column)),
         child: Align(
           alignment: Alignment.centerLeft,
           child: Padding(
@@ -181,7 +195,7 @@ class _TrackTableViewState extends ConsumerState<TrackTableView> {
                   if (icon != null) ...[
                     const SizedBox(width: 4),
                     Icon(icon, size: 18),
-                  ]
+                  ],
                 ],
               ),
             ),
@@ -235,7 +249,8 @@ class TrackRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final track = ref.watch(trackItemProvider);
     final selected = ref.watch(
-        selectedTrackIdsProvider.select((state) => state.contains(track.id)));
+      selectedTrackIdsProvider.select((state) => state.contains(track.id)),
+    );
     return ContextMenuWidget(
       child: InkWell(
         onTap: () {
@@ -244,10 +259,14 @@ class TrackRow extends ConsumerWidget {
           final metaPressed =
               Platform.isMacOS && HardwareKeyboard.instance.isMetaPressed;
           final shiftPressed = HardwareKeyboard.instance.isShiftPressed;
-          ref.read(selectedTrackIdsProvider.notifier).handleSelection(track.id,
-              ctrlPressed: ctrlPressed,
-              metaPressed: metaPressed,
-              shiftPressed: shiftPressed);
+          ref
+              .read(selectedTrackIdsProvider.notifier)
+              .handleSelection(
+                track.id,
+                ctrlPressed: ctrlPressed,
+                metaPressed: metaPressed,
+                shiftPressed: shiftPressed,
+              );
         },
         child: Container(
           color: selected
@@ -261,8 +280,9 @@ class TrackRow extends ConsumerWidget {
               kTrackTitleColumnId => track.metadata.title ?? '',
               kArtistNameColumnId => track.metadata.artist ?? '',
               kAlbumColumnId => track.metadata.album ?? '',
-              kDurationColumnId =>
-                CommonProperties.formatDuration(track.properties.duration),
+              kDurationColumnId => CommonProperties.formatDuration(
+                track.properties.duration,
+              ),
               _ => throw UnimplementedError(),
             };
             return Align(
@@ -298,35 +318,40 @@ class TrackRow extends ConsumerWidget {
         MenuAction(
           title: '编辑元数据',
           image: MenuImage.icon(Icons.edit),
-          callback: () async => await ref.read(getDialogProvider.notifier).show(
-              const Dialog(child: EditMetadataDialog()),
-              barrierDismissible: false),
+          callback: () async => await ref
+              .read(getDialogProvider.notifier)
+              .show(
+                const Dialog(child: EditMetadataDialog()),
+                barrierDismissible: false,
+              ),
         ),
         Menu(
           title: '编辑封面',
           image: MenuImage.icon(Icons.image),
           children: [
             MenuAction(
-                title: '逐个编辑',
-                image: MenuImage.icon(Icons.filter_1),
-                callback: () async {
-                  const dialog = Dialog(child: CoverDialog(isBatch: false));
-                  await ref
-                      .read(getDialogProvider.notifier)
-                      .show(dialog, barrierDismissible: false);
-                }),
+              title: '逐个编辑',
+              image: MenuImage.icon(Icons.filter_1),
+              callback: () async {
+                const dialog = Dialog(child: CoverDialog(isBatch: false));
+                await ref
+                    .read(getDialogProvider.notifier)
+                    .show(dialog, barrierDismissible: false);
+              },
+            ),
             MenuAction(
-                title: '批量编辑',
-                image: MenuImage.icon(Icons.filter_none),
-                attributes: MenuActionAttributes(
-                  disabled: ref.read(selectedTracksProvider).length == 1,
-                ),
-                callback: () async {
-                  const dialog = Dialog(child: CoverDialog(isBatch: true));
-                  await ref
-                      .read(getDialogProvider.notifier)
-                      .show(dialog, barrierDismissible: false);
-                }),
+              title: '批量编辑',
+              image: MenuImage.icon(Icons.filter_none),
+              attributes: MenuActionAttributes(
+                disabled: ref.read(selectedTracksProvider).length == 1,
+              ),
+              callback: () async {
+                const dialog = Dialog(child: CoverDialog(isBatch: true));
+                await ref
+                    .read(getDialogProvider.notifier)
+                    .show(dialog, barrierDismissible: false);
+              },
+            ),
           ],
         ),
         MenuAction(
@@ -338,18 +363,20 @@ class TrackRow extends ConsumerWidget {
           },
         ),
         MenuAction(
-            title: '转码',
-            image: MenuImage.icon(Icons.transit_enterexit),
-            callback: () async => await ref
-                .read(getDialogProvider.notifier)
-                .show(const TranscodeDialog(), barrierDismissible: false)),
+          title: '转码',
+          image: MenuImage.icon(Icons.transit_enterexit),
+          callback: () async => await ref
+              .read(getDialogProvider.notifier)
+              .show(const TranscodeDialog(), barrierDismissible: false),
+        ),
         MenuSeparator(),
         MenuAction(
-            title: '重命名',
-            image: MenuImage.icon(Icons.drive_file_rename_outline),
-            callback: () async => await ref
-                .read(getDialogProvider.notifier)
-                .show(const RenameDialog(), barrierDismissible: false)),
+          title: '重命名',
+          image: MenuImage.icon(Icons.drive_file_rename_outline),
+          callback: () async => await ref
+              .read(getDialogProvider.notifier)
+              .show(const RenameDialog(), barrierDismissible: false),
+        ),
         MenuAction(
           title: '移除',
           image: MenuImage.icon(Icons.delete),

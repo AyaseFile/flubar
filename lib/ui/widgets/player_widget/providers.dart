@@ -6,7 +6,6 @@ import 'package:flubar/models/extensions/properties_extension.dart';
 import 'package:flubar/rust/api/models.dart';
 import 'package:flubar/ui/dialogs/metadata_dialog/providers.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'providers.g.dart';
@@ -37,13 +36,15 @@ class Player extends _$Player {
     final sources = selectedTracks.map((track) {
       if (track.properties.isCue()) {
         final start = Duration(
-            milliseconds: (track.properties.cueStartSec! * 1000).round());
+          milliseconds: (track.properties.cueStartSec! * 1000).round(),
+        );
         final end = track.properties.cueDurationSec != null
             ? start +
-                Duration(
-                    milliseconds:
-                        (track.properties.cueDurationSec! * 1000).round())
-            : null; // 艺术楼梯
+                  Duration(
+                    milliseconds: (track.properties.cueDurationSec! * 1000)
+                        .round(),
+                  )
+            : null;
 
         return ClippingAudioSource(
           child: AudioSource.file(track.path, tag: track.metadata),
@@ -87,8 +88,11 @@ class Player extends _$Player {
     if (clip != null) {
       final start = clip.start ?? Duration.zero;
       final end = clip.end ?? _player.duration ?? Duration.zero;
-      final clampedPosition =
-          _clampDuration(position, Duration.zero, end - start);
+      final clampedPosition = _clampDuration(
+        position,
+        Duration.zero,
+        end - start,
+      );
       await _player.seek(clampedPosition + start);
     } else {
       await _player.seek(position);
@@ -96,22 +100,23 @@ class Player extends _$Player {
   }
 
   ClippingAudioSource? _getCurrentClip() {
-    final currentSource =
-        _player.sequence.elementAtOrNull(_player.currentIndex ?? -1);
+    final currentSource = _player.sequence.elementAtOrNull(
+      _player.currentIndex ?? -1,
+    );
     return currentSource is ClippingAudioSource ? currentSource : null;
   }
 
   Stream<PlayerState> get playerStateStream => _player.playerStateStream;
 
   Stream<Duration> get positionStream => _player.positionStream.map((position) {
-        final clip = _getCurrentClip();
-        if (clip != null) {
-          final start = clip.start ?? Duration.zero;
-          final end = clip.end ?? position;
-          return _clampDuration(position - start, Duration.zero, end - start);
-        }
-        return position;
-      });
+    final clip = _getCurrentClip();
+    if (clip != null) {
+      final start = clip.start ?? Duration.zero;
+      final end = clip.end ?? position;
+      return _clampDuration(position - start, Duration.zero, end - start);
+    }
+    return position;
+  });
 
   Stream<Duration> get durationStream =>
       _player.durationStream.map((fullDuration) {
@@ -127,13 +132,17 @@ class Player extends _$Player {
 
   Stream<SequenceState?> get sequenceStateStream => _player.sequenceStateStream;
 
-  Stream<bool> get hasTrack => sequenceStateStream.map((state) =>
-      state?.sequence.isNotEmpty == true &&
-      state!.currentIndex! < state.sequence.length);
+  Stream<bool> get hasTrack => sequenceStateStream.map(
+    (state) =>
+        state?.sequence.isNotEmpty == true &&
+        state!.currentIndex! < state.sequence.length,
+  );
 
-  Stream<bool> get hasNext => sequenceStateStream.map((state) =>
-      state?.sequence.isNotEmpty == true &&
-      state!.currentIndex! < state.sequence.length - 1);
+  Stream<bool> get hasNext => sequenceStateStream.map(
+    (state) =>
+        state?.sequence.isNotEmpty == true &&
+        state!.currentIndex! < state.sequence.length - 1,
+  );
 
   Stream<bool> get hasPrevious =>
       sequenceStateStream.map((state) => (state?.currentIndex ?? 0) > 0);
@@ -148,8 +157,9 @@ AsyncValue<bool> playerPlaying(Ref ref) {
   final playerState = ref.watch(playerStateProvider);
   final hasTrack = ref.watch(playerHasTrackProvider);
   // globalTalker.debug('当前播放器状态: $playerState');
-  return playerState
-      .whenData((state) => hasTrack.valueOrNull == true && state.playing);
+  return playerState.whenData(
+    (state) => hasTrack.value == true && state.playing,
+  );
 }
 
 @Riverpod(keepAlive: true)
@@ -182,8 +192,9 @@ Stream<bool> playerHasPrevious(Ref ref) =>
 
 @Riverpod(keepAlive: true)
 Stream<Metadata?> playerTrackMetadata(Ref ref) {
-  final sequenceStateStream =
-      ref.watch(playerProvider.notifier).sequenceStateStream;
+  final sequenceStateStream = ref
+      .watch(playerProvider.notifier)
+      .sequenceStateStream;
   return sequenceStateStream.map((sequenceState) {
     final currentSource = sequenceState?.currentSource;
     if (currentSource == null) return null;

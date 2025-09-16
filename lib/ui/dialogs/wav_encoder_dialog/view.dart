@@ -32,19 +32,21 @@ class WavEncoderDialog extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
           child: const Text('取消'),
         ),
-        Consumer(builder: (context, ref, _) {
-          return TextButton(
-            onPressed: () {
-              final encoder = ref.read(encoderSelectionProvider);
-              ref
-                  .read(transcodeSettingsProvider.notifier)
-                  .updateWavEncoder(encoder);
-              Navigator.pop(context, encoder);
-            },
-            autofocus: true,
-            child: const Text('确定'),
-          );
-        }),
+        Consumer(
+          builder: (context, ref, _) {
+            return TextButton(
+              onPressed: () {
+                final encoder = ref.read(encoderSelectionProvider);
+                ref
+                    .read(transcodeSettingsProvider.notifier)
+                    .updateWavEncoder(encoder);
+                Navigator.pop(context, encoder);
+              },
+              autofocus: true,
+              child: const Text('确定'),
+            );
+          },
+        ),
       ],
     );
   }
@@ -56,22 +58,23 @@ class _EncoderItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final encoder = ref.watch(encoderItemProvider);
-    final selected =
-        ref.watch(encoderSelectionProvider.select((state) => state == encoder));
+    final selected = ref.watch(
+      encoderSelectionProvider.select((state) => state == encoder),
+    );
     return ListTile(
       title: Text(encoder.displayName),
       contentPadding: EdgeInsets.zero,
-      leading: Consumer(builder: (context, ref, _) {
-        final groupValue = ref.watch(encoderSelectionProvider);
-        return RadioGroup(
-          groupValue: groupValue,
-          onChanged: (value) =>
-              ref.read(encoderSelectionProvider.notifier).select(value!),
-          child: Radio(
-            value: encoder,
-          ),
-        );
-      }),
+      leading: Consumer(
+        builder: (context, ref, _) {
+          final groupValue = ref.watch(encoderSelectionProvider);
+          return RadioGroup(
+            groupValue: groupValue,
+            onChanged: (value) =>
+                ref.read(encoderSelectionProvider.notifier).select(value!),
+            child: Radio(value: encoder),
+          );
+        },
+      ),
       selected: selected,
     );
   }

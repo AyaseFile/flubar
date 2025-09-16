@@ -8,7 +8,6 @@ import 'package:flubar/models/state/settings.dart';
 import 'package:flubar/utils/transcode/transcode.dart';
 import 'package:hive/hive.dart';
 import 'package:path/path.dart' as p;
-import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'providers.g.dart';
@@ -43,9 +42,7 @@ class GeneralSettings extends _$GeneralSettings {
         final loadedSettings = GeneralSettingsModel.fromJson(
           jsonDecode(str) as Map<String, dynamic>,
         );
-        return defaultSettings.copyWith(
-          darkMode: loadedSettings.darkMode,
-        );
+        return defaultSettings.copyWith(darkMode: loadedSettings.darkMode);
       } catch (e) {
         globalTalker.handle(e, null, '无法解析常规设置: $str');
         return defaultSettings;
@@ -255,8 +252,9 @@ class TranscodeWarnings extends _$TranscodeWarnings {
   @override
   TranscodeWarningsModel build() {
     final settings = (() {
-      final str =
-          ref.read(settingsProvider.notifier).getJson('transcodeWarnings');
+      final str = ref
+          .read(settingsProvider.notifier)
+          .getJson('transcodeWarnings');
       const defaultSettings = TranscodeWarningsModel();
       try {
         final loadedSettings = TranscodeWarningsModel.fromJson(
@@ -354,8 +352,9 @@ class TableColumnState extends _$TableColumnState {
   @override
   TableColumnStateModel build() {
     final settings = (() {
-      final str =
-          ref.read(settingsProvider.notifier).getJson('tableColumnState');
+      final str = ref
+          .read(settingsProvider.notifier)
+          .getJson('tableColumnState');
       const defaultSettings = TableColumnStateModel();
       try {
         final loadedSettings = TableColumnStateModel.fromJson(
@@ -385,7 +384,7 @@ class TableColumnState extends _$TableColumnState {
 Future<String?> getInitialDirectory(String? path) async {
   return path != null && await Directory(path).exists()
       ? path.endsWith(p.separator)
-          ? path
-          : '$path${p.separator}'
+            ? path
+            : '$path${p.separator}'
       : null;
 }

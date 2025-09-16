@@ -17,6 +17,7 @@ import 'package:flubar/ui/dialogs/transcode_dialog/providers.dart';
 import 'package:flubar/utils/template/providers.dart';
 import 'package:flubar/utils/template/template.dart';
 import 'package:path/path.dart' as p;
+import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'transcode.dart';
@@ -53,9 +54,7 @@ class TranscodeUtil extends _$TranscodeUtil
           // 检查输出文件是否存在
           if (await File(outputFile).exists() &&
               !baseCommand.args.contains(const CliArg(name: 'y'))) {
-            sendPort.send({
-              'error': '输出文件 $outputFile 已存在',
-            });
+            sendPort.send({'error': '输出文件 $outputFile 已存在'});
             continue;
           }
           final command = baseCommand.copyWith(
@@ -78,20 +77,24 @@ class TranscodeUtil extends _$TranscodeUtil
             final metadata = track.metadata;
             if (rewriteMetadata) {
               await loftyWriteMetadata(
-                  file: outputFile,
-                  metadata: metadata,
-                  force: true); // 清除了元数据, 需要强制写入
+                file: outputFile,
+                metadata: metadata,
+                force: true,
+              ); // 清除了元数据, 需要强制写入
             }
             if (rewriteFrontCover) {
               await loftyWritePicture(
-                  file: outputFile, picture: metadata.frontCover, force: true);
+                file: outputFile,
+                picture: metadata.frontCover,
+                force: true,
+              );
             }
             sendPort.send({'error': null});
           } else {
             final stderr = await process.stderr.transform(utf8.decoder).join();
             sendPort.send({
               'error': '无法转码文件 $path. 退出码: $exitCode',
-              'e': FfmpegException(stderr.trim())
+              'e': FfmpegException(stderr.trim()),
             });
           }
         } catch (e, st) {
@@ -109,28 +112,24 @@ class TranscodeUtil extends _$TranscodeUtil
     required bool clearMetadata,
     required bool keepAudioOnly,
   }) {
-    final args = <CliArg>[
-      const CliArg(name: 'nostdin'),
-    ];
+    final args = <CliArg>[const CliArg(name: 'nostdin')];
 
     args.addAll(switch (options) {
-      CopyTranscodeOptions() => [
-          const CliArg(name: 'c:a', value: 'copy'),
-        ],
+      CopyTranscodeOptions() => [const CliArg(name: 'c:a', value: 'copy')],
       Mp3TranscodeOptions(:final bitrate) => [
-          const CliArg(name: 'c:a', value: 'libmp3lame'),
-          CliArg(name: 'b:a', value: '${bitrate}k'),
-        ],
+        const CliArg(name: 'c:a', value: 'libmp3lame'),
+        CliArg(name: 'b:a', value: '${bitrate}k'),
+      ],
       FlacTranscodeOptions(:final compressionLevel) => [
-          const CliArg(name: 'c:a', value: 'flac'),
-          CliArg(name: 'compression_level', value: '$compressionLevel'),
-        ],
+        const CliArg(name: 'c:a', value: 'flac'),
+        CliArg(name: 'compression_level', value: '$compressionLevel'),
+      ],
       WavPackTranscodeOptions() => [
-          const CliArg(name: 'c:a', value: 'wavpack'),
-        ],
+        const CliArg(name: 'c:a', value: 'wavpack'),
+      ],
       WavTranscodeOptions(:final encoder) => [
-          CliArg(name: 'c:a', value: encoder.displayName),
-        ],
+        CliArg(name: 'c:a', value: encoder.displayName),
+      ],
     });
 
     if (overwriteExistingFiles) args.add(const CliArg(name: 'y'));
@@ -164,7 +163,10 @@ class TranscodeUtil extends _$TranscodeUtil
           ? p.dirname(path)
           : (_customOutputDir ?? p.dirname(path));
       final newName = _tplProcessor.process(
-          metadata: metadata, path: path, extension: _ext);
+        metadata: metadata,
+        path: path,
+        extension: _ext,
+      );
       final outputFile = p.join(dir, newName);
       var command = _baseCommand;
       if (track.properties.isCue()) {
@@ -189,8 +191,9 @@ class TranscodeUtil extends _$TranscodeUtil
   @override
   void init() {
     final options = ref.read(transcodeOptsProvider);
-    final ffmpegPath =
-        ref.read(transcodeSettingsProvider.select((state) => state.ffmpegPath));
+    final ffmpegPath = ref.read(
+      transcodeSettingsProvider.select((state) => state.ffmpegPath),
+    );
     final overwrite = ref.read(overwriteExistingFilesProvider);
     final delete = ref.read(deleteOriginalFilesProvider);
     final clearMetadata = ref.read(clearMetadataProvider);
@@ -225,8 +228,9 @@ class TranscodeUtil extends _$TranscodeUtil
   }
 
   @override
-  void onCancellation(CancelException e) => transcodeTalker
-      .info('转码操作已取消.${e.reason != null ? ' 原因: ${e.reason}' : ''}');
+  void onCancellation(CancelException e) => transcodeTalker.info(
+    '转码操作已取消.${e.reason != null ? ' 原因: ${e.reason}' : ''}',
+  );
 
   @override
   void onCompletion(Duration duration) {

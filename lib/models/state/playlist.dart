@@ -21,10 +21,7 @@ enum TrackSortProperty {
   none,
 }
 
-enum TrackSortOrder {
-  ascending,
-  descending,
-}
+enum TrackSortOrder { ascending, descending }
 
 @freezed
 abstract class Playlist with _$Playlist {

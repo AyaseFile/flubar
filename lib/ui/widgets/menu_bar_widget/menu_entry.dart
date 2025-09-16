@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 class MenuEntry {
   final String? label;
   final MenuSerializableShortcut? shortcut;
   final VoidCallback? onPressed;
   final List<MenuEntry>? menuChildren;
-  final Provider<bool>? enabled;
-  final StreamProvider<bool>? streamEnabled;
+  final ProviderListenable<bool>? enabled;
+  final ProviderListenable<AsyncValue<bool>>? streamEnabled;
   final bool divider;
 
   const MenuEntry({
@@ -18,8 +19,8 @@ class MenuEntry {
     this.enabled,
     this.streamEnabled,
     this.divider = false,
-  })  : assert(menuChildren == null || onPressed == null),
-        assert(label == null || divider == false);
+  }) : assert(menuChildren == null || onPressed == null),
+       assert(label == null || divider == false);
 
   static List<Widget> build(List<MenuEntry> selections) {
     Widget buildSelection(MenuEntry selection) {
@@ -71,15 +72,17 @@ class MenuEntry {
   }
 
   static Map<MenuSerializableShortcut, Intent> shortcuts(
-      List<MenuEntry> selections) {
+    List<MenuEntry> selections,
+  ) {
     final result = <MenuSerializableShortcut, Intent>{};
     for (final selection in selections) {
       if (selection.menuChildren != null) {
         result.addAll(MenuEntry.shortcuts(selection.menuChildren!));
       } else {
         if (selection.shortcut != null && selection.onPressed != null) {
-          result[selection.shortcut!] =
-              VoidCallbackIntent(selection.onPressed!);
+          result[selection.shortcut!] = VoidCallbackIntent(
+            selection.onPressed!,
+          );
         }
       }
     }
@@ -93,7 +96,8 @@ class MenuDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const SizedBox(
-        height: 8.0,
-        child: Divider(thickness: 1.0, indent: 8.0, endIndent: 8.0));
+      height: 8.0,
+      child: Divider(thickness: 1.0, indent: 8.0, endIndent: 8.0),
+    );
   }
 }

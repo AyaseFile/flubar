@@ -54,10 +54,14 @@ class _HomeViewState extends ConsumerState<HomeView> with WindowListener {
   @override
   void onWindowClose() {
     ref.read(windowSettingsProvider.notifier).updateWindowSize(_windowSize);
-    ref.read(tableColumnStateProvider.notifier).updateTrackTableColumns(ref
-        .read(trackTableColumnsProvider)
-        .map((column) => column.toState())
-        .toList());
+    ref
+        .read(tableColumnStateProvider.notifier)
+        .updateTrackTableColumns(
+          ref
+              .read(trackTableColumnsProvider)
+              .map((column) => column.toState())
+              .toList(),
+        );
   }
 
   @override
@@ -75,8 +79,9 @@ class _HomeViewState extends ConsumerState<HomeView> with WindowListener {
         child: Column(
           children: [
             const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [Expanded(child: MenuBarWidget())]),
+              mainAxisSize: MainAxisSize.min,
+              children: [Expanded(child: MenuBarWidget())],
+            ),
             Expanded(
               child: MultiSplitViewTheme(
                 data: multiSplitViewTheme,
@@ -84,17 +89,19 @@ class _HomeViewState extends ConsumerState<HomeView> with WindowListener {
                   pushDividers: true,
                   initialAreas: [
                     Area(
-                        flex: 1,
-                        builder: (context, area) => const PlaylistView()),
+                      flex: 1,
+                      builder: (context, area) => const PlaylistView(),
+                    ),
                     Area(
                       flex: 5,
                       builder: (context, area) => const Stack(
-                          children: [TrackTableView(), MediaDragWidget()]),
-                    )
+                        children: [TrackTableView(), MediaDragWidget()],
+                      ),
+                    ),
                   ],
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),

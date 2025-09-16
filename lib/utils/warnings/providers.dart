@@ -23,8 +23,9 @@ class TranscodeWarningUtil extends _$TranscodeWarningUtil {
       warning += '使用有损转码\n';
     }
     if (warnings.floatToInt) {
-      final hasFloat =
-          tracks.any((track) => _isFloat(track.properties.sampleFormat));
+      final hasFloat = tracks.any(
+        (track) => _isFloat(track.properties.sampleFormat),
+      );
       if (hasFloat && _isIntTranscode(opts)) {
         warning += '浮点数转整数\n';
       }
@@ -32,8 +33,9 @@ class TranscodeWarningUtil extends _$TranscodeWarningUtil {
     if (warnings.highToLowBit) {
       _bitDepth = _getTranscodeBitDepth(opts);
       if (_bitDepth != 0) {
-        final hasHighToLowBit =
-            tracks.any((track) => _isHighToLowBit(track.properties));
+        final hasHighToLowBit = tracks.any(
+          (track) => _isHighToLowBit(track.properties),
+        );
         if (hasHighToLowBit) {
           warning += '高位转低位\n';
         }
@@ -49,15 +51,14 @@ class TranscodeWarningUtil extends _$TranscodeWarningUtil {
       FlacTranscodeOptions() => 24,
       WavPackTranscodeOptions() => 0,
       WavTranscodeOptions(:final encoder) => switch (encoder) {
-          FfmpegEncoder.pcm_u8 => 8,
-          FfmpegEncoder.pcm_s16le || FfmpegEncoder.pcm_s16be => 16,
-          FfmpegEncoder.pcm_s24le || FfmpegEncoder.pcm_s24be => 24,
-          FfmpegEncoder.pcm_s32le ||
-          FfmpegEncoder.pcm_s32be ||
-          FfmpegEncoder.pcm_f32le ||
-          FfmpegEncoder.pcm_f32be =>
-            32,
-        },
+        FfmpegEncoder.pcm_u8 => 8,
+        FfmpegEncoder.pcm_s16le || FfmpegEncoder.pcm_s16be => 16,
+        FfmpegEncoder.pcm_s24le || FfmpegEncoder.pcm_s24be => 24,
+        FfmpegEncoder.pcm_s32le ||
+        FfmpegEncoder.pcm_s32be ||
+        FfmpegEncoder.pcm_f32le ||
+        FfmpegEncoder.pcm_f32be => 32,
+      },
     };
   }
 
@@ -106,9 +107,9 @@ class TranscodeWarningUtil extends _$TranscodeWarningUtil {
       FlacTranscodeOptions() => true,
       WavPackTranscodeOptions() => false,
       WavTranscodeOptions(:final encoder) => switch (encoder) {
-          FfmpegEncoder.pcm_f32le || FfmpegEncoder.pcm_f32be => false,
-          _ => true,
-        },
+        FfmpegEncoder.pcm_f32le || FfmpegEncoder.pcm_f32be => false,
+        _ => true,
+      },
     };
   }
 }

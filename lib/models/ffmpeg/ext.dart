@@ -16,10 +16,9 @@ extension FfmpegCommandExt on FfmpegCommand {
       executable: ffmpegPath,
       args: [
         ...inputs.expand((input) => input.args),
-        ...args.expand((arg) => [
-              "-${arg.name}",
-              if (arg.value != null) arg.value!,
-            ]),
+        ...args.expand(
+          (arg) => ["-${arg.name}", if (arg.value != null) arg.value!],
+        ),
         outputFilepath,
       ],
     );

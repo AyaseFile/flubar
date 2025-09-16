@@ -18,29 +18,31 @@ class CoverDragWidget extends ConsumerWidget {
             minHeight: constraints.maxHeight,
           ),
           child: DropRegion(
-              hitTestBehavior: HitTestBehavior.translucent,
-              formats: [Formats.fileUri],
-              onDropOver: (event) =>
-                  event.session.allowedOperations.contains(DropOperation.copy)
-                      ? DropOperation.copy
-                      : DropOperation.none,
-              onPerformDrop: (event) async {
-                final items = event.session.items;
-                if (items.length == 1) {
-                  ref.read(coverDragStateProvider.notifier).setDragging(false);
-                  final uri =
-                      await items.first.dataReader!.readValue(Formats.fileUri);
-                  if (uri == null) return;
-                  await ref
-                      .read(coverDragStateProvider.notifier)
-                      .addFile(uri.toFilePath());
-                }
-              },
-              onDropEnter: (_) =>
-                  ref.read(coverDragStateProvider.notifier).setDragging(true),
-              onDropLeave: (_) =>
-                  ref.read(coverDragStateProvider.notifier).setDragging(false),
-              child: _DragIndicator()),
+            hitTestBehavior: HitTestBehavior.translucent,
+            formats: [Formats.fileUri],
+            onDropOver: (event) =>
+                event.session.allowedOperations.contains(DropOperation.copy)
+                ? DropOperation.copy
+                : DropOperation.none,
+            onPerformDrop: (event) async {
+              final items = event.session.items;
+              if (items.length == 1) {
+                ref.read(coverDragStateProvider.notifier).setDragging(false);
+                final uri = await items.first.dataReader!.readValue(
+                  Formats.fileUri,
+                );
+                if (uri == null) return;
+                await ref
+                    .read(coverDragStateProvider.notifier)
+                    .addFile(uri.toFilePath());
+              }
+            },
+            onDropEnter: (_) =>
+                ref.read(coverDragStateProvider.notifier).setDragging(true),
+            onDropLeave: (_) =>
+                ref.read(coverDragStateProvider.notifier).setDragging(false),
+            child: _DragIndicator(),
+          ),
         );
       },
     );

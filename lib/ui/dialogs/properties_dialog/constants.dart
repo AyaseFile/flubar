@@ -19,7 +19,7 @@ const kValueColumnWidth = 380.0;
 
 const kPropertiesColumns = [
   TableColumn(width: kKeyColumnWidth),
-  TableColumn(width: kValueColumnWidth)
+  TableColumn(width: kValueColumnWidth),
 ];
 
 const kDialogWidth = 400.0;

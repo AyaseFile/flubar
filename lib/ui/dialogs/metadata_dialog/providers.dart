@@ -7,7 +7,6 @@ import 'package:flubar/models/state/track.dart';
 import 'package:flubar/rust/api/models.dart';
 import 'package:flubar/ui/view/tracklist_view/constants.dart';
 import 'package:flubar/ui/view/tracklist_view/providers.dart';
-import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'constants.dart';
@@ -51,10 +50,7 @@ class SelectedTracks extends _$SelectedTracks {
     // 不需要手动更新 commonMetadataProvider
   }
 
-  void updateAllMetadataState({
-    required int rowId,
-    required String? value,
-  }) {
+  void updateAllMetadataState({required int rowId, required String? value}) {
     state = state.map((t) {
       final metadata = _updated(t, rowId, value);
       return t.copyWith(metadata: metadata);
@@ -134,63 +130,74 @@ class CommonMetadata extends _$CommonMetadata {
 
     return IList([
       CommonMetadataModel(
-          id: kTrackTitleRowId,
-          key: '标题',
-          value: _formatValues(titleSet),
-          multi: titleSet.length > 1),
+        id: kTrackTitleRowId,
+        key: '标题',
+        value: _formatValues(titleSet),
+        multi: titleSet.length > 1,
+      ),
       CommonMetadataModel(
-          id: kArtistNameRowId,
-          key: '艺术家',
-          value: _formatValues(artistSet),
-          multi: artistSet.length > 1),
+        id: kArtistNameRowId,
+        key: '艺术家',
+        value: _formatValues(artistSet),
+        multi: artistSet.length > 1,
+      ),
       CommonMetadataModel(
-          id: kAlbumRowId,
-          key: '专辑',
-          value: _formatValues(albumSet),
-          multi: albumSet.length > 1),
+        id: kAlbumRowId,
+        key: '专辑',
+        value: _formatValues(albumSet),
+        multi: albumSet.length > 1,
+      ),
       CommonMetadataModel(
-          id: kAlbumArtistRowId,
-          key: '专辑艺术家',
-          value: _formatValues(albumArtistSet),
-          multi: albumArtistSet.length > 1),
+        id: kAlbumArtistRowId,
+        key: '专辑艺术家',
+        value: _formatValues(albumArtistSet),
+        multi: albumArtistSet.length > 1,
+      ),
       CommonMetadataModel(
-          id: kTrackNumberRowId,
-          key: '音轨',
-          value: _formatValues(trackNumberSet),
-          multi: trackNumberSet.length > 1),
+        id: kTrackNumberRowId,
+        key: '音轨',
+        value: _formatValues(trackNumberSet),
+        multi: trackNumberSet.length > 1,
+      ),
       CommonMetadataModel(
-          id: kTrackTotalRowId,
-          key: '音轨总数',
-          value: _formatValues(trackTotalSet),
-          multi: trackTotalSet.length > 1),
+        id: kTrackTotalRowId,
+        key: '音轨总数',
+        value: _formatValues(trackTotalSet),
+        multi: trackTotalSet.length > 1,
+      ),
       CommonMetadataModel(
-          id: kDiscNumberRowId,
-          key: '碟片',
-          value: _formatValues(discNumberSet),
-          multi: discNumberSet.length > 1),
+        id: kDiscNumberRowId,
+        key: '碟片',
+        value: _formatValues(discNumberSet),
+        multi: discNumberSet.length > 1,
+      ),
       CommonMetadataModel(
-          id: kDiscTotalRowId,
-          key: '碟片总数',
-          value: _formatValues(discTotalSet),
-          multi: discTotalSet.length > 1),
+        id: kDiscTotalRowId,
+        key: '碟片总数',
+        value: _formatValues(discTotalSet),
+        multi: discTotalSet.length > 1,
+      ),
       CommonMetadataModel(
-          id: kDateRowId,
-          key: '日期',
-          value: _formatValues(dateSet),
-          multi: dateSet.length > 1),
+        id: kDateRowId,
+        key: '日期',
+        value: _formatValues(dateSet),
+        multi: dateSet.length > 1,
+      ),
       CommonMetadataModel(
-          id: kGenreRowId,
-          key: '流派',
-          value: _formatValues(genreSet),
-          multi: genreSet.length > 1),
+        id: kGenreRowId,
+        key: '流派',
+        value: _formatValues(genreSet),
+        multi: genreSet.length > 1,
+      ),
     ]);
   }
 
   String _formatValues<T>(Set<T?> values) {
     if (values.isEmpty) return '';
 
-    final nonNullValues =
-        values.where((v) => v != null && v.toString().isNotEmpty);
+    final nonNullValues = values.where(
+      (v) => v != null && v.toString().isNotEmpty,
+    );
 
     final parts = <String>[];
     if (nonNullValues.isNotEmpty) {
@@ -280,8 +287,10 @@ class SelectedCommonMetadataIds extends _$SelectedCommonMetadataIds {
         ref.read(lastSelectedCommonMetadataIdProvider.notifier).set(id);
       } else {
         final lastSelectedId = ref.read(lastSelectedCommonMetadataIdProvider);
-        final metadataIds =
-            ref.read(commonMetadataProvider).map((kv) => kv.id).toIList();
+        final metadataIds = ref
+            .read(commonMetadataProvider)
+            .map((kv) => kv.id)
+            .toIList();
         final lastSelectedIndex = metadataIds.indexOf(lastSelectedId);
         final currentIndex = metadataIds.indexOf(id);
         if (lastSelectedIndex != -1 && currentIndex != -1) {

@@ -6,10 +6,7 @@ part 'ext.dart';
 
 @freezed
 abstract class CliArg with _$CliArg {
-  const factory CliArg({
-    required String name,
-    String? value,
-  }) = _CliArg;
+  const factory CliArg({required String name, String? value}) = _CliArg;
 }
 
 @freezed

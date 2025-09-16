@@ -7,7 +7,6 @@ import 'package:flubar/models/extensions/properties_extension.dart';
 import 'package:flubar/models/state/playlist.dart';
 import 'package:flubar/models/state/track.dart';
 import 'package:flubar/ui/view/playlist_view/providers.dart';
-import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:unorm_dart/unorm_dart.dart' as unorm;
 
@@ -53,8 +52,9 @@ class Tracks extends _$Tracks {
       return tracks;
     }
 
-    final sortedTracks =
-        tracks.sorted((a, b) => _compareTracksByProperty(a, b, sortProperty));
+    final sortedTracks = tracks.sorted(
+      (a, b) => _compareTracksByProperty(a, b, sortProperty),
+    );
     return sortOrder == TrackSortOrder.ascending
         ? sortedTracks.toIList()
         : sortedTracks.reversed.toIList();
@@ -73,10 +73,14 @@ class Tracks extends _$Tracks {
         return _compareNullableStrings(aMetadata.album, bMetadata.album);
       case TrackSortProperty.albumArtist:
         return _compareNullableStrings(
-            aMetadata.albumArtist, bMetadata.albumArtist);
+          aMetadata.albumArtist,
+          bMetadata.albumArtist,
+        );
       case TrackSortProperty.trackNumber:
         return _compareNullableInts(
-            aMetadata.trackNumber, bMetadata.trackNumber);
+          aMetadata.trackNumber,
+          bMetadata.trackNumber,
+        );
       case TrackSortProperty.trackTotal:
         return _compareNullableInts(aMetadata.trackTotal, bMetadata.trackTotal);
       case TrackSortProperty.discNumber:
@@ -89,7 +93,9 @@ class Tracks extends _$Tracks {
         return _compareNullableStrings(aMetadata.genre, bMetadata.genre);
       case TrackSortProperty.duration:
         return _compareNullableDoubles(
-            a.properties.duration, b.properties.duration);
+          a.properties.duration,
+          b.properties.duration,
+        );
       case TrackSortProperty.none:
         return 0;
     }

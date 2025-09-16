@@ -18,30 +18,31 @@ class MediaDragWidget extends ConsumerWidget {
             minHeight: constraints.maxHeight,
           ),
           child: DropRegion(
-              hitTestBehavior: HitTestBehavior.translucent,
-              formats: [Formats.fileUri],
-              onDropOver: (event) =>
-                  event.session.allowedOperations.contains(DropOperation.copy)
-                      ? DropOperation.copy
-                      : DropOperation.none,
-              onPerformDrop: (event) async {
-                final enableDrag = ref.read(enableMediaDragProvider);
-                if (!enableDrag) return;
-                ref.read(mediaDragStateProvider.notifier).setDragging(false);
-                final paths = await _getPaths(event);
-                await ref.read(mediaDragStateProvider.notifier).addFiles(paths);
-              },
-              onDropEnter: (_) {
-                final enableDrag = ref.read(enableMediaDragProvider);
-                if (!enableDrag) return;
-                ref.read(mediaDragStateProvider.notifier).setDragging(true);
-              },
-              onDropLeave: (_) {
-                final enableDrag = ref.read(enableMediaDragProvider);
-                if (!enableDrag) return;
-                ref.read(mediaDragStateProvider.notifier).setDragging(false);
-              },
-              child: const _DragIndicator()),
+            hitTestBehavior: HitTestBehavior.translucent,
+            formats: [Formats.fileUri],
+            onDropOver: (event) =>
+                event.session.allowedOperations.contains(DropOperation.copy)
+                ? DropOperation.copy
+                : DropOperation.none,
+            onPerformDrop: (event) async {
+              final enableDrag = ref.read(enableMediaDragProvider);
+              if (!enableDrag) return;
+              ref.read(mediaDragStateProvider.notifier).setDragging(false);
+              final paths = await _getPaths(event);
+              await ref.read(mediaDragStateProvider.notifier).addFiles(paths);
+            },
+            onDropEnter: (_) {
+              final enableDrag = ref.read(enableMediaDragProvider);
+              if (!enableDrag) return;
+              ref.read(mediaDragStateProvider.notifier).setDragging(true);
+            },
+            onDropLeave: (_) {
+              final enableDrag = ref.read(enableMediaDragProvider);
+              if (!enableDrag) return;
+              ref.read(mediaDragStateProvider.notifier).setDragging(false);
+            },
+            child: const _DragIndicator(),
+          ),
         );
       },
     );
@@ -50,9 +51,8 @@ class MediaDragWidget extends ConsumerWidget {
   Future<Iterable<String>> _getPaths(PerformDropEvent event) async {
     final items = event.session.items;
     final paths = (await Future.wait(
-            items.map((e) => e.dataReader!.readValue(Formats.fileUri))))
-        .nonNulls
-        .map((e) => e.toFilePath());
+      items.map((e) => e.dataReader!.readValue(Formats.fileUri)),
+    )).nonNulls.map((e) => e.toFilePath());
     return paths;
   }
 }

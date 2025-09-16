@@ -45,22 +45,24 @@ class _TranscodeDialog extends ConsumerWidget {
             Center(
               child: Column(
                 children: [
-                  Consumer(builder: (context, ref, _) {
-                    final progress = ref.watch(transcodeProgressProvider);
-                    return Column(
-                      children: [
-                        LinearProgressIndicator(value: progress),
-                        const SizedBox(height: 8),
-                        Text('${(progress * 100).toStringAsFixed(2)}%'),
-                      ],
-                    );
-                  }),
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final progress = ref.watch(transcodeProgressProvider);
+                      return Column(
+                        children: [
+                          LinearProgressIndicator(value: progress),
+                          const SizedBox(height: 8),
+                          Text('${(progress * 100).toStringAsFixed(2)}%'),
+                        ],
+                      );
+                    },
+                  ),
                   const SizedBox(height: 8),
                   const Text('正在转码...'),
                 ],
               ),
-            )
-          ]
+            ),
+          ],
         ],
       ),
       actions: [
@@ -79,7 +81,9 @@ class _TranscodeDialog extends ConsumerWidget {
                   if (failedCount != -1) {
                     if (failedCount > 0) {
                       showExceptionSnackbar(
-                          title: '转码操作失败', message: '$failedCount 个文件转码失败');
+                        title: '转码操作失败',
+                        message: '$failedCount 个文件转码失败',
+                      );
                     } else {
                       showSnackbar(title: '转码操作成功', message: '所有文件转码成功');
                     }
@@ -87,8 +91,9 @@ class _TranscodeDialog extends ConsumerWidget {
                   if (context.mounted) Navigator.of(context).pop();
                 },
           autofocus: true,
-          child:
-              transcodeState.isLoading ? const Text('停止') : const Text('开始转码'),
+          child: transcodeState.isLoading
+              ? const Text('停止')
+              : const Text('开始转码'),
         ),
       ],
     );
@@ -106,25 +111,29 @@ class _TranscodeSettings extends StatelessWidget {
         _SettingRow(label: '输出格式', child: _TranscodeFormatSelector()),
         _SettingRow(
           label: '输出位置',
-          child: Row(children: [
-            _OutputDirectorySelector(),
-            SizedBox(width: kSpaceBetweenItems),
-            _OverwriteExistingFilesCheckbox(),
-            SizedBox(width: kSpaceBetweenItems),
-            _DeleteOriginalFilesCheckbox(),
-          ]),
+          child: Row(
+            children: [
+              _OutputDirectorySelector(),
+              SizedBox(width: kSpaceBetweenItems),
+              _OverwriteExistingFilesCheckbox(),
+              SizedBox(width: kSpaceBetweenItems),
+              _DeleteOriginalFilesCheckbox(),
+            ],
+          ),
         ),
         _SettingRow(
           label: '附加选项',
-          child: Row(children: [
-            _ClearMetadataCheckbox(),
-            SizedBox(width: kSpaceBetweenItems),
-            _KeepAudioOnlyCheckbox(),
-            SizedBox(width: kSpaceBetweenItems),
-            _RewriteMetadataCheckbox(),
-            SizedBox(width: kSpaceBetweenItems),
-            _RewriteFrontCoverCheckbox(),
-          ]),
+          child: Row(
+            children: [
+              _ClearMetadataCheckbox(),
+              SizedBox(width: kSpaceBetweenItems),
+              _KeepAudioOnlyCheckbox(),
+              SizedBox(width: kSpaceBetweenItems),
+              _RewriteMetadataCheckbox(),
+              SizedBox(width: kSpaceBetweenItems),
+              _RewriteFrontCoverCheckbox(),
+            ],
+          ),
         ),
         _TranscodeOptionsSelector(),
         _SettingRow(label: '输出文件名模板', child: _TplField()),
@@ -178,11 +187,15 @@ class _TranscodeFormatSelector extends ConsumerWidget {
             onChanged: (value) =>
                 ref.read(transcodeFmtProvider.notifier).setFormat(value!),
             items: TranscodeFormat.values
-                .map((format) => DropdownMenuItem(
-                      value: format,
-                      child: Text(format.displayName,
-                          style: const TextStyle(fontSize: 14)),
-                    ))
+                .map(
+                  (format) => DropdownMenuItem(
+                    value: format,
+                    child: Text(
+                      format.displayName,
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                  ),
+                )
                 .toList(),
           ),
         ),
@@ -237,7 +250,8 @@ class _OutputDirectorySelector extends ConsumerWidget {
             onPressed: () async {
               final outputPath = ref.read(historyProvider).outputPath;
               final selectedDir = await FilePicker.platform.getDirectoryPath(
-                  initialDirectory: await getInitialDirectory(outputPath));
+                initialDirectory: await getInitialDirectory(outputPath),
+              );
               if (selectedDir != null) {
                 final newPath = '${p.dirname(selectedDir)}${p.separator}';
                 ref.read(historyProvider.notifier).updateOutputPath(newPath);
@@ -277,10 +291,15 @@ class _Checkbox extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Consumer(builder: (context, ref, _) {
-          final enabled = !ref.watch(transcodeProvider).isLoading;
-          return Checkbox(value: value, onChanged: enabled ? onChanged : null);
-        }),
+        Consumer(
+          builder: (context, ref, _) {
+            final enabled = !ref.watch(transcodeProvider).isLoading;
+            return Checkbox(
+              value: value,
+              onChanged: enabled ? onChanged : null,
+            );
+          },
+        ),
         Text(label),
       ],
     );
@@ -377,75 +396,78 @@ class _TranscodeOptionsSelector extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final options = ref.watch(transcodeOptsProvider);
     return switch (options) {
-      CopyTranscodeOptions() =>
-        const SizedBox(height: kSettingRowVerticalPadding * 2),
+      CopyTranscodeOptions() => const SizedBox(
+        height: kSettingRowVerticalPadding * 2,
+      ),
       Mp3TranscodeOptions(:final bitrate) => _SettingRow(
-          label: '码率',
-          child: Row(
-            children: [
-              Expanded(
-                child: Slider(
-                  min: 64,
-                  max: 320,
-                  divisions: 256 ~/ 64,
-                  value: bitrate.toDouble(),
-                  onChanged: (value) => ref
-                      .read(transcodeOptsProvider.notifier)
-                      .setMp3Options(bitrate: value.toInt()),
-                ),
+        label: '码率',
+        child: Row(
+          children: [
+            Expanded(
+              child: Slider(
+                min: 64,
+                max: 320,
+                divisions: 256 ~/ 64,
+                value: bitrate.toDouble(),
+                onChanged: (value) => ref
+                    .read(transcodeOptsProvider.notifier)
+                    .setMp3Options(bitrate: value.toInt()),
               ),
-              SizedBox(
-                width: kBitrateDisplayWidth,
-                child: Text('$bitrate kbps'),
-              ),
-            ],
-          ),
-        ),
-      FlacTranscodeOptions(:final compressionLevel) => _SettingRow(
-          label: '压缩级别',
-          child: Row(
-            children: [
-              Expanded(
-                child: Slider(
-                  min: 0,
-                  max: 8,
-                  divisions: 8,
-                  value: compressionLevel.toDouble(),
-                  onChanged: (value) => ref
-                      .read(transcodeOptsProvider.notifier)
-                      .setFlacOptions(compressionLevel: value.toInt()),
-                ),
-              ),
-              SizedBox(
-                width: kCompressionLevelDisplayWidth,
-                child: Text(compressionLevel.toString()),
-              ),
-            ],
-          ),
-        ),
-      WavPackTranscodeOptions() =>
-        const SizedBox(height: kSettingRowVerticalPadding * 2),
-      WavTranscodeOptions(:final encoder) => _SettingRow(
-          label: '编码器',
-          expandChild: false,
-          child: SizedBox(
-            width: kEncoderDisplayWidth,
-            child: DropdownButton(
-              value: encoder,
-              isExpanded: true,
-              onChanged: (value) => ref
-                  .read(transcodeOptsProvider.notifier)
-                  .setWavOptions(encoder: value!),
-              items: FfmpegEncoder.values
-                  .map((encoder) => DropdownMenuItem(
-                        value: encoder,
-                        child: Text(encoder.displayName,
-                            style: const TextStyle(fontSize: 14)),
-                      ))
-                  .toList(),
             ),
+            SizedBox(width: kBitrateDisplayWidth, child: Text('$bitrate kbps')),
+          ],
+        ),
+      ),
+      FlacTranscodeOptions(:final compressionLevel) => _SettingRow(
+        label: '压缩级别',
+        child: Row(
+          children: [
+            Expanded(
+              child: Slider(
+                min: 0,
+                max: 8,
+                divisions: 8,
+                value: compressionLevel.toDouble(),
+                onChanged: (value) => ref
+                    .read(transcodeOptsProvider.notifier)
+                    .setFlacOptions(compressionLevel: value.toInt()),
+              ),
+            ),
+            SizedBox(
+              width: kCompressionLevelDisplayWidth,
+              child: Text(compressionLevel.toString()),
+            ),
+          ],
+        ),
+      ),
+      WavPackTranscodeOptions() => const SizedBox(
+        height: kSettingRowVerticalPadding * 2,
+      ),
+      WavTranscodeOptions(:final encoder) => _SettingRow(
+        label: '编码器',
+        expandChild: false,
+        child: SizedBox(
+          width: kEncoderDisplayWidth,
+          child: DropdownButton(
+            value: encoder,
+            isExpanded: true,
+            onChanged: (value) => ref
+                .read(transcodeOptsProvider.notifier)
+                .setWavOptions(encoder: value!),
+            items: FfmpegEncoder.values
+                .map(
+                  (encoder) => DropdownMenuItem(
+                    value: encoder,
+                    child: Text(
+                      encoder.displayName,
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                  ),
+                )
+                .toList(),
           ),
         ),
+      ),
     };
   }
 }
@@ -470,8 +492,9 @@ class _CommandField extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final commandController =
-        useTextEditingController(text: ref.read(transcodeCmdProvider));
+    final commandController = useTextEditingController(
+      text: ref.read(transcodeCmdProvider),
+    );
 
     ref.listen(transcodeCmdProvider, (previous, next) {
       commandController.value = TextEditingValue(text: next);
@@ -495,16 +518,18 @@ class _TplField extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final tplController =
-        useTextEditingController(text: ref.read(outputFileNameTplProvider));
+    final tplController = useTextEditingController(
+      text: ref.read(outputFileNameTplProvider),
+    );
 
     ref.listen(outputFileNameTplProvider, (previous, next) {
       final currentSelection = tplController.selection;
       tplController.value = TextEditingValue(
         text: next,
         selection: currentSelection.copyWith(
-            baseOffset: math.min(currentSelection.baseOffset, next.length),
-            extentOffset: math.min(currentSelection.extentOffset, next.length)),
+          baseOffset: math.min(currentSelection.baseOffset, next.length),
+          extentOffset: math.min(currentSelection.extentOffset, next.length),
+        ),
       );
     });
 

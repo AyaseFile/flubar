@@ -33,9 +33,10 @@ class EditableTableDialog extends StatelessWidget {
             title: const Text('表格编辑'),
             actions: [
               TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  autofocus: true,
-                  child: const Text('完成')),
+                onPressed: () => Navigator.of(context).pop(),
+                autofocus: true,
+                child: const Text('完成'),
+              ),
             ],
           ),
           body: const EditableTableView(),
@@ -56,11 +57,9 @@ class _EditableTableViewState extends ConsumerState<EditableTableView> {
   @override
   Widget build(BuildContext context) {
     return Card(
-        margin: EdgeInsets.zero,
-        child: Padding(
-          padding: kTableViewPadding,
-          child: _tableBuilder(),
-        ));
+      margin: EdgeInsets.zero,
+      child: Padding(padding: kTableViewPadding, child: _tableBuilder()),
+    );
   }
 
   Widget _tableBuilder() {
@@ -69,13 +68,17 @@ class _EditableTableViewState extends ConsumerState<EditableTableView> {
     return TableView.builder(
       style: TableViewStyle(
         scrollbars: TableViewScrollbarsStyle(
-            vertical: TableViewScrollbarStyle(scrollPadding: false)),
+          vertical: TableViewScrollbarStyle(scrollPadding: false),
+        ),
       ),
       columns: columns,
       rowHeight: kEditableTableRowHeight,
       rowCount: selectedTracks.length,
       headerBuilder: (context, contentBuilder) => _headerBuilder(
-          context, contentBuilder, (column) => columns[column].id),
+        context,
+        contentBuilder,
+        (column) => columns[column].id,
+      ),
       rowBuilder: (context, row, contentBuilder) {
         final track = selectedTracks[row];
         return ProviderScope(
@@ -113,8 +116,9 @@ class _EditableTableViewState extends ConsumerState<EditableTableView> {
         _ => throw UnimplementedError(),
       };
       return InkWell(
-        onTap: () => Navigator.of(context)
-            .push(_createColumnControlsRoute(context, column)),
+        onTap: () => Navigator.of(
+          context,
+        ).push(_createColumnControlsRoute(context, column)),
         child: Align(
           alignment: Alignment.centerLeft,
           child: Padding(
@@ -138,10 +142,13 @@ class _EditableTableViewState extends ConsumerState<EditableTableView> {
       controlCellBuildContext: cellBuildContext,
       columnIndex: columnIndex,
       tableViewChanged: null,
-      onColumnTranslate: (index, translation) => setState(() =>
-          columns[index] = columns[index].copyWith(translation: translation)),
+      onColumnTranslate: (index, translation) => setState(
+        () =>
+            columns[index] = columns[index].copyWith(translation: translation),
+      ),
       onColumnResize: (index, width) => setState(
-          () => columns[index] = columns[index].copyWith(width: width)),
+        () => columns[index] = columns[index].copyWith(width: width),
+      ),
       onColumnMove: (oldIndex, newIndex) =>
           setState(() => columns.insert(newIndex, columns.removeAt(oldIndex))),
     );
@@ -182,20 +189,21 @@ class EditableTrackRow extends ConsumerWidget {
         child: Padding(
           padding: kTableTextPadding,
           child: Padding(
-              padding: kCellTextPadding,
-              child: TextFieldCell(
-                enabled: columnId != kFileNameColumnId,
-                text: text,
-                onSubmitted: columnId == kFileNameColumnId
-                    ? null
-                    : (text) => ref
+            padding: kCellTextPadding,
+            child: TextFieldCell(
+              enabled: columnId != kFileNameColumnId,
+              text: text,
+              onSubmitted: columnId == kFileNameColumnId
+                  ? null
+                  : (text) => ref
                         .read(selectedTracksProvider.notifier)
                         .updateMetadataState(
                           trackId: track.id,
                           columnId: columnId,
                           value: text,
                         ),
-              )),
+            ),
+          ),
         ),
       );
     });
@@ -212,8 +220,9 @@ class TextFieldCell extends HookWidget {
     required this.enabled,
     required this.text,
     this.onSubmitted,
-  }) : assert((enabled && onSubmitted != null) ||
-            (!enabled && onSubmitted == null));
+  }) : assert(
+         (enabled && onSubmitted != null) || (!enabled && onSubmitted == null),
+       );
 
   @override
   Widget build(BuildContext context) {
@@ -222,8 +231,12 @@ class TextFieldCell extends HookWidget {
     );
 
     if (!enabled) {
-      return Text(text,
-          style: textStyle, maxLines: 1, overflow: TextOverflow.ellipsis);
+      return Text(
+        text,
+        style: textStyle,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      );
     }
 
     final ctrl = useTextEditingController(text: text);

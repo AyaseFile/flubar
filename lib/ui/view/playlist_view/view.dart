@@ -30,39 +30,48 @@ class PlaylistCardList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final playlists = ref.watch(playlistsProvider);
     return ContextMenuWidget(
-        menuProvider: (_) => _buildContextMenu(ref),
-        child: ListView.builder(
-          itemCount: playlists.length,
-          itemBuilder: (context, index) {
-            final playlist = playlists[index];
-            return ProviderScope(
-              overrides: [playlistItemProvider.overrideWithValue(playlist)],
-              child: const PlaylistCard(),
-            );
-          },
-        ));
+      menuProvider: (_) => _buildContextMenu(ref),
+      child: ListView.builder(
+        itemCount: playlists.length,
+        itemBuilder: (context, index) {
+          final playlist = playlists[index];
+          return ProviderScope(
+            overrides: [playlistItemProvider.overrideWithValue(playlist)],
+            child: const PlaylistCard(),
+          );
+        },
+      ),
+    );
   }
 
   Menu _buildContextMenu(WidgetRef ref) {
-    return Menu(children: [
-      MenuAction(
-        title: '添加播放列表',
-        image: MenuImage.icon(Icons.add),
-        callback: () async {
-          await ref.read(getDialogProvider.notifier).show(
-                InputDialog(
-                  dialogTitle: '添加播放列表',
-                  onConfirm: (name) {
-                    final id = ref.read(playlistIdProvider.notifier).nextId();
-                    ref.read(playlistsProvider.notifier).addPlaylists([
-                      Playlist(id: id, name: name, tracks: const IList.empty()),
-                    ]);
-                  },
-                ),
-              );
-        },
-      )
-    ]);
+    return Menu(
+      children: [
+        MenuAction(
+          title: '添加播放列表',
+          image: MenuImage.icon(Icons.add),
+          callback: () async {
+            await ref
+                .read(getDialogProvider.notifier)
+                .show(
+                  InputDialog(
+                    dialogTitle: '添加播放列表',
+                    onConfirm: (name) {
+                      final id = ref.read(playlistIdProvider.notifier).nextId();
+                      ref.read(playlistsProvider.notifier).addPlaylists([
+                        Playlist(
+                          id: id,
+                          name: name,
+                          tracks: const IList.empty(),
+                        ),
+                      ]);
+                    },
+                  ),
+                );
+          },
+        ),
+      ],
+    );
   }
 }
 
@@ -73,51 +82,58 @@ class PlaylistCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final playlist = ref.watch(playlistItemProvider);
     final selected = ref.watch(
-        playlistIdProvider.select((state) => state.selectedId == playlist.id));
+      playlistIdProvider.select((state) => state.selectedId == playlist.id),
+    );
     return ContextMenuWidget(
-        menuProvider: (_) => _buildContextMenu(ref, playlist),
-        child: Card(
-          color: selected
-              ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.7)
-              : null,
-          child: ListTile(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            title: Text(playlist.name, overflow: TextOverflow.ellipsis),
-            onTap: () {
-              if (!selected) {
-                ref.read(selectedTrackIdsProvider.notifier).clear();
-              }
-              ref.read(playlistIdProvider.notifier).select(playlist.id);
-            },
+      menuProvider: (_) => _buildContextMenu(ref, playlist),
+      child: Card(
+        color: selected
+            ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.7)
+            : null,
+        child: ListTile(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-        ));
+          title: Text(playlist.name, overflow: TextOverflow.ellipsis),
+          onTap: () {
+            if (!selected) {
+              ref.read(selectedTrackIdsProvider.notifier).clear();
+            }
+            ref.read(playlistIdProvider.notifier).select(playlist.id);
+          },
+        ),
+      ),
+    );
   }
 
   Menu _buildContextMenu(WidgetRef ref, Playlist playlist) {
-    return Menu(children: [
-      if (playlist.id != kDefaultPlaylistId) // 不允许删除默认播放列表
+    return Menu(
+      children: [
+        if (playlist.id != kDefaultPlaylistId) // 不允许删除默认播放列表
+          MenuAction(
+            title: '删除',
+            image: MenuImage.icon(Icons.delete),
+            callback: () =>
+                ref.read(playlistsProvider.notifier).removePlaylist(playlist),
+          ),
         MenuAction(
-          title: '删除',
-          image: MenuImage.icon(Icons.delete),
-          callback: () =>
-              ref.read(playlistsProvider.notifier).removePlaylist(playlist),
+          title: '重命名',
+          image: MenuImage.icon(Icons.edit),
+          callback: () async {
+            await ref
+                .read(getDialogProvider.notifier)
+                .show(
+                  InputDialog(
+                    dialogTitle: '重命名',
+                    initialValue: playlist.name,
+                    onConfirm: (name) => ref
+                        .read(playlistsProvider.notifier)
+                        .updatePlaylist(playlist.copyWith(name: name)),
+                  ),
+                );
+          },
         ),
-      MenuAction(
-        title: '重命名',
-        image: MenuImage.icon(Icons.edit),
-        callback: () async {
-          await ref.read(getDialogProvider.notifier).show(
-                InputDialog(
-                  dialogTitle: '重命名',
-                  initialValue: playlist.name,
-                  onConfirm: (name) => ref
-                      .read(playlistsProvider.notifier)
-                      .updatePlaylist(playlist.copyWith(name: name)),
-                ),
-              );
-        },
-      ),
-    ]);
+      ],
+    );
   }
 }

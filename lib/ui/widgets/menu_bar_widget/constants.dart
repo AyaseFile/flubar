@@ -6,7 +6,7 @@ const kAudioExtensionsList = [
   'aac',
   'ogg',
   'alac',
-  'cue'
+  'cue',
 ];
 
 const kAudioExtensionsSet = {

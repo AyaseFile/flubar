@@ -41,16 +41,17 @@ class CoverDialog extends ConsumerWidget {
               IconButton(
                 onPressed: coverIndex > 0
                     ? () => ref
-                        .read(currentTrackCoverIndexProvider.notifier)
-                        .previous()
+                          .read(currentTrackCoverIndexProvider.notifier)
+                          .previous()
                     : null,
                 icon: const Icon(Icons.arrow_back),
               ),
               const SizedBox(width: 8),
               IconButton(
                 onPressed: coverIndex < selectedCovers.length - 1
-                    ? () =>
-                        ref.read(currentTrackCoverIndexProvider.notifier).next()
+                    ? () => ref
+                          .read(currentTrackCoverIndexProvider.notifier)
+                          .next()
                     : null,
                 icon: const Icon(Icons.arrow_forward),
               ),
@@ -71,7 +72,8 @@ class CoverDialog extends ConsumerWidget {
                         width: 18,
                         height: 18,
                         child: CircularProgressIndicator(),
-                      ))
+                      ),
+                    )
                   : TextButton(
                       onPressed: () async {
                         await ref
@@ -95,27 +97,31 @@ class CoverDialog extends ConsumerWidget {
       return AspectRatio(
         aspectRatio: 1,
         child: Padding(
-            padding: kViewPadding,
-            child: Stack(children: [
+          padding: kViewPadding,
+          child: Stack(
+            children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: switch (trackCover) {
                   TrackCoverModel(updated: false, oldCover: final cover?) ||
-                  TrackCoverModel(updated: true, newCover: final cover?) =>
-                    Image.memory(
-                      cover,
-                      fit: BoxFit.cover,
-                    ),
+                  TrackCoverModel(
+                    updated: true,
+                    newCover: final cover?,
+                  ) => Image.memory(cover, fit: BoxFit.cover),
                   _ => Consumer(
-                      builder: (context, ref, _) => ref
-                              .watch(coverDragStateProvider)
-                          ? const SizedBox.shrink()
-                          : const Center(
-                              child: Icon(Icons.image_not_supported, size: 72)))
+                    builder: (context, ref, _) =>
+                        ref.watch(coverDragStateProvider)
+                        ? const SizedBox.shrink()
+                        : const Center(
+                            child: Icon(Icons.image_not_supported, size: 72),
+                          ),
+                  ),
                 },
               ),
-              const CoverDragWidget()
-            ])),
+              const CoverDragWidget(),
+            ],
+          ),
+        ),
       );
     }
 
@@ -156,14 +162,15 @@ class CoverDialog extends ConsumerWidget {
       children: [
         Expanded(
           child: SingleChildScrollView(
-              child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              buildImage(),
-              const SizedBox(height: 16),
-              buildButtons(),
-            ],
-          )),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                buildImage(),
+                const SizedBox(height: 16),
+                buildButtons(),
+              ],
+            ),
+          ),
         ),
         const SizedBox(width: 16),
         Expanded(
@@ -180,7 +187,9 @@ class CoverDialog extends ConsumerWidget {
                   ),
                   subtitle: Text(
                     _formatSubtitle(
-                        track.metadata.artist, track.metadata.title),
+                      track.metadata.artist,
+                      track.metadata.title,
+                    ),
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(fontSize: 12),
                   ),
@@ -211,45 +220,57 @@ class _CoverSettingsIconButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Builder(builder: (context) {
-      return IconButton(
-        icon: const Icon(Icons.settings),
-        onPressed: !ref.watch(metadataUtilProvider).isLoading
-            ? () {
-                MetadataSettingsIconButton.showSettingsPopupMenu(
-                  context: context,
-                  children: [
-                    ListTile(
-                      title: const Text('仅写入内存'),
-                      trailing: Consumer(builder: (context, ref, _) {
-                        final writeToMemory = ref.watch(metadataSettingsProvider
-                            .select((state) => state.writeToMemoryOnly));
-                        return Checkbox(
-                          value: writeToMemory,
-                          onChanged: (value) => ref
-                              .read(metadataSettingsProvider.notifier)
-                              .updateWriteToMemoryOnly(value!),
-                        );
-                      }),
-                    ),
-                    ListTile(
-                      title: const Text('强制写入元数据'),
-                      trailing: Consumer(builder: (context, ref, _) {
-                        final force = ref.watch(metadataSettingsProvider
-                            .select((state) => state.forceWriteMetadata));
-                        return Checkbox(
-                          value: force,
-                          onChanged: (value) => ref
-                              .read(metadataSettingsProvider.notifier)
-                              .updateForceWriteMetadata(value!),
-                        );
-                      }),
-                    ),
-                  ].map((e) => PopupMenuItem(child: e)).toList(),
-                );
-              }
-            : null,
-      );
-    });
+    return Builder(
+      builder: (context) {
+        return IconButton(
+          icon: const Icon(Icons.settings),
+          onPressed: !ref.watch(metadataUtilProvider).isLoading
+              ? () {
+                  MetadataSettingsIconButton.showSettingsPopupMenu(
+                    context: context,
+                    children: [
+                      ListTile(
+                        title: const Text('仅写入内存'),
+                        trailing: Consumer(
+                          builder: (context, ref, _) {
+                            final writeToMemory = ref.watch(
+                              metadataSettingsProvider.select(
+                                (state) => state.writeToMemoryOnly,
+                              ),
+                            );
+                            return Checkbox(
+                              value: writeToMemory,
+                              onChanged: (value) => ref
+                                  .read(metadataSettingsProvider.notifier)
+                                  .updateWriteToMemoryOnly(value!),
+                            );
+                          },
+                        ),
+                      ),
+                      ListTile(
+                        title: const Text('强制写入元数据'),
+                        trailing: Consumer(
+                          builder: (context, ref, _) {
+                            final force = ref.watch(
+                              metadataSettingsProvider.select(
+                                (state) => state.forceWriteMetadata,
+                              ),
+                            );
+                            return Checkbox(
+                              value: force,
+                              onChanged: (value) => ref
+                                  .read(metadataSettingsProvider.notifier)
+                                  .updateForceWriteMetadata(value!),
+                            );
+                          },
+                        ),
+                      ),
+                    ].map((e) => PopupMenuItem(child: e)).toList(),
+                  );
+                }
+              : null,
+        );
+      },
+    );
   }
 }

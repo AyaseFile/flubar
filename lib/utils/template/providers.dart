@@ -12,6 +12,7 @@ import 'package:flubar/ui/dialogs/rename_dialog/providers.dart';
 import 'package:flubar/ui/view/playlist_view/providers.dart';
 import 'package:flubar/utils/template/template.dart';
 import 'package:path/path.dart' as p;
+import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'providers.g.dart';
@@ -36,8 +37,9 @@ class TplUtil extends _$TplUtil with IsolateMixin<(String, String)> {
         }
       }
     };
-    return TemplateProcessor(ref
-        .watch(metadataSettingsProvider.select((state) => state.fileNameTpl)));
+    return TemplateProcessor(
+      ref.watch(metadataSettingsProvider.select((state) => state.fileNameTpl)),
+    );
   }
 
   void setTpl(String tpl) {
@@ -45,8 +47,9 @@ class TplUtil extends _$TplUtil with IsolateMixin<(String, String)> {
   }
 
   void resetTpl() {
-    state = TemplateProcessor(ref
-        .read(metadataSettingsProvider.select((state) => state.fileNameTpl)));
+    state = TemplateProcessor(
+      ref.read(metadataSettingsProvider.select((state) => state.fileNameTpl)),
+    );
   }
 
   @override
@@ -70,8 +73,9 @@ class TplUtil extends _$TplUtil with IsolateMixin<(String, String)> {
   void init() {}
 
   @override
-  void onCancellation(CancelException e) => renameTalker
-      .info('重命名操作已取消.${e.reason != null ? ' 原因: ${e.reason}' : ''}');
+  void onCancellation(CancelException e) => renameTalker.info(
+    '重命名操作已取消.${e.reason != null ? ' 原因: ${e.reason}' : ''}',
+  );
 
   @override
   void onCompletion(Duration duration) {
@@ -86,7 +90,8 @@ class TplUtil extends _$TplUtil with IsolateMixin<(String, String)> {
         .read(playlistsProvider.notifier)
         .updateTracks(playlistId, updatedTracks);
     renameTalker.info(
-        '成功重命名 ${updatedTracks.length}/${_newTracks.length} 个文件. 耗时: $duration');
+      '成功重命名 ${updatedTracks.length}/${_newTracks.length} 个文件. 耗时: $duration',
+    );
     _newTracks.clear();
   }
 

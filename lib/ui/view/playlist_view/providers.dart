@@ -13,11 +13,12 @@ part 'providers.g.dart';
 class Playlists extends _$Playlists {
   @override
   IList<Playlist> build() => IList([
-        Playlist(
-            id: kDefaultPlaylistId,
-            name: kDefaultPlaylistName,
-            tracks: const IList.empty())
-      ]);
+    Playlist(
+      id: kDefaultPlaylistId,
+      name: kDefaultPlaylistName,
+      tracks: const IList.empty(),
+    ),
+  ]);
 
   void addPlaylists(Iterable<Playlist> playlists) {
     state = state.addAll(playlists);
@@ -57,7 +58,8 @@ class Playlists extends _$Playlists {
     state = state.map((p) {
       if (p.id == id) {
         return p.copyWith(
-            tracks: p.tracks.removeWhere((t) => trackIds.contains(t.id)));
+          tracks: p.tracks.removeWhere((t) => trackIds.contains(t.id)),
+        );
       }
       return p;
     }).toIList();
@@ -67,8 +69,9 @@ class Playlists extends _$Playlists {
     final updateMap = {for (final track in tracks) track.id: track};
     state = state.map((p) {
       if (p.id == id) {
-        final updatedTracks =
-            p.tracks.map((t) => updateMap[t.id] ?? t).toIList();
+        final updatedTracks = p.tracks
+            .map((t) => updateMap[t.id] ?? t)
+            .toIList();
         return p.copyWith(tracks: updatedTracks);
       }
       return p;
@@ -92,11 +95,17 @@ class Playlists extends _$Playlists {
 class CurrentPlaylist extends _$CurrentPlaylist {
   @override
   Playlist build() {
-    final id =
-        ref.watch(playlistIdProvider.select((state) => state.selectedId));
-    return ref.watch(playlistsProvider.select((state) => state.firstWhere(
-        (p) => p.id == id,
-        orElse: () => throw StateError('No playlist found with id $id'))));
+    final id = ref.watch(
+      playlistIdProvider.select((state) => state.selectedId),
+    );
+    return ref.watch(
+      playlistsProvider.select(
+        (state) => state.firstWhere(
+          (p) => p.id == id,
+          orElse: () => throw StateError('No playlist found with id $id'),
+        ),
+      ),
+    );
   }
 
   void setSortProperty(TrackSortProperty property) {
@@ -108,9 +117,12 @@ class CurrentPlaylist extends _$CurrentPlaylist {
   }
 
   void resetSortPropertyAndOrder() {
-    _updatePlaylist(state.copyWith(
+    _updatePlaylist(
+      state.copyWith(
         sortProperty: TrackSortProperty.none,
-        sortOrder: TrackSortOrder.ascending));
+        sortOrder: TrackSortOrder.ascending,
+      ),
+    );
   }
 
   void _updatePlaylist(Playlist playlist) {

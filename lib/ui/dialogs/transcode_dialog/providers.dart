@@ -3,6 +3,7 @@ import 'package:flubar/models/ffmpeg/cli.dart';
 import 'package:flubar/models/state/settings.dart';
 import 'package:flubar/utils/transcode/providers.dart';
 import 'package:flubar/utils/transcode/transcode.dart';
+import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'providers.g.dart';
@@ -11,7 +12,8 @@ part 'providers.g.dart';
 class TranscodeFmt extends _$TranscodeFmt {
   @override
   TranscodeFormat build() => ref.watch(
-      transcodeSettingsProvider.select((state) => state.transcodeFormat));
+    transcodeSettingsProvider.select((state) => state.transcodeFormat),
+  );
 
   void setFormat(TranscodeFormat format) {
     state = format;
@@ -28,40 +30,59 @@ class TranscodeOpts extends _$TranscodeOpts {
         return const TranscodeOptions.copy();
       case TranscodeFormat.mp3:
         return TranscodeOptions.mp3(
-            bitrate: ref.watch(
-                transcodeSettingsProvider.select((state) => state.mp3Bitrate)));
+          bitrate: ref.watch(
+            transcodeSettingsProvider.select((state) => state.mp3Bitrate),
+          ),
+        );
       case TranscodeFormat.flac:
         return TranscodeOptions.flac(
-            compressionLevel: ref.watch(transcodeSettingsProvider
-                .select((state) => state.flacCompressionLevel)));
+          compressionLevel: ref.watch(
+            transcodeSettingsProvider.select(
+              (state) => state.flacCompressionLevel,
+            ),
+          ),
+        );
       case TranscodeFormat.wavPack:
         return const TranscodeOptions.wavPack();
       case TranscodeFormat.wav:
         return TranscodeOptions.wav(
-            encoder: ref.watch(
-                transcodeSettingsProvider.select((state) => state.wavEncoder)));
+          encoder: ref.watch(
+            transcodeSettingsProvider.select((state) => state.wavEncoder),
+          ),
+        );
     }
   }
 
   void setMp3Options({int? bitrate}) {
     state = TranscodeOptions.mp3(
-        bitrate: bitrate ??
-            ref.read(
-                transcodeSettingsProvider.select((state) => state.mp3Bitrate)));
+      bitrate:
+          bitrate ??
+          ref.read(
+            transcodeSettingsProvider.select((state) => state.mp3Bitrate),
+          ),
+    );
   }
 
   void setFlacOptions({int? compressionLevel}) {
     state = TranscodeOptions.flac(
-        compressionLevel: compressionLevel ??
-            ref.read(transcodeSettingsProvider
-                .select((state) => state.flacCompressionLevel)));
+      compressionLevel:
+          compressionLevel ??
+          ref.read(
+            transcodeSettingsProvider.select(
+              (state) => state.flacCompressionLevel,
+            ),
+          ),
+    );
   }
 
   void setWavOptions({FfmpegEncoder? encoder}) {
     state = TranscodeOptions.wav(
-        encoder: encoder ??
-            ref.read(
-                transcodeSettingsProvider.select((state) => state.wavEncoder)));
+      encoder:
+          encoder ??
+          ref.read(
+            transcodeSettingsProvider.select((state) => state.wavEncoder),
+          ),
+    );
   }
 
   void setOptions(TranscodeOptions options) {
@@ -74,21 +95,23 @@ class TranscodeCmd extends _$TranscodeCmd {
   @override
   String build() {
     final options = ref.watch(transcodeOptsProvider);
-    final ffmpegPath = ref
-        .watch(transcodeSettingsProvider.select((state) => state.ffmpegPath));
+    final ffmpegPath = ref.watch(
+      transcodeSettingsProvider.select((state) => state.ffmpegPath),
+    );
     final overwrite = ref.watch(overwriteExistingFilesProvider);
     final clearMetadata = ref.watch(clearMetadataProvider);
     final keepAudioOnly = ref.watch(keepAudioOnlyProvider);
-    final command = TranscodeUtil.buildFfmpegCommand(
-      ffmpegPath: ffmpegPath,
-      options: options,
-      overwriteExistingFiles: overwrite,
-      clearMetadata: clearMetadata,
-      keepAudioOnly: keepAudioOnly,
-    ).copyWith(
-      inputs: [FfmpegInput.asset('<input_file>')],
-      outputFilepath: '<output_file>',
-    );
+    final command =
+        TranscodeUtil.buildFfmpegCommand(
+          ffmpegPath: ffmpegPath,
+          options: options,
+          overwriteExistingFiles: overwrite,
+          clearMetadata: clearMetadata,
+          keepAudioOnly: keepAudioOnly,
+        ).copyWith(
+          inputs: [FfmpegInput.asset('<input_file>')],
+          outputFilepath: '<output_file>',
+        );
     return command.toCli().preview();
   }
 }
@@ -164,8 +187,9 @@ class OutputFileNameTpl extends _$OutputFileNameTpl {
 @riverpod
 class RememberTranscodeChoice extends _$RememberTranscodeChoice {
   @override
-  bool build() => ref.watch(transcodeSettingsProvider
-      .select((state) => state.rememberTranscodeChoice));
+  bool build() => ref.watch(
+    transcodeSettingsProvider.select((state) => state.rememberTranscodeChoice),
+  );
 
   void toggle() => state = !state;
 }
@@ -174,7 +198,8 @@ class RememberTranscodeChoice extends _$RememberTranscodeChoice {
 class UseOriginalDirectory extends _$UseOriginalDirectory {
   @override
   bool build() => ref.watch(
-      transcodeSettingsProvider.select((state) => state.useOriginalDirectory));
+    transcodeSettingsProvider.select((state) => state.useOriginalDirectory),
+  );
 
   void toggle() => state = !state;
 }
@@ -182,8 +207,9 @@ class UseOriginalDirectory extends _$UseOriginalDirectory {
 @riverpod
 class OverwriteExistingFiles extends _$OverwriteExistingFiles {
   @override
-  bool build() => ref.watch(transcodeSettingsProvider
-      .select((state) => state.overwriteExistingFiles));
+  bool build() => ref.watch(
+    transcodeSettingsProvider.select((state) => state.overwriteExistingFiles),
+  );
 
   void toggle() => state = !state;
 }
@@ -192,7 +218,8 @@ class OverwriteExistingFiles extends _$OverwriteExistingFiles {
 class DeleteOriginalFiles extends _$DeleteOriginalFiles {
   @override
   bool build() => ref.watch(
-      transcodeSettingsProvider.select((state) => state.deleteOriginalFiles));
+    transcodeSettingsProvider.select((state) => state.deleteOriginalFiles),
+  );
 
   void toggle() => state = !state;
 }
@@ -200,8 +227,9 @@ class DeleteOriginalFiles extends _$DeleteOriginalFiles {
 @riverpod
 class ClearMetadata extends _$ClearMetadata {
   @override
-  bool build() => ref
-      .watch(transcodeSettingsProvider.select((state) => state.clearMetadata));
+  bool build() => ref.watch(
+    transcodeSettingsProvider.select((state) => state.clearMetadata),
+  );
 
   void set(bool value) => value ? enable() : disable();
 
@@ -218,8 +246,9 @@ class ClearMetadata extends _$ClearMetadata {
 @riverpod
 class KeepAudioOnly extends _$KeepAudioOnly {
   @override
-  bool build() => ref
-      .watch(transcodeSettingsProvider.select((state) => state.keepAudioOnly));
+  bool build() => ref.watch(
+    transcodeSettingsProvider.select((state) => state.keepAudioOnly),
+  );
 
   void set(bool value) => value ? enable() : disable();
 
@@ -237,7 +266,8 @@ class KeepAudioOnly extends _$KeepAudioOnly {
 class RewriteMetadata extends _$RewriteMetadata {
   @override
   bool build() => ref.watch(
-      transcodeSettingsProvider.select((state) => state.rewriteMetadata));
+    transcodeSettingsProvider.select((state) => state.rewriteMetadata),
+  );
 
   void set(bool value) => value ? enable() : disable();
 
@@ -255,7 +285,8 @@ class RewriteMetadata extends _$RewriteMetadata {
 class RewriteFrontCover extends _$RewriteFrontCover {
   @override
   bool build() => ref.watch(
-      transcodeSettingsProvider.select((state) => state.rewriteFrontCover));
+    transcodeSettingsProvider.select((state) => state.rewriteFrontCover),
+  );
 
   void set(bool value) => value ? enable() : disable();
 

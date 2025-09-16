@@ -54,37 +54,42 @@ class _EditMetadataDialog extends StatelessWidget {
             actions: [
               const MetadataSettingsIconButton(),
               const SizedBox(width: 8),
-              Consumer(builder: (context, ref, _) {
-                return TextButton(
-                  onPressed: !ref.watch(metadataUtilProvider).isLoading
-                      ? () => Navigator.of(context).pop()
-                      : null,
-                  child: const Text('取消'),
-                );
-              }),
+              Consumer(
+                builder: (context, ref, _) {
+                  return TextButton(
+                    onPressed: !ref.watch(metadataUtilProvider).isLoading
+                        ? () => Navigator.of(context).pop()
+                        : null,
+                    child: const Text('取消'),
+                  );
+                },
+              ),
               const SizedBox(width: 8),
-              Consumer(builder: (context, ref, _) {
-                return ref.watch(metadataUtilProvider).isLoading
-                    ? const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(),
-                        ))
-                    : TextButton(
-                        onPressed: () async {
-                          final success = await ref
-                              .read(metadataUtilProvider.notifier)
-                              .writeMetadata();
-                          if (context.mounted && success) {
-                            Navigator.of(context).pop();
-                          }
-                        },
-                        autofocus: true,
-                        child: const Text('保存'),
-                      );
-              })
+              Consumer(
+                builder: (context, ref, _) {
+                  return ref.watch(metadataUtilProvider).isLoading
+                      ? const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(),
+                          ),
+                        )
+                      : TextButton(
+                          onPressed: () async {
+                            final success = await ref
+                                .read(metadataUtilProvider.notifier)
+                                .writeMetadata();
+                            if (context.mounted && success) {
+                              Navigator.of(context).pop();
+                            }
+                          },
+                          autofocus: true,
+                          child: const Text('保存'),
+                        );
+                },
+              ),
             ],
           ),
           body: const _MetadataTableView(),
@@ -99,46 +104,58 @@ class MetadataSettingsIconButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Builder(builder: (context) {
-      return IconButton(
-        icon: const Icon(Icons.settings),
-        onPressed: !ref.watch(metadataUtilProvider).isLoading
-            ? () {
-                showSettingsPopupMenu(
-                  context: context,
-                  children: [
-                    ListTile(
-                      title: const Text('仅写入内存'),
-                      trailing: Consumer(builder: (context, ref, _) {
-                        final writeToMemory = ref.watch(metadataSettingsProvider
-                            .select((state) => state.writeToMemoryOnly));
-                        return Checkbox(
-                          value: writeToMemory,
-                          onChanged: (value) => ref
-                              .read(metadataSettingsProvider.notifier)
-                              .updateWriteToMemoryOnly(value!),
-                        );
-                      }),
-                    ),
-                    ListTile(
-                      title: const Text('强制写入元数据'),
-                      trailing: Consumer(builder: (context, ref, _) {
-                        final force = ref.watch(metadataSettingsProvider
-                            .select((state) => state.forceWriteMetadata));
-                        return Checkbox(
-                          value: force,
-                          onChanged: (value) => ref
-                              .read(metadataSettingsProvider.notifier)
-                              .updateForceWriteMetadata(value!),
-                        );
-                      }),
-                    ),
-                  ].map((e) => PopupMenuItem(child: e)).toList(),
-                );
-              }
-            : null,
-      );
-    });
+    return Builder(
+      builder: (context) {
+        return IconButton(
+          icon: const Icon(Icons.settings),
+          onPressed: !ref.watch(metadataUtilProvider).isLoading
+              ? () {
+                  showSettingsPopupMenu(
+                    context: context,
+                    children: [
+                      ListTile(
+                        title: const Text('仅写入内存'),
+                        trailing: Consumer(
+                          builder: (context, ref, _) {
+                            final writeToMemory = ref.watch(
+                              metadataSettingsProvider.select(
+                                (state) => state.writeToMemoryOnly,
+                              ),
+                            );
+                            return Checkbox(
+                              value: writeToMemory,
+                              onChanged: (value) => ref
+                                  .read(metadataSettingsProvider.notifier)
+                                  .updateWriteToMemoryOnly(value!),
+                            );
+                          },
+                        ),
+                      ),
+                      ListTile(
+                        title: const Text('强制写入元数据'),
+                        trailing: Consumer(
+                          builder: (context, ref, _) {
+                            final force = ref.watch(
+                              metadataSettingsProvider.select(
+                                (state) => state.forceWriteMetadata,
+                              ),
+                            );
+                            return Checkbox(
+                              value: force,
+                              onChanged: (value) => ref
+                                  .read(metadataSettingsProvider.notifier)
+                                  .updateForceWriteMetadata(value!),
+                            );
+                          },
+                        ),
+                      ),
+                    ].map((e) => PopupMenuItem(child: e)).toList(),
+                  );
+                }
+              : null,
+        );
+      },
+    );
   }
 
   static void showSettingsPopupMenu({
@@ -150,16 +167,14 @@ class MetadataSettingsIconButton extends ConsumerWidget {
     final position = RelativeRect.fromRect(
       Rect.fromPoints(
         button.localToGlobal(Offset.zero, ancestor: overlay),
-        button.localToGlobal(button.size.bottomRight(Offset.zero),
-            ancestor: overlay),
+        button.localToGlobal(
+          button.size.bottomRight(Offset.zero),
+          ancestor: overlay,
+        ),
       ),
       Offset.zero & overlay.size,
     );
-    showMenu(
-      context: context,
-      position: position,
-      items: children,
-    );
+    showMenu(context: context, position: position, items: children);
   }
 }
 
@@ -186,7 +201,8 @@ class _MetadataTableView extends ConsumerWidget {
     return TableView.builder(
       style: TableViewStyle(
         scrollbars: TableViewScrollbarsStyle(
-            vertical: TableViewScrollbarStyle(scrollPadding: false)),
+          vertical: TableViewScrollbarStyle(scrollPadding: false),
+        ),
       ),
       columns: kMetadataColumns,
       rowHeight: kRowHeight,
@@ -206,7 +222,9 @@ class _MetadataTableView extends ConsumerWidget {
   }
 
   Widget _headerBuilder(
-      BuildContext context, TableRowContentBuilder contentBuilder) {
+    BuildContext context,
+    TableRowContentBuilder contentBuilder,
+  ) {
     const style = TextStyle(fontWeight: FontWeight.bold);
     return contentBuilder(context, (context, column) {
       final text = switch (column) {
@@ -236,51 +254,60 @@ class _MetadataRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final metadata = ref.watch(commonMetadataItemProvider);
-    final selected = ref.watch(selectedCommonMetadataIdsProvider
-        .select((state) => state.contains(metadata.id)));
+    final selected = ref.watch(
+      selectedCommonMetadataIdsProvider.select(
+        (state) => state.contains(metadata.id),
+      ),
+    );
     return ContextMenuWidget(
-        child: InkWell(
-          onTap: () {
-            final ctrlPressed =
-                Platform.isLinux && HardwareKeyboard.instance.isControlPressed;
-            final metaPressed =
-                Platform.isMacOS && HardwareKeyboard.instance.isMetaPressed;
-            final shiftPressed = HardwareKeyboard.instance.isShiftPressed;
-            ref
-                .read(selectedCommonMetadataIdsProvider.notifier)
-                .handleSelection(metadata.id,
-                    ctrlPressed: ctrlPressed,
-                    metaPressed: metaPressed,
-                    shiftPressed: shiftPressed);
-          },
-          child: Container(
-            color: selected
-                ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)
-                : Colors.transparent,
-            child: contentBuilder(context, (context, column) {
-              final text = switch (column) {
-                kKeyColumnIndex => metadata.key,
-                kValueColumnIndex => metadata.value,
-                _ => throw UnimplementedError(),
-              };
-              return Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: kTableTextPadding,
-                  child: Padding(
-                    padding: kCellTextPadding,
-                    child: Text(text, overflow: TextOverflow.ellipsis),
-                  ),
-                ),
+      child: InkWell(
+        onTap: () {
+          final ctrlPressed =
+              Platform.isLinux && HardwareKeyboard.instance.isControlPressed;
+          final metaPressed =
+              Platform.isMacOS && HardwareKeyboard.instance.isMetaPressed;
+          final shiftPressed = HardwareKeyboard.instance.isShiftPressed;
+          ref
+              .read(selectedCommonMetadataIdsProvider.notifier)
+              .handleSelection(
+                metadata.id,
+                ctrlPressed: ctrlPressed,
+                metaPressed: metaPressed,
+                shiftPressed: shiftPressed,
               );
-            }),
-          ),
+        },
+        child: Container(
+          color: selected
+              ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)
+              : Colors.transparent,
+          child: contentBuilder(context, (context, column) {
+            final text = switch (column) {
+              kKeyColumnIndex => metadata.key,
+              kValueColumnIndex => metadata.value,
+              _ => throw UnimplementedError(),
+            };
+            return Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: kTableTextPadding,
+                child: Padding(
+                  padding: kCellTextPadding,
+                  child: Text(text, overflow: TextOverflow.ellipsis),
+                ),
+              ),
+            );
+          }),
         ),
-        menuProvider: (_) => _buildContextMenu(ref, metadata, selected));
+      ),
+      menuProvider: (_) => _buildContextMenu(ref, metadata, selected),
+    );
   }
 
   Menu _buildContextMenu(
-      WidgetRef ref, CommonMetadataModel metadata, bool selected) {
+    WidgetRef ref,
+    CommonMetadataModel metadata,
+    bool selected,
+  ) {
     if (!selected) {
       ref.read(selectedCommonMetadataIdsProvider.notifier).clear();
       ref.read(selectedCommonMetadataIdsProvider.notifier).toggle(metadata.id);
@@ -294,13 +321,15 @@ class _MetadataRow extends ConsumerWidget {
                 ? '批量编辑'
                 : '编辑', // 元数据是否多值, 或为空, 则显示批量编辑
             image: MenuImage.icon(Icons.edit),
-            callback: () => Get.dialog(InputDialog(
-              dialogTitle: '编辑 ${metadata.key}',
-              initialValue: metadata.value,
-              onConfirm: (value) => ref
-                  .read(commonMetadataProvider.notifier)
-                  .updateCommonValue(value),
-            )),
+            callback: () => Get.dialog(
+              InputDialog(
+                dialogTitle: '编辑 ${metadata.key}',
+                initialValue: metadata.value,
+                onConfirm: (value) => ref
+                    .read(commonMetadataProvider.notifier)
+                    .updateCommonValue(value),
+              ),
+            ),
           ),
         if ((length == 1 && metadata.multi ||
                 (metadata.value.isEmpty && !metadata.multi)) ||
@@ -312,7 +341,8 @@ class _MetadataRow extends ConsumerWidget {
               final ids = ref.read(selectedCommonMetadataIdsProvider);
               final length = ids.length + 1; // 加上文件名列
               var columnWidth = kEditableTableColumnWidth;
-              final currentWidth = Get.width * kEditableTableWidthRatio -
+              final currentWidth =
+                  Get.width * kEditableTableWidthRatio -
                   kDoubleViewPadding.horizontal -
                   kTableViewPadding.horizontal;
               // 计算列宽度
@@ -323,7 +353,7 @@ class _MetadataRow extends ConsumerWidget {
                 columnWidth = calcWidth;
               }
               final columns = [
-                AdvancedColumn(id: kFileNameColumnId, width: columnWidth)
+                AdvancedColumn(id: kFileNameColumnId, width: columnWidth),
               ];
               for (final id in ids) {
                 final columnId = switch (id) {
@@ -344,7 +374,7 @@ class _MetadataRow extends ConsumerWidget {
               Get.dialog(
                 ProviderScope(
                   overrides: [
-                    editableTableColumnsProvider.overrideWithValue(columns)
+                    editableTableColumnsProvider.overrideWithValue(columns),
                   ],
                   child: const EditableTableDialog(),
                 ),
@@ -357,7 +387,7 @@ class _MetadataRow extends ConsumerWidget {
           image: MenuImage.icon(Icons.delete),
           callback: () =>
               ref.read(commonMetadataProvider.notifier).removeCommonValue(),
-        )
+        ),
       ],
     );
   }

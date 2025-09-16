@@ -46,16 +46,20 @@ class _MenuBarWidgetState extends ConsumerState<MenuBarWidget> {
             onPressed: () async {
               final openPath = ref.read(historyProvider).openPath;
               final result = await FilePicker.platform.pickFiles(
-                  allowMultiple: true,
-                  allowedExtensions: kAudioExtensionsList,
-                  initialDirectory: await getInitialDirectory(openPath));
+                allowMultiple: true,
+                allowedExtensions: kAudioExtensionsList,
+                initialDirectory: await getInitialDirectory(openPath),
+              );
               if (result != null) {
                 final newPath =
                     '${p.dirname(result.xFiles.first.path)}${p.separator}';
                 ref.read(historyProvider.notifier).updateOpenPath(newPath);
-                ref.read(mediaDragStateProvider.notifier).addFiles(
-                    result.xFiles.map((e) => e.path),
-                    behavior: DragBehavior.filesOnly);
+                ref
+                    .read(mediaDragStateProvider.notifier)
+                    .addFiles(
+                      result.xFiles.map((e) => e.path),
+                      behavior: DragBehavior.filesOnly,
+                    );
               }
             },
           ),
@@ -64,13 +68,14 @@ class _MenuBarWidgetState extends ConsumerState<MenuBarWidget> {
             onPressed: () async {
               final openPath = ref.read(historyProvider).openPath;
               final result = await FilePicker.platform.getDirectoryPath(
-                  initialDirectory: await getInitialDirectory(openPath));
+                initialDirectory: await getInitialDirectory(openPath),
+              );
               if (result != null) {
                 final newPath = '${p.dirname(result)}${p.separator}';
                 ref.read(historyProvider.notifier).updateOpenPath(newPath);
-                ref
-                    .read(mediaDragStateProvider.notifier)
-                    .addFiles([result], behavior: DragBehavior.recursive);
+                ref.read(mediaDragStateProvider.notifier).addFiles([
+                  result,
+                ], behavior: DragBehavior.recursive);
               }
             },
           ),
@@ -138,16 +143,18 @@ class _MenuBarWidgetState extends ConsumerState<MenuBarWidget> {
           MenuEntry(
             label: '关于',
             onPressed: () => showAboutDialog(
-                context: context,
-                applicationName: kAppName,
-                applicationVersion: kAppVersion),
+              context: context,
+              applicationName: kAppName,
+              applicationVersion: kAppVersion,
+            ),
           ),
         ],
       ),
     ];
     _shortcutsEntry?.dispose();
-    _shortcutsEntry =
-        ShortcutRegistry.of(context).addAll(MenuEntry.shortcuts(entries));
+    _shortcutsEntry = ShortcutRegistry.of(
+      context,
+    ).addAll(MenuEntry.shortcuts(entries));
     return entries;
   }
 }

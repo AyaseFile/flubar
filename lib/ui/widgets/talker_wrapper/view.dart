@@ -15,10 +15,14 @@ class TalkerWrapper extends StatelessWidget {
       listener: (data) {
         if (data is TalkerException) {
           showExceptionSnackbar(
-              title: '异常', message: _mapErrorMessage(data.displayException));
+            title: '异常',
+            message: _mapErrorMessage(data.displayException),
+          );
         } else if (data is TalkerError) {
           showExceptionSnackbar(
-              title: '错误', message: _mapErrorMessage(data.displayError));
+            title: '错误',
+            message: _mapErrorMessage(data.displayError),
+          );
         }
       },
       child: child,

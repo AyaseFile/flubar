@@ -19,7 +19,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'providers.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class EnableMediaDrag extends _$EnableMediaDrag {
   @override
   bool build() => true;
@@ -33,28 +33,30 @@ class EnableMediaDrag extends _$EnableMediaDrag {
   }
 }
 
-enum DragBehavior {
-  filesOnly,
-  recursive,
-}
+enum DragBehavior { filesOnly, recursive }
 
 @riverpod
 class MediaDragState extends _$MediaDragState {
   @override
   bool build() => false;
 
-  Future<void> addFiles(Iterable<String> paths,
-      {DragBehavior behavior = DragBehavior.recursive}) async {
+  Future<void> addFiles(
+    Iterable<String> paths, {
+    DragBehavior behavior = DragBehavior.recursive,
+  }) async {
     final id = ref.read(playlistIdProvider).selectedId;
     final maxTrackIdNotifier = ref.read(maxTrackIdProvider.notifier);
     final playlistsNotifier = ref.read(playlistsProvider.notifier);
 
     final filePaths = await switch (behavior) {
       DragBehavior.filesOnly => Future.value(paths),
-      DragBehavior.recursive => Future.wait(paths.map((path) async =>
-          await FileSystemEntity.isDirectory(path)
+      DragBehavior.recursive => Future.wait(
+        paths.map(
+          (path) async => await FileSystemEntity.isDirectory(path)
               ? await _getMediaFiles(path)
-              : [path])).then((lists) => lists.expand((x) => x)),
+              : [path],
+        ),
+      ).then((lists) => lists.expand((x) => x)),
     };
 
     var failed = 0;
@@ -67,7 +69,8 @@ class MediaDragState extends _$MediaDragState {
             return cueTracks.map((e) {
               final (cueAudio, metadata, properties) = e;
               globalTalker.debug(
-                  '文件: $cueAudio, 元数据: ${metadata.toJson()}, 属性: ${properties.toJson()}');
+                '文件: $cueAudio, 元数据: ${metadata.toJson()}, 属性: ${properties.toJson()}',
+              );
               return Track(
                 id: maxTrackIdNotifier.nextId(),
                 path: cueAudio,
@@ -78,14 +81,15 @@ class MediaDragState extends _$MediaDragState {
           } else {
             final (metadata, properties) = await readFile(file: path);
             globalTalker.debug(
-                '文件: $path, 元数据: ${metadata.toJson()}, 属性: ${properties.toJson()}');
+              '文件: $path, 元数据: ${metadata.toJson()}, 属性: ${properties.toJson()}',
+            );
             return [
               Track(
                 id: maxTrackIdNotifier.nextId(),
                 path: path,
                 metadata: metadata,
                 properties: properties,
-              )
+              ),
             ];
           }
         } catch (e) {
@@ -97,7 +101,7 @@ class MediaDragState extends _$MediaDragState {
               metadata: const Metadata(),
               properties: const Properties(),
               path: path,
-            )
+            ),
           ];
         }
       }),
@@ -108,30 +112,34 @@ class MediaDragState extends _$MediaDragState {
     final cueAsPlaylist = ref.read(scanSettingsProvider).cueAsPlaylist;
     if (cueAsPlaylist) {
       final (audioTracks, cueTracksByPath) = tracks
-          .fold<(List<Track>, Map<String, List<Track>>)>(([], {}),
-              (acc, track) {
-        final (audioList, cueMap) = acc;
-        if (track.properties.isCue()) {
-          (cueMap[track.path] ??= []).add(track);
-        } else {
-          audioList.add(track);
-        }
-        return (audioList, cueMap);
-      });
+          .fold<(List<Track>, Map<String, List<Track>>)>(([], {}), (
+            acc,
+            track,
+          ) {
+            final (audioList, cueMap) = acc;
+            if (track.properties.isCue()) {
+              (cueMap[track.path] ??= []).add(track);
+            } else {
+              audioList.add(track);
+            }
+            return (audioList, cueMap);
+          });
 
       if (audioTracks.isNotEmpty) {
         playlistsNotifier.addTracks(id, audioTracks);
       }
 
       if (cueTracksByPath.isNotEmpty) {
-        playlistsNotifier.addPlaylists(cueTracksByPath.entries.map((entry) {
-          final cueTracks = entry.value;
-          return Playlist(
-            id: maxTrackIdNotifier.nextId(),
-            name: cueTracks.first.metadata.album ?? '未知专辑',
-            tracks: cueTracks.toIList(),
-          );
-        }));
+        playlistsNotifier.addPlaylists(
+          cueTracksByPath.entries.map((entry) {
+            final cueTracks = entry.value;
+            return Playlist(
+              id: maxTrackIdNotifier.nextId(),
+              name: cueTracks.first.metadata.album ?? '未知专辑',
+              tracks: cueTracks.toIList(),
+            );
+          }),
+        );
       }
     } else {
       playlistsNotifier.addTracks(id, tracks);

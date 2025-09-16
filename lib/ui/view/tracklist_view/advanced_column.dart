@@ -47,9 +47,6 @@ class AdvancedColumn extends TableColumn {
   }
 
   AdvancedColumnState toState() {
-    return AdvancedColumnState(
-      id: id,
-      width: width,
-    );
+    return AdvancedColumnState(id: id, width: width);
   }
 }

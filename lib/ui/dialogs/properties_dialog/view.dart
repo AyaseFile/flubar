@@ -56,7 +56,8 @@ class _PropertiesTableView extends ConsumerWidget {
     return TableView.builder(
       style: TableViewStyle(
         scrollbars: TableViewScrollbarsStyle(
-            vertical: TableViewScrollbarStyle(scrollPadding: false)),
+          vertical: TableViewScrollbarStyle(scrollPadding: false),
+        ),
       ),
       columns: kPropertiesColumns,
       rowHeight: kRowHeight,
@@ -68,7 +69,7 @@ class _PropertiesTableView extends ConsumerWidget {
           key: ValueKey(metadata.id),
           child: ProviderScope(
             overrides: [
-              commonPropertiesItemProvider.overrideWithValue(metadata)
+              commonPropertiesItemProvider.overrideWithValue(metadata),
             ],
             child: PropertiesRow(contentBuilder: contentBuilder),
           ),
@@ -78,7 +79,9 @@ class _PropertiesTableView extends ConsumerWidget {
   }
 
   Widget _headerBuilder(
-      BuildContext context, TableRowContentBuilder contentBuilder) {
+    BuildContext context,
+    TableRowContentBuilder contentBuilder,
+  ) {
     const style = TextStyle(fontWeight: FontWeight.bold);
     return contentBuilder(context, (context, column) {
       final text = switch (column) {

@@ -39,9 +39,8 @@ enum FfmpegEncoder {
 
 @freezed
 abstract class GeneralSettingsModel with _$GeneralSettingsModel {
-  const factory GeneralSettingsModel({
-    @Default(_S.kDarkMode) bool darkMode,
-  }) = _GeneralSettings;
+  const factory GeneralSettingsModel({@Default(_S.kDarkMode) bool darkMode}) =
+      _GeneralSettings;
 
   factory GeneralSettingsModel.fromJson(Map<String, dynamic> json) =>
       _$GeneralSettingsModelFromJson(json);

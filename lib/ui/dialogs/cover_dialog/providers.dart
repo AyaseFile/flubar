@@ -28,8 +28,10 @@ class GroupedTrackCover extends _$GroupedTrackCover with TrackCoverMixin {
       coverMap.putIfAbsent(existingKey, () => []).add(track);
     }
     return IList(
-      coverMap.entries.map((entry) =>
-          TrackCoverModel(oldCover: entry.key, tracks: entry.value.toIList())),
+      coverMap.entries.map(
+        (entry) =>
+            TrackCoverModel(oldCover: entry.key, tracks: entry.value.toIList()),
+      ),
     );
   }
 }
@@ -43,7 +45,7 @@ class BatchedTrackCover extends _$BatchedTrackCover with TrackCoverMixin {
   }
 }
 
-mixin TrackCoverMixin on AutoDisposeNotifier<IList<TrackCoverModel>> {
+mixin TrackCoverMixin on $Notifier<IList<TrackCoverModel>> {
   void useOldCover() {
     final index = ref.read(currentTrackCoverIndexProvider);
     state = state.map((e) {

@@ -32,21 +32,9 @@ class DefaultSettings {
       id: kTrackNumberColumnId,
       width: kTrackNumberColumnWidth,
     ),
-    AdvancedColumnState(
-      id: kTrackTitleColumnId,
-      width: kTrackTitleColumnWidth,
-    ),
-    AdvancedColumnState(
-      id: kArtistNameColumnId,
-      width: kArtistNameColumnWidth,
-    ),
-    AdvancedColumnState(
-      id: kAlbumColumnId,
-      width: kAlbumColumnWidth,
-    ),
-    AdvancedColumnState(
-      id: kDurationColumnId,
-      width: kDurationColumnWidth,
-    ),
+    AdvancedColumnState(id: kTrackTitleColumnId, width: kTrackTitleColumnWidth),
+    AdvancedColumnState(id: kArtistNameColumnId, width: kArtistNameColumnWidth),
+    AdvancedColumnState(id: kAlbumColumnId, width: kAlbumColumnWidth),
+    AdvancedColumnState(id: kDurationColumnId, width: kDurationColumnWidth),
   ];
 }

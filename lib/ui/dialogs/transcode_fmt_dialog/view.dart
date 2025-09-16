@@ -32,19 +32,21 @@ class TranscodeFormatDialog extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(),
           child: const Text('取消'),
         ),
-        Consumer(builder: (context, ref, _) {
-          return TextButton(
-            onPressed: () {
-              final fmt = ref.read(selectionProvider);
-              ref
-                  .read(transcodeSettingsProvider.notifier)
-                  .updateTranscodeFormat(fmt);
-              Navigator.of(context).pop();
-            },
-            autofocus: true,
-            child: const Text('确定'),
-          );
-        }),
+        Consumer(
+          builder: (context, ref, _) {
+            return TextButton(
+              onPressed: () {
+                final fmt = ref.read(selectionProvider);
+                ref
+                    .read(transcodeSettingsProvider.notifier)
+                    .updateTranscodeFormat(fmt);
+                Navigator.of(context).pop();
+              },
+              autofocus: true,
+              child: const Text('确定'),
+            );
+          },
+        ),
       ],
     );
   }
@@ -56,22 +58,23 @@ class _SelectionItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final option = ref.watch(selectionItemProvider);
-    final selected =
-        ref.watch(selectionProvider.select((state) => state == option));
+    final selected = ref.watch(
+      selectionProvider.select((state) => state == option),
+    );
     return ListTile(
       title: Text(option.displayName),
       contentPadding: EdgeInsets.zero,
-      leading: Consumer(builder: (context, ref, _) {
-        final groupValue = ref.watch(selectionProvider);
-        return RadioGroup(
-          groupValue: groupValue,
-          onChanged: (value) =>
-              ref.read(selectionProvider.notifier).select(value!),
-          child: Radio(
-            value: option,
-          ),
-        );
-      }),
+      leading: Consumer(
+        builder: (context, ref, _) {
+          final groupValue = ref.watch(selectionProvider);
+          return RadioGroup(
+            groupValue: groupValue,
+            onChanged: (value) =>
+                ref.read(selectionProvider.notifier).select(value!),
+            child: Radio(value: option),
+          );
+        },
+      ),
       selected: selected,
     );
   }

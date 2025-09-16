@@ -38,8 +38,9 @@ mixin IsolateMixin<T> {
     final chunks = _buildChunks(data);
 
     var processedCount = 0;
-    final futures = chunks.map((chunk) =>
-        Isolate.spawn(isolateTask!, [_receivePort!.sendPort, chunk]));
+    final futures = chunks.map(
+      (chunk) => Isolate.spawn(isolateTask!, [_receivePort!.sendPort, chunk]),
+    );
     final startTimestamp = DateTime.now();
     final isolates = await Future.wait(futures);
 
