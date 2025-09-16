@@ -1,7 +1,5 @@
-import 'package:ffmpeg_cli/ffmpeg_cli.dart';
 import 'package:flubar/app/settings/providers.dart';
-import 'package:flubar/models/extensions/cli_command.dart';
-import 'package:flubar/models/extensions/ffmpeg_command.dart';
+import 'package:flubar/models/ffmpeg/cli.dart';
 import 'package:flubar/models/state/settings.dart';
 import 'package:flubar/utils/transcode/providers.dart';
 import 'package:flubar/utils/transcode/transcode.dart';

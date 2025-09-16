@@ -2,13 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 
-import 'package:ffmpeg_cli/ffmpeg_cli.dart';
 import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/app/talker.dart';
 import 'package:flubar/models/cancel_token/cancel_token.dart';
 import 'package:flubar/models/exceptions/ffmpeg_exception.dart';
-import 'package:flubar/models/extensions/ffmpeg_command.dart';
 import 'package:flubar/models/extensions/properties_extension.dart';
+import 'package:flubar/models/ffmpeg/cli.dart';
 import 'package:flubar/models/isolate/mixin.dart';
 import 'package:flubar/models/state/track.dart';
 import 'package:flubar/rust/api/lofty.dart';
