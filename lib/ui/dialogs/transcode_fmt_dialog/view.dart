@@ -63,11 +63,13 @@ class _SelectionItem extends ConsumerWidget {
       contentPadding: EdgeInsets.zero,
       leading: Consumer(builder: (context, ref, _) {
         final groupValue = ref.watch(selectionProvider);
-        return Radio(
-          value: option,
+        return RadioGroup(
           groupValue: groupValue,
           onChanged: (value) =>
               ref.read(selectionProvider.notifier).select(value!),
+          child: Radio(
+            value: option,
+          ),
         );
       }),
       selected: selected,

@@ -63,11 +63,13 @@ class _EncoderItem extends ConsumerWidget {
       contentPadding: EdgeInsets.zero,
       leading: Consumer(builder: (context, ref, _) {
         final groupValue = ref.watch(encoderSelectionProvider);
-        return Radio(
-          value: encoder,
+        return RadioGroup(
           groupValue: groupValue,
           onChanged: (value) =>
               ref.read(encoderSelectionProvider.notifier).select(value!),
+          child: Radio(
+            value: encoder,
+          ),
         );
       }),
       selected: selected,
