@@ -20,6 +20,7 @@ class Settings extends _$Settings {
   late final Box _box;
 
   @override
+  // ignore: only_use_keep_alive_inside_keep_alive
   void build() => _box = ref.read(settingsBoxProvider);
 
   String getJson(String key) {
@@ -299,6 +300,7 @@ WindowSettingsModel windowSettingsLoaded(Ref ref) => throw UnimplementedError();
 @Riverpod(keepAlive: true)
 class WindowSettings extends _$WindowSettings {
   @override
+  // ignore: only_use_keep_alive_inside_keep_alive
   WindowSettingsModel build() => ref.read(windowSettingsLoadedProvider);
 
   void updateWindowSize(Size size) {

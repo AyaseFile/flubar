@@ -13,7 +13,7 @@ import 'constants.dart';
 
 part 'providers.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class SelectedTracks extends _$SelectedTracks {
   @override
   IList<Track> build() {
