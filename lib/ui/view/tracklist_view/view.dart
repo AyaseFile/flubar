@@ -110,15 +110,26 @@ class _TrackTableViewState extends ConsumerState<TrackTableView> {
             contentBuilder,
             (column) => columns[column].id,
           ),
+          rowReorder: TableRowReorder(
+            onReorder: (oldIndex, newIndex) {
+              final id = ref.read(playlistIdProvider).selectedId;
+              ref
+                  .read(playlistsProvider.notifier)
+                  .reorderTracks(id, oldIndex, newIndex);
+            },
+          ),
           rowBuilder: (context, row, contentBuilder) {
             final track = tracks[row];
             return KeyedSubtree(
               key: ValueKey(track.id),
-              child: ProviderScope(
-                overrides: [trackItemProvider.overrideWithValue(track)],
-                child: TrackRow(
-                  contentBuilder: contentBuilder,
-                  getColumnId: (column) => columns[column].id,
+              child: ReorderableDragStartListener(
+                index: row,
+                child: ProviderScope(
+                  overrides: [trackItemProvider.overrideWithValue(track)],
+                  child: TrackRow(
+                    contentBuilder: contentBuilder,
+                    getColumnId: (column) => columns[column].id,
+                  ),
                 ),
               ),
             );

@@ -83,6 +83,7 @@ class Playlists extends _$Playlists {
       if (p.id == id) {
         final tracks = p.tracks;
         final track = tracks[oldIndex];
+        newIndex = newIndex > oldIndex ? newIndex - 1 : newIndex;
         final newTracks = tracks.removeAt(oldIndex).insert(newIndex, track);
         return p.copyWith(tracks: newTracks);
       }
