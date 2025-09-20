@@ -9,6 +9,7 @@ import 'package:flubar/ui/dialogs/transcode_fmt_dialog/view.dart';
 import 'package:flubar/ui/dialogs/wav_encoder_dialog/view.dart';
 import 'package:flubar/ui/widgets/setting_tile/view.dart';
 import 'package:flubar/utils/template/providers.dart';
+import 'package:flubar/utils/transcode/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart' hide SettingsTile;
 import 'package:get/get.dart';
@@ -207,9 +208,9 @@ class _SettingsListView extends StatelessWidget {
               onPressed: (ref, _) => Get.dialog(
                 SliderDialog(
                   title: 'MP3 比特率',
-                  min: 64,
-                  max: 320,
-                  divisions: 256 ~/ 64,
+                  min: kMp3BitrateMin.toDouble(),
+                  max: kMp3BitrateMax.toDouble(),
+                  divisions: kMp3BitrateDivisions,
                   initialValue: ref.read(
                     transcodeSettingsProvider.select(
                       (state) => state.mp3Bitrate,
@@ -235,8 +236,8 @@ class _SettingsListView extends StatelessWidget {
                 SliderDialog(
                   title: 'FLAC 压缩等级',
                   min: 0,
-                  max: 8,
-                  divisions: 8,
+                  max: kFlacCompressionLevelMax.toDouble(),
+                  divisions: kFlacCompressionLevelMax,
                   initialValue: ref.read(
                     transcodeSettingsProvider.select(
                       (state) => state.flacCompressionLevel,

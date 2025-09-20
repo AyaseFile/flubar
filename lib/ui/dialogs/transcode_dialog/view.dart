@@ -5,6 +5,7 @@ import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/models/state/settings.dart';
 import 'package:flubar/ui/dialogs/ratio_dialog/view.dart';
 import 'package:flubar/ui/snackbar/view.dart';
+import 'package:flubar/utils/transcode/constants.dart';
 import 'package:flubar/utils/transcode/transcode.dart';
 import 'package:flubar/utils/warnings/providers.dart';
 import 'package:flutter/material.dart';
@@ -405,9 +406,9 @@ class _TranscodeOptionsSelector extends ConsumerWidget {
           children: [
             Expanded(
               child: Slider(
-                min: 64,
-                max: 320,
-                divisions: 256 ~/ 64,
+                min: kMp3BitrateMin.toDouble(),
+                max: kMp3BitrateMax.toDouble(),
+                divisions: kMp3BitrateDivisions,
                 value: bitrate.toDouble(),
                 onChanged: (value) => ref
                     .read(transcodeOptsProvider.notifier)
@@ -425,8 +426,8 @@ class _TranscodeOptionsSelector extends ConsumerWidget {
             Expanded(
               child: Slider(
                 min: 0,
-                max: 8,
-                divisions: 8,
+                max: kFlacCompressionLevelMax.toDouble(),
+                divisions: kFlacCompressionLevelMax,
                 value: compressionLevel.toDouble(),
                 onChanged: (value) => ref
                     .read(transcodeOptsProvider.notifier)
