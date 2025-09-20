@@ -24,7 +24,7 @@ PODS:
     - FlutterMacOS
   - super_native_extensions (0.0.1):
     - FlutterMacOS
-  - window_manager (0.2.0):
+  - window_manager (0.5.0):
     - FlutterMacOS
   - window_size (0.0.2):
     - FlutterMacOS
@@ -77,20 +77,20 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   audio_session: 728ae3823d914f809c485d390274861a24b0904e
-  device_info_plus: ce1b7762849d3ec103d0e0517299f2db7ad60720
+  device_info_plus: 1b14eed9bf95428983aed283a8d51cce3d8c4215
   file_picker: e716a70a9fe5fd9e09ebc922d7541464289443af
-  FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
+  FlutterMacOS: d0db08ddef1a9af05a5ec4b724367152bb0500b1
   irondash_engine_context: da62996ee25616d2f01bbeb85dc115d813359478
   just_audio: a42c63806f16995daf5b219ae1d679deb76e6a79
   media_kit_native_event_loop: d20622d35dd6d06fe71223976bd70a2bcf595dce
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
-  rust_lib_flubar: 932c00d07602a1c4a390a2d6e86255f5bb8c9aa0
+  rust_lib_flubar: 72d7432d931bac6102840b3d465c66c5ceaf9f23
   screen_retriever_macos: 776e0fa5d42c6163d2bf772d22478df4b302b161
   share_plus: 1fa619de8392a4398bfaf176d441853922614e89
   super_native_extensions: 85efee3a7495b46b04befcfc86ed12069264ebf3
-  window_manager: 3a1844359a6295ab1e47659b1a777e36773cd6e8
+  window_manager: e25faf20d88283a0d46e7b1a759d07261ca27575
   window_size: 339dafa0b27a95a62a843042038fa6c3c48de195
 
-PODFILE CHECKSUM: 236401fc2c932af29a9fcf0e97baeeb2d750d367
+PODFILE CHECKSUM: f0c21717cb7ee9112f915044c74bfceb5b12e02a
 
 COCOAPODS: 1.16.2
