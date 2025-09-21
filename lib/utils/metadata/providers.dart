@@ -3,8 +3,7 @@ import 'package:flubar/app/talker.dart';
 import 'package:flubar/models/extensions/metadata_extension.dart';
 import 'package:flubar/models/extensions/properties_extension.dart';
 import 'package:flubar/models/state/track.dart';
-import 'package:flubar/rust/api/id3.dart';
-import 'package:flubar/rust/api/lofty.dart';
+import 'package:flubar/rust/api/lofty.dart' as lofty;
 import 'package:flubar/ui/dialogs/cover_dialog/providers.dart';
 import 'package:flubar/ui/dialogs/metadata_dialog/providers.dart';
 import 'package:flubar/ui/snackbar/view.dart';
@@ -44,24 +43,19 @@ class MetadataUtil extends _$MetadataUtil {
           return;
         }
         try {
-          await loftyWriteMetadata(
+          await lofty.writeMetadata(
             metadata: t.metadata,
             file: t.path,
             force: force,
           );
           updatedTracks.add(t);
-        } catch (loftyError) {
+        } catch (e) {
+          failed++;
           if (force) {
-            failed++;
-            globalTalker.error('无法强制更新元数据: ${t.path}', loftyError);
+            globalTalker.error('无法强制更新元数据: ${t.path}', e);
             return;
-          }
-          try {
-            await id3WriteMetadata(metadata: t.metadata, file: t.path);
-            updatedTracks.add(t);
-          } catch (id3Error) {
-            failed++;
-            globalTalker.error('无法更新元数据: ${t.path}', [loftyError, id3Error]);
+          } else {
+            globalTalker.error('无法更新元数据: ${t.path}', e);
           }
         }
       }),
@@ -123,24 +117,19 @@ class MetadataUtil extends _$MetadataUtil {
               return;
             }
             try {
-              await loftyWritePicture(
+              await lofty.writeFrontCover(
                 file: t.path,
-                picture: frontCover,
+                cover: frontCover,
                 force: force,
               );
               updatedTracks.add(t.copyWith(metadata: metadata));
-            } catch (loftyError) {
+            } catch (e) {
+              failed++;
               if (force) {
-                failed++;
-                globalTalker.error('无法强制更新封面: ${t.path}', loftyError);
+                globalTalker.error('无法强制更新封面: ${t.path}', e);
                 return;
-              }
-              try {
-                await id3WritePicture(file: t.path, picture: frontCover);
-                updatedTracks.add(t.copyWith(metadata: metadata));
-              } catch (id3Error) {
-                failed++;
-                globalTalker.error('无法更新封面: ${t.path}', [loftyError, id3Error]);
+              } else {
+                globalTalker.error('无法更新封面: ${t.path}', e);
               }
             }
           }),

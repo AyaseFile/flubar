@@ -76,16 +76,16 @@ class TranscodeUtil extends _$TranscodeUtil
             }
             final metadata = track.metadata;
             if (rewriteMetadata) {
-              await loftyWriteMetadata(
+              await writeMetadata(
                 file: outputFile,
                 metadata: metadata,
                 force: true,
               ); // 清除了元数据, 需要强制写入
             }
             if (rewriteFrontCover) {
-              await loftyWritePicture(
+              await writeFrontCover(
                 file: outputFile,
-                picture: metadata.frontCover,
+                cover: metadata.frontCover,
                 force: true,
               );
             }

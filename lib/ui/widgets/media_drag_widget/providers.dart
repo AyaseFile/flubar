@@ -8,7 +8,7 @@ import 'package:flubar/models/extensions/properties_extension.dart';
 import 'package:flubar/models/state/playlist.dart';
 import 'package:flubar/models/state/track.dart';
 import 'package:flubar/rust/api/cue.dart';
-import 'package:flubar/rust/api/ffmpeg.dart';
+import 'package:flubar/rust/api/lofty.dart';
 import 'package:flubar/rust/api/models.dart';
 import 'package:flubar/ui/snackbar/view.dart';
 import 'package:flubar/ui/view/playlist_view/providers.dart';
@@ -79,7 +79,7 @@ class MediaDragState extends _$MediaDragState {
               );
             }).toList();
           } else {
-            final (metadata, properties) = await readFile(file: path);
+            final (metadata, properties) = await readHybrid(file: path);
             globalTalker.debug(
               '文件: $path, 元数据: ${metadata.toJson()}, 属性: ${properties.toJson()}',
             );
