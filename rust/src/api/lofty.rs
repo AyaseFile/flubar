@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use anyhow::{Result, anyhow};
 use lofty::config::WriteOptions;
-use lofty::file::{TaggedFile, TaggedFileExt};
+use lofty::file::{FileType, TaggedFile, TaggedFileExt};
 use lofty::picture::{MimeType, PictureType};
 use lofty::prelude::Accessor;
 use lofty::properties::FileProperties;
@@ -12,10 +12,17 @@ use lofty::tag::{ItemKey, Tag, TagExt};
 use super::models::{Metadata, Properties};
 
 pub fn write_metadata(file: &str, metadata: Metadata, force: bool) -> Result<()> {
-    let mut tag = if force {
+    let (mut tag, file_type) = if force {
         create_or_get_tag(file)?
     } else {
         try_get_tag(file)?
+    };
+
+    let is_wavpack = file_type == FileType::WavPack;
+    let date_key = if is_wavpack {
+        ItemKey::Year
+    } else {
+        ItemKey::RecordingDate
     };
 
     fn set_or_remove(tag: &mut Tag, key: ItemKey, value: Option<String>) -> Result<()> {
@@ -56,15 +63,17 @@ pub fn write_metadata(file: &str, metadata: Metadata, force: bool) -> Result<()>
         ItemKey::DiscTotal,
         metadata.disc_total.map(|n| n.to_string()),
     )?;
+
     set_or_remove(
         &mut tag,
-        ItemKey::RecordingDate,
+        date_key,
         metadata.date.map(|d| {
             Timestamp::from_str(&d)
                 .expect("Failed to parse date")
                 .to_string()
         }),
     )?;
+
     set_or_remove(&mut tag, ItemKey::Genre, metadata.genre)?;
 
     tag.save_to_path(file, WriteOptions::default())?;
@@ -72,7 +81,7 @@ pub fn write_metadata(file: &str, metadata: Metadata, force: bool) -> Result<()>
 }
 
 pub fn write_front_cover(file: &str, cover: Option<Vec<u8>>, force: bool) -> Result<()> {
-    let mut tag = if force {
+    let (mut tag, _) = if force {
         create_or_get_tag(file)?
     } else {
         try_get_tag(file)?
@@ -105,48 +114,49 @@ pub fn write_front_cover(file: &str, cover: Option<Vec<u8>>, force: bool) -> Res
 }
 
 #[inline]
-fn try_get_tag(file: &str) -> Result<Tag> {
-    let tagged_file = get_tagged_file(file)?;
+fn try_get_tag(file: &str) -> Result<(Tag, FileType)> {
+    let (tagged_file, file_type) = get_tagged_file(file)?;
 
     if let Some(primary_tag) = tagged_file.primary_tag() {
-        return Ok(primary_tag.to_owned());
+        return Ok((primary_tag.to_owned(), file_type));
     }
 
     tagged_file.first_tag().map_or_else(
         || Err(anyhow!("Failed to get or create tag")),
-        |tag| Ok(tag.to_owned()),
+        |tag| Ok((tag.to_owned(), file_type)),
     )
 }
 
 #[inline]
-fn create_or_get_tag(file: &str) -> Result<Tag> {
-    let mut tagged_file = get_tagged_file(file)?;
+fn create_or_get_tag(file: &str) -> Result<(Tag, FileType)> {
+    let (mut tagged_file, file_type) = get_tagged_file(file)?;
 
     if let Some(primary_tag) = tagged_file.primary_tag() {
-        return Ok(primary_tag.to_owned());
+        return Ok((primary_tag.to_owned(), file_type));
     }
 
     if let Some(first_tag) = tagged_file.first_tag() {
-        return Ok(first_tag.to_owned());
+        return Ok((first_tag.to_owned(), file_type));
     }
 
     let tag_type = tagged_file.primary_tag_type();
     tagged_file.insert_tag(Tag::new(tag_type));
     let primary_tag = tagged_file.primary_tag().unwrap();
-    Ok(primary_tag.to_owned())
+    Ok((primary_tag.to_owned(), file_type))
 }
 
 #[inline]
-fn get_tagged_file(file: &str) -> Result<TaggedFile> {
+fn get_tagged_file(file: &str) -> Result<(TaggedFile, FileType)> {
     match lofty::read_from_path(file) {
-        Ok(tagged_file) => Ok(tagged_file),
+        Ok(tagged_file) => {
+            let file_type = tagged_file.file_type();
+            Ok((tagged_file, file_type))
+        }
         _ => {
             let prob = lofty::probe::Probe::open(file)?;
-            Ok(TaggedFile::new(
-                prob.file_type().unwrap(),
-                FileProperties::default(),
-                vec![],
-            ))
+            let file_type = prob.file_type().unwrap();
+            let tagged_file = TaggedFile::new(file_type, FileProperties::default(), vec![]);
+            Ok((tagged_file, file_type))
         }
     }
 }
@@ -172,6 +182,13 @@ pub fn read_hybrid(file: &str) -> Result<(Metadata, Properties)> {
 
     let mut metadata = Metadata::new();
 
+    let is_wavpack = tagged_file.file_type() == FileType::WavPack;
+    let date_key = if is_wavpack {
+        ItemKey::Year
+    } else {
+        ItemKey::RecordingDate
+    };
+
     if let Some(tag) = tagged_file
         .primary_tag()
         .or_else(|| tagged_file.first_tag())
@@ -184,9 +201,7 @@ pub fn read_hybrid(file: &str) -> Result<(Metadata, Properties)> {
         metadata.track_total = tag.track_total().map(|e| e as u8);
         metadata.disc_number = tag.disk().map(|e| e as u8);
         metadata.disc_total = tag.disk_total().map(|e| e as u8);
-        metadata.date = tag
-            .get_string(ItemKey::RecordingDate)
-            .map(|e| e.to_string());
+        metadata.date = tag.get_string(date_key).map(|e| e.to_string());
         metadata.genre = tag.genre().map(|e| e.to_string());
 
         if let Some(cover) = tag
