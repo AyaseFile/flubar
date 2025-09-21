@@ -7,17 +7,15 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: macos-26
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Setup Flutter SDK
-        uses: subosito/flutter-action@v2
+      - uses: cachix/install-nix-action@v31
         with:
-          channel: stable
-          flutter-version: 3.29.2
-      - name: Run build script
-        run: python build.py
+          nix_path: nixpkgs=channel:nixos-unstable
+      - name: Enter Nix shell and run build script
+        run: nix develop --command python build.py
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:

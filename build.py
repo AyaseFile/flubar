@@ -1,34 +1,26 @@
+import os
 import subprocess
 
 
-def install_dependencies():
-    subprocess.run(
-        "sudo apt-get update -y", shell=True)
-    subprocess.run(
-        "sudo apt-get install -y curl git unzip xz-utils zip libglu1-mesa", shell=True)
-    subprocess.run(
-        "sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev",
-        shell=True,
-    )
-    subprocess.run(
-        "sudo apt-get install -y pkg-config ffmpeg libmpv-dev libcue-dev", shell=True)
-
-
 def build():
-    subprocess.run("flutter pub get", shell=True)
-    subprocess.run(
-        "dart run build_runner build --delete-conflicting-outputs", shell=True
-    )
-    subprocess.run("flutter build linux --release -v", shell=True)
+    env = os.environ.copy()
+
+    subprocess.run("flutter pub get", shell=True, env=env)
+    subprocess.run("touch rust/src/frb_generated.rs", shell=True, env=env)
+    subprocess.run("flutter_rust_bridge_codegen generate", shell=True, env=env)
+    subprocess.run("flutter build macos --release -v", shell=True, env=env, check=True)
 
 
 def package():
+    env = os.environ.copy()
     subprocess.run(
-        "tar -czvf flubar.tar.gz -C build/linux/x64/release/bundle .", shell=True
+        "tar -czvf flubar.tar.gz -C build/macos/Build/Products/Release flubar.app",
+        shell=True,
+        env=env,
+        check=True,
     )
 
 
 if __name__ == "__main__":
-    install_dependencies()
     build()
     package()
