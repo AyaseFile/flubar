@@ -1,31 +1,32 @@
 use std::str::FromStr;
 
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use lofty::config::WriteOptions;
 use lofty::file::{TaggedFile, TaggedFileExt};
 use lofty::picture::{MimeType, PictureType};
+use lofty::prelude::Accessor;
 use lofty::properties::FileProperties;
 use lofty::tag::items::Timestamp;
 use lofty::tag::{ItemKey, Tag, TagExt};
 
-use super::models::Metadata;
+use super::models::{Metadata, Properties};
 
-pub fn lofty_write_metadata(file: String, metadata: Metadata, force: bool) -> Result<()> {
+pub fn write_metadata(file: &str, metadata: Metadata, force: bool) -> Result<()> {
     let mut tag = if force {
-        force_create_tag_for_file(&file)?
+        create_or_get_tag(file)?
     } else {
-        get_or_create_tag_for_file(&file)?
+        try_get_tag(file)?
     };
 
     fn set_or_remove(tag: &mut Tag, key: ItemKey, value: Option<String>) -> Result<()> {
         match value {
-            Some(v) => {
-                if !tag.insert_text(key.clone(), v) {
+            Some(value) => {
+                if !tag.insert_text(key, value) {
                     return Err(anyhow!("Failed to insert text for key: {:?}", key));
                 }
             }
             None => {
-                tag.remove_key(&key);
+                tag.remove_key(key);
             }
         }
         Ok(())
@@ -66,45 +67,45 @@ pub fn lofty_write_metadata(file: String, metadata: Metadata, force: bool) -> Re
     )?;
     set_or_remove(&mut tag, ItemKey::Genre, metadata.genre)?;
 
-    tag.save_to_path(&file, WriteOptions::default())?;
+    tag.save_to_path(file, WriteOptions::default())?;
     Ok(())
 }
 
-pub fn lofty_write_picture(file: String, picture: Option<Vec<u8>>, force: bool) -> Result<()> {
+pub fn write_front_cover(file: &str, cover: Option<Vec<u8>>, force: bool) -> Result<()> {
     let mut tag = if force {
-        force_create_tag_for_file(&file)?
+        create_or_get_tag(file)?
     } else {
-        get_or_create_tag_for_file(&file)?
+        try_get_tag(file)?
     };
 
-    if let Some(picture) = picture {
-        let kind = infer::get(&picture).expect("Failed to get mime type");
+    if let Some(cover) = cover {
+        let kind = infer::get(&cover).expect("Failed to get mime type");
         let mime_type = MimeType::from_str(kind.mime_type());
         let cover_front_index = tag
             .pictures()
             .iter()
             .position(|p| p.pic_type() == PictureType::CoverFront);
-        let new_picture = lofty::picture::Picture::new_unchecked(
+        let picture = lofty::picture::Picture::new_unchecked(
             PictureType::CoverFront,
             Some(mime_type),
             None,
-            picture,
+            cover,
         );
         if let Some(index) = cover_front_index {
-            tag.set_picture(index, new_picture);
+            tag.set_picture(index, picture);
         } else {
-            tag.push_picture(new_picture);
+            tag.push_picture(picture);
         }
     } else {
         tag.remove_picture_type(PictureType::CoverFront);
     }
 
-    tag.save_to_path(&file, WriteOptions::default())?;
+    tag.save_to_path(file, WriteOptions::default())?;
     Ok(())
 }
 
 #[inline]
-fn get_or_create_tag_for_file(file: &str) -> Result<Tag> {
+fn try_get_tag(file: &str) -> Result<Tag> {
     let tagged_file = get_tagged_file(file)?;
 
     if let Some(primary_tag) = tagged_file.primary_tag() {
@@ -113,25 +114,25 @@ fn get_or_create_tag_for_file(file: &str) -> Result<Tag> {
 
     tagged_file.first_tag().map_or_else(
         || Err(anyhow!("Failed to get or create tag")),
-        |first_tag| Ok(first_tag.to_owned()),
+        |tag| Ok(tag.to_owned()),
     )
 }
 
 #[inline]
-fn force_create_tag_for_file(file: &str) -> Result<Tag> {
+fn create_or_get_tag(file: &str) -> Result<Tag> {
     let mut tagged_file = get_tagged_file(file)?;
 
-    if let Some(primary_tag) = tagged_file.primary_tag_mut() {
+    if let Some(primary_tag) = tagged_file.primary_tag() {
         return Ok(primary_tag.to_owned());
     }
 
-    if let Some(first_tag) = tagged_file.first_tag_mut() {
+    if let Some(first_tag) = tagged_file.first_tag() {
         return Ok(first_tag.to_owned());
     }
 
     let tag_type = tagged_file.primary_tag_type();
     tagged_file.insert_tag(Tag::new(tag_type));
-    let primary_tag = tagged_file.primary_tag_mut().unwrap();
+    let primary_tag = tagged_file.primary_tag().unwrap();
     Ok(primary_tag.to_owned())
 }
 
@@ -141,9 +142,6 @@ fn get_tagged_file(file: &str) -> Result<TaggedFile> {
         Ok(tagged_file) => Ok(tagged_file),
         _ => {
             let prob = lofty::probe::Probe::open(file)?;
-            if prob.file_type().is_none() {
-                return Err(anyhow!("File type could not be determined"));
-            }
             Ok(TaggedFile::new(
                 prob.file_type().unwrap(),
                 FileProperties::default(),
@@ -151,4 +149,55 @@ fn get_tagged_file(file: &str) -> Result<TaggedFile> {
             ))
         }
     }
+}
+
+pub(crate) fn read_front_cover(file: &str) -> Result<Option<Vec<u8>>> {
+    let tagged_file = lofty::read_from_path(file)?;
+
+    if let Some(tag) = tagged_file
+        .primary_tag()
+        .or_else(|| tagged_file.first_tag())
+        && let Some(cover) = tag
+            .get_picture_type(PictureType::CoverFront)
+            .or_else(|| tag.pictures().first())
+    {
+        return Ok(Some(cover.data().to_vec()));
+    }
+
+    Ok(None)
+}
+
+pub fn read_hybrid(file: &str) -> Result<(Metadata, Properties)> {
+    let tagged_file = lofty::read_from_path(file)?;
+
+    let mut metadata = Metadata::new();
+
+    if let Some(tag) = tagged_file
+        .primary_tag()
+        .or_else(|| tagged_file.first_tag())
+    {
+        metadata.title = tag.title().map(|e| e.to_string());
+        metadata.artist = tag.artist().map(|e| e.to_string());
+        metadata.album = tag.album().map(|e| e.to_string());
+        metadata.album_artist = tag.get_string(ItemKey::AlbumArtist).map(|e| e.to_string());
+        metadata.track_number = tag.track().map(|e| e as u8);
+        metadata.track_total = tag.track_total().map(|e| e as u8);
+        metadata.disc_number = tag.disk().map(|e| e as u8);
+        metadata.disc_total = tag.disk_total().map(|e| e as u8);
+        metadata.date = tag
+            .get_string(ItemKey::RecordingDate)
+            .map(|e| e.to_string());
+        metadata.genre = tag.genre().map(|e| e.to_string());
+
+        if let Some(cover) = tag
+            .get_picture_type(PictureType::CoverFront)
+            .or_else(|| tag.pictures().first())
+        {
+            metadata.front_cover = Some(cover.data().to_vec());
+        }
+    }
+
+    let properties = super::ffmpeg::read_properties(file)?;
+
+    Ok((metadata, properties))
 }

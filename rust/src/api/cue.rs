@@ -1,16 +1,19 @@
-use anyhow::{anyhow, Context, Result};
+use std::{collections::HashMap, fs::read_to_string, path::Path};
+
+use anyhow::Result;
 use cue::cd::CD;
 use cue::cd_text::PTI;
 
-use super::ffmpeg::{cue_read_front_cover, cue_read_properties};
+use super::ffmpeg::read_properties;
+use super::lofty::read_front_cover;
 use super::models::{Metadata, Properties};
 
 pub const REM_DATE: usize = 0;
 pub const FPS: f64 = 75.0;
 
-pub fn cue_read_file(file: String) -> Result<Vec<(String, Metadata, Properties)>> {
-    let cue_sheet = std::fs::read_to_string(file.clone())?;
-    let cd = CD::parse(cue_sheet).map_err(|e| anyhow!("Failed to parse cue sheet: {:?}", e))?;
+pub fn cue_read_file(file: &str) -> Result<Vec<(String, Metadata, Properties)>> {
+    let cue_sheet = read_to_string(file)?;
+    let cd = CD::parse(cue_sheet)?;
 
     let album = cd.get_cdtext().read(PTI::Title);
     let album_artist = cd.get_cdtext().read(PTI::Performer);
@@ -18,24 +21,19 @@ pub fn cue_read_file(file: String) -> Result<Vec<(String, Metadata, Properties)>
     let track_total = cd.get_track_count() as u8;
     let genre = cd.get_cdtext().read(PTI::Genre);
 
-    let mut properties_map: std::collections::HashMap<String, Properties> =
-        std::collections::HashMap::new();
-    let mut front_cover_map: std::collections::HashMap<String, Option<Vec<u8>>> =
-        std::collections::HashMap::new();
+    let mut properties_map: HashMap<String, Properties> = HashMap::new();
+    let mut front_cover_map: HashMap<String, Option<Vec<u8>>> = HashMap::new();
     let mut result: Vec<(String, Metadata, Properties)> = Vec::new();
-    let dir = std::path::Path::new(&file)
-        .parent()
-        .context("Failed to get parent directory")?;
+    let dir = Path::new(file).parent().unwrap();
 
-    for (index, track) in cd.tracks().iter().enumerate() {
+    for (index, track) in cd.tracks().into_iter().enumerate() {
         let filename = track.get_filename();
-        let path = dir.join(&filename);
-        let path_str = path.to_string_lossy().to_string();
+        let path = dir.join(&filename).to_string_lossy().into_owned();
 
         let properties = if let Some(properties) = properties_map.get(&filename) {
             properties.clone()
         } else {
-            let properties = cue_read_properties(path_str.clone())?;
+            let properties = read_properties(&path)?;
             properties_map.insert(filename.clone(), properties.clone());
             properties
         };
@@ -43,8 +41,8 @@ pub fn cue_read_file(file: String) -> Result<Vec<(String, Metadata, Properties)>
         let front_cover = if let Some(front_cover) = front_cover_map.get(&filename) {
             front_cover.clone()
         } else {
-            let front_cover = cue_read_front_cover(path_str.clone())?;
-            front_cover_map.insert(filename.clone(), front_cover.clone());
+            let front_cover = read_front_cover(&path)?;
+            front_cover_map.insert(filename, front_cover.clone());
             front_cover
         };
 
@@ -68,19 +66,16 @@ pub fn cue_read_file(file: String) -> Result<Vec<(String, Metadata, Properties)>
         let cue_start = track.get_start() as f64 / FPS;
         let cue_duration = if let Some(duration) = track.get_length() {
             Some(duration as f64 / FPS)
-        } else if let Some(total_duration) = properties.duration_sec {
-            let start_time = track.get_start() as f64 / FPS;
-            Some(total_duration - start_time)
         } else {
-            None
+            properties.duration_sec.map(|duration| duration - cue_start)
         };
 
         let properties = Properties {
             duration_sec: None,
             cue_start_sec: Some(cue_start),
             cue_duration_sec: cue_duration,
-            codec: properties.codec.clone(),
-            sample_format: properties.sample_format.clone(),
+            codec: properties.codec,
+            sample_format: properties.sample_format,
             sample_rate: properties.sample_rate,
             bits_per_raw_sample: properties.bits_per_raw_sample,
             bits_per_coded_sample: properties.bits_per_coded_sample,
@@ -88,7 +83,7 @@ pub fn cue_read_file(file: String) -> Result<Vec<(String, Metadata, Properties)>
             channels: properties.channels,
         };
 
-        result.push((path_str, metadata, properties));
+        result.push((path, metadata, properties));
     }
 
     Ok(result)

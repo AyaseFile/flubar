@@ -1,18 +1,17 @@
 [package]
 name = "rust_lib_flubar"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [lib]
 crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
 flutter_rust_bridge = "=2.11.1"
-anyhow = "1.0.93"
-lofty = "0.21.1"
-id3 = "1.14.0"
-ffmpeg-next = { version = "7.1.0", features = ["codec"] }
-infer = "0.16.0"
+anyhow = "1.0.99"
+lofty = { git = "https://github.com/Serial-ATA/lofty-rs.git", rev = "2727c5c" }
+ffmpeg-next = { version = "8.0.0", default-features = false, features = ["codec", "format", "build", "static"] }
+infer = "0.19.0"
 cue = { git = "https://github.com/AyaseFile/libcue.rs" }
 
 [profile.release]

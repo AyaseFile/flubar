@@ -11,7 +11,11 @@
     { nixpkgs, fenix, ... }:
     let
       inherit (nixpkgs) lib;
-      inherit (lib) optionals optionalString;
+      inherit (lib)
+        genAttrs
+        optionals
+        optionalString
+        ;
 
       systems = [
         "x86_64-linux"
@@ -27,12 +31,13 @@
         aarch64-darwin = ''
           export PATH="/Library/Developer/CommandLineTools/usr/bin:$PATH"
           export DEVELOPER_DIR="/Applications/Xcode.app/Contents/Developer"
+          export SDKROOT="$(xcrun --show-sdk-path)"
         '';
       };
 
       forAllSystems =
         f:
-        nixpkgs.lib.genAttrs systems (
+        genAttrs systems (
           system:
           f {
             inherit system;
@@ -45,13 +50,21 @@
         { pkgs, system, ... }:
         with pkgs;
         let
-          rust_toolchain = fenix.packages.${system}.stable.withComponents [
+          _rust_toolchain = fenix.packages.${system}.stable.withComponents [
             "cargo"
             "rustc"
             "rust-src"
             "clippy"
             "rustfmt"
           ];
+          rust_toolchain =
+            if system == "aarch64-darwin" then
+              fenix.packages.${system}.combine [
+                _rust_toolchain
+                fenix.packages.${system}.targets.x86_64-apple-darwin.stable.rust-std
+              ]
+            else
+              _rust_toolchain;
         in
         {
           default = mkShellNoCC {
@@ -64,11 +77,11 @@
               pkg-config
             ]
             ++ optionals (system == "x86_64-linux") [
-              clang
-              libclang
-              ninja
+              gcc
               bison
               flex
+              nasm
+              ninja
               # gtk3
               xz
             ]
@@ -78,9 +91,7 @@
               rsync # fix permissions issue
             ];
             buildInputs = [
-              ffmpeg.dev
-            ]
-            ++ optionals (system == "x86_64-linux") [
+              ffmpeg_8.dev
               mpv-unwrapped
             ];
             shellHook = ''
@@ -88,6 +99,7 @@
               ${optionalString (system == "x86_64-linux") ''
                 export LD_LIBRARY_PATH="${pkgs.mpv-unwrapped}/lib:$LD_LIBRARY_PATH"
                 export LIBCLANG_PATH="${pkgs.libclang.lib}/lib"
+                export BINDGEN_EXTRA_CLANG_ARGS="-I${glibc.dev}/include -I${libclang.lib}/lib/clang/${lib.versions.major libclang.version}/include";
               ''}
               ${optionalString (system == "aarch64-darwin") ''
                 export LIBRARY_PATH="${pkgs.darwin.libiconv}/lib:$LIBRARY_PATH"
