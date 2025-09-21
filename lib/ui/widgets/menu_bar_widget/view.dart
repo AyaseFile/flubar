@@ -146,6 +146,7 @@ class _MenuBarWidgetState extends ConsumerState<MenuBarWidget> {
               context: context,
               applicationName: kAppName,
               applicationVersion: kAppVersion,
+              children: [const Text('Github: $kRepoUrl')],
             ),
           ),
         ],

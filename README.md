@@ -17,5 +17,7 @@ see `flake.nix` and `build.py` for details.
 - [metadata_god](https://github.com/KRTirtho/metadata_god), MIT
 - [lofty](https://crates.io/crates/lofty), MIT or Apache-2.0
 - [id3](https://crates.io/crates/id3), MIT
+- [libcue](https://github.com/lipnitsk/libcue), GPL-2.0 or later
 - [cue](https://crates.io/crates/cue), GPL-2.0 or later
+- [ffmpeg](https://ffmpeg.org/), LGPL-2.1 or later, GPL-2.0 or later
 - [ffmpeg-next](https://crates.io/crates/ffmpeg-next), WTFPL
