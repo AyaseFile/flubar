@@ -59,8 +59,6 @@ abstract class ScanSettingsModel with _$ScanSettingsModel {
 @freezed
 abstract class MetadataSettingsModel with _$MetadataSettingsModel {
   const factory MetadataSettingsModel({
-    @Default(_S.kWriteToMemoryOnly) bool writeToMemoryOnly,
-    @Default(_S.kForceWriteMetadata) bool forceWriteMetadata,
     @Default(_S.kFileNameTpl) String fileNameTpl,
   }) = _MetadataSettings;
 

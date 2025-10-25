@@ -6,6 +6,7 @@ import 'package:flubar/models/state/track.dart';
 import 'package:flubar/ui/constants.dart';
 import 'package:flubar/ui/dialogs/cover_dialog/view.dart';
 import 'package:flubar/ui/dialogs/get_dialog/providers.dart';
+import 'package:flubar/ui/dialogs/metadata_backup_dialog/view.dart';
 import 'package:flubar/ui/dialogs/metadata_dialog/providers.dart';
 import 'package:flubar/ui/dialogs/metadata_dialog/view.dart';
 import 'package:flubar/ui/dialogs/properties_dialog/providers.dart';
@@ -262,6 +263,9 @@ class TrackRow extends ConsumerWidget {
     final selected = ref.watch(
       selectedTrackIdsProvider.select((state) => state.contains(track.id)),
     );
+    final isPending = track.pendingWriteback;
+    final colorScheme = Theme.of(context).colorScheme;
+    final borderColor = isPending ? Colors.amber : Colors.green;
     return ContextMenuWidget(
       child: InkWell(
         onTap: () {
@@ -280,9 +284,12 @@ class TrackRow extends ConsumerWidget {
               );
         },
         child: Container(
-          color: selected
-              ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)
-              : Colors.transparent,
+          decoration: BoxDecoration(
+            color: selected
+                ? colorScheme.primary.withValues(alpha: 0.3)
+                : Colors.transparent,
+            border: Border(left: BorderSide(color: borderColor, width: 3)),
+          ),
           child: contentBuilder(context, (context, column) {
             final columnId = getColumnId(column);
             final text = switch (columnId) {
@@ -379,6 +386,32 @@ class TrackRow extends ConsumerWidget {
           callback: () async => await ref
               .read(getDialogProvider.notifier)
               .show(const TranscodeDialog(), barrierDismissible: false),
+        ),
+        Menu(
+          title: '元数据备份',
+          image: MenuImage.icon(Icons.backup),
+          children: [
+            MenuAction(
+              title: '导出元数据',
+              image: MenuImage.icon(Icons.upload),
+              callback: () async {
+                const dialog = MetadataExportDialog();
+                await ref
+                    .read(getDialogProvider.notifier)
+                    .show(dialog, barrierDismissible: false);
+              },
+            ),
+            MenuAction(
+              title: '导入元数据',
+              image: MenuImage.icon(Icons.download),
+              callback: () async {
+                const dialog = MetadataImportDialog();
+                await ref
+                    .read(getDialogProvider.notifier)
+                    .show(dialog, barrierDismissible: false);
+              },
+            ),
+          ],
         ),
         MenuSeparator(),
         MenuAction(

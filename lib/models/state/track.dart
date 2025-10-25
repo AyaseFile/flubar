@@ -10,5 +10,6 @@ abstract class Track with _$Track {
     required String path,
     required Metadata metadata,
     required Properties properties,
+    @Default(false) bool pendingWriteback,
   }) = _Track;
 }

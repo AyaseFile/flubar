@@ -1,13 +1,17 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/app/talker.dart';
 import 'package:flubar/models/extensions/metadata_extension.dart';
 import 'package:flubar/models/extensions/properties_extension.dart';
+import 'package:flubar/models/state/metadata_backup.dart';
 import 'package:flubar/models/state/playlist.dart';
 import 'package:flubar/models/state/track.dart';
 import 'package:flubar/rust/api/cue.dart';
+import 'package:flubar/rust/api/ffmpeg.dart';
 import 'package:flubar/rust/api/lofty.dart';
 import 'package:flubar/rust/api/models.dart';
 import 'package:flubar/ui/snackbar/view.dart';
@@ -44,9 +48,7 @@ class MediaDragState extends _$MediaDragState {
     Iterable<String> paths, {
     DragBehavior behavior = DragBehavior.recursive,
   }) async {
-    final id = ref.read(playlistIdProvider).selectedId;
     final maxTrackIdNotifier = ref.read(maxTrackIdProvider.notifier);
-    final playlistsNotifier = ref.read(playlistsProvider.notifier);
 
     final filePaths = await switch (behavior) {
       DragBehavior.filesOnly => Future.value(paths),
@@ -95,23 +97,103 @@ class MediaDragState extends _$MediaDragState {
         } catch (e) {
           failed++;
           globalTalker.error('无法读取文件: $path', e, null);
-          return [
-            Track(
-              id: maxTrackIdNotifier.nextId(),
-              metadata: const Metadata(),
-              properties: const Properties(),
-              path: path,
-            ),
-          ];
+          return const <Track>[];
         }
       }),
       eagerError: false,
     );
 
     final tracks = results.expand((tracks) => tracks);
+    _appendTracks(tracks);
+
+    if (failed != 0) {
+      showExceptionSnackbar(title: '错误', message: '无法读取 $failed 个文件');
+    }
+  }
+
+  Future<void> addTracksFromMetadataBackup(MetadataBackupModel backup) async {
+    final maxTrackIdNotifier = ref.read(maxTrackIdProvider.notifier);
+
+    final coverMap = <int, Uint8List?>{};
+    Uint8List? frontCoverForIndex(int? index) {
+      if (index == null) return null;
+      if (coverMap.containsKey(index)) {
+        return coverMap[index];
+      }
+      if (index < 0 || index >= backup.frontCovers.length) {
+        return coverMap[index] = null;
+      }
+      try {
+        return coverMap[index] = base64Decode(backup.frontCovers[index]);
+      } catch (e) {
+        globalTalker.warning('解码封面失败: $e');
+        return coverMap[index] = null;
+      }
+    }
+
+    var failed = 0;
+    final tracks = <Track>[];
+
+    for (final item in backup.metadataList) {
+      final path = item.path;
+      if (!File(path).existsSync()) {
+        failed++;
+        globalTalker.error('元数据备份对应的文件不存在: $path');
+        continue;
+      }
+
+      final metadataMap = item.metadata;
+      final metadata = Metadata(
+        title: metadataMap['title'] as String?,
+        artist: metadataMap['artist'] as String?,
+        album: metadataMap['album'] as String?,
+        albumArtist: metadataMap['albumartist'] as String?,
+        trackNumber: metadataMap['tracknumber'] as int?,
+        trackTotal: metadataMap['tracktotal'] as int?,
+        discNumber: metadataMap['discnumber'] as int?,
+        discTotal: metadataMap['disctotal'] as int?,
+        date: metadataMap['date'] as String?,
+        genre: metadataMap['genre'] as String?,
+        frontCover: frontCoverForIndex(item.frontCoverIndex),
+      );
+
+      try {
+        final properties = await readProperties(file: path);
+        tracks.add(
+          Track(
+            id: maxTrackIdNotifier.nextId(),
+            path: path,
+            metadata: metadata,
+            properties: properties,
+            pendingWriteback: true,
+          ),
+        );
+      } catch (e, st) {
+        failed++;
+        globalTalker.error('读取文件属性失败: $path', e, st);
+      }
+    }
+
+    _appendTracks(tracks);
+
+    if (failed != 0) {
+      showExceptionSnackbar(title: '错误', message: '未找到 $failed 个备份文件');
+    }
+  }
+
+  void _appendTracks(Iterable<Track> tracks) {
+    final playlistId = ref.read(playlistIdProvider).selectedId;
+    final playlistsNotifier = ref.read(playlistsProvider.notifier);
     final cueAsPlaylist = ref.read(scanSettingsProvider).cueAsPlaylist;
+    final maxTrackIdNotifier = ref.read(maxTrackIdProvider.notifier);
+
+    final trackList = tracks.toList();
+    if (trackList.isEmpty) {
+      return;
+    }
+
     if (cueAsPlaylist) {
-      final (audioTracks, cueTracksByPath) = tracks
+      final (audioTracks, cueTracksByPath) = trackList
           .fold<(List<Track>, Map<String, List<Track>>)>(([], {}), (
             acc,
             track,
@@ -126,7 +208,7 @@ class MediaDragState extends _$MediaDragState {
           });
 
       if (audioTracks.isNotEmpty) {
-        playlistsNotifier.addTracks(id, audioTracks);
+        playlistsNotifier.addTracks(playlistId, audioTracks);
       }
 
       if (cueTracksByPath.isNotEmpty) {
@@ -142,11 +224,7 @@ class MediaDragState extends _$MediaDragState {
         );
       }
     } else {
-      playlistsNotifier.addTracks(id, tracks);
-    }
-
-    if (failed != 0) {
-      showExceptionSnackbar(title: '错误', message: '无法读取 $failed 个文件');
+      playlistsNotifier.addTracks(playlistId, trackList);
     }
   }
 

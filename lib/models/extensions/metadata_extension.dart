@@ -33,17 +33,17 @@ extension MetadataExtension on Metadata {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'title': title,
-      'artist': artist,
-      'album': album,
-      'albumartist': albumArtist,
-      'tracknumber': trackNumber,
-      'tracktotal': trackTotal,
-      'discnumber': discNumber,
-      'disctotal': discTotal,
-      'date': date,
-      'genre': genre,
-    };
+    final Map<String, dynamic> json = {};
+    if (title != null) json['title'] = title;
+    if (artist != null) json['artist'] = artist;
+    if (album != null) json['album'] = album;
+    if (albumArtist != null) json['albumartist'] = albumArtist;
+    if (trackNumber != null) json['tracknumber'] = trackNumber;
+    if (trackTotal != null) json['tracktotal'] = trackTotal;
+    if (discNumber != null) json['discnumber'] = discNumber;
+    if (discTotal != null) json['disctotal'] = discTotal;
+    if (date != null) json['date'] = date;
+    if (genre != null) json['genre'] = genre;
+    return json;
   }
 }

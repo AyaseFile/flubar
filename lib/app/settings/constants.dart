@@ -5,8 +5,6 @@ import 'package:flubar/ui/view/tracklist_view/constants.dart';
 class DefaultSettings {
   static const kDarkMode = false;
   static const kCueAsPlaylist = true;
-  static const kWriteToMemoryOnly = false;
-  static const kForceWriteMetadata = false;
   static const kFileNameTpl = '%filename%';
   static const kFfmpegPath = '/usr/bin/ffmpeg';
   static const kIsolateCount = 4;

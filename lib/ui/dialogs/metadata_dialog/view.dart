@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/models/state/common_metadata.dart';
 import 'package:flubar/ui/constants.dart';
 import 'package:flubar/ui/dialogs/editable_table_view/constants.dart';
@@ -52,14 +51,10 @@ class _EditMetadataDialog extends StatelessWidget {
             automaticallyImplyLeading: false,
             title: const Text('编辑元数据'),
             actions: [
-              const MetadataSettingsIconButton(),
-              const SizedBox(width: 8),
               Consumer(
                 builder: (context, ref, _) {
                   return TextButton(
-                    onPressed: !ref.watch(metadataUtilProvider).isLoading
-                        ? () => Navigator.of(context).pop()
-                        : null,
+                    onPressed: () => Navigator.of(context).pop(),
                     child: const Text('取消'),
                   );
                 },
@@ -67,27 +62,18 @@ class _EditMetadataDialog extends StatelessWidget {
               const SizedBox(width: 8),
               Consumer(
                 builder: (context, ref, _) {
-                  return ref.watch(metadataUtilProvider).isLoading
-                      ? const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(),
-                          ),
-                        )
-                      : TextButton(
-                          onPressed: () async {
-                            final success = await ref
-                                .read(metadataUtilProvider.notifier)
-                                .writeMetadata();
-                            if (context.mounted && success) {
-                              Navigator.of(context).pop();
-                            }
-                          },
-                          autofocus: true,
-                          child: const Text('保存'),
-                        );
+                  return TextButton(
+                    onPressed: () async {
+                      final success = await ref
+                          .read(metadataApplyUtilProvider.notifier)
+                          .applyMetadata();
+                      if (context.mounted && success) {
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    autofocus: true,
+                    child: const Text('保存'),
+                  );
                 },
               ),
             ],
@@ -96,85 +82,6 @@ class _EditMetadataDialog extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class MetadataSettingsIconButton extends ConsumerWidget {
-  const MetadataSettingsIconButton({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Builder(
-      builder: (context) {
-        return IconButton(
-          icon: const Icon(Icons.settings),
-          onPressed: !ref.watch(metadataUtilProvider).isLoading
-              ? () {
-                  showSettingsPopupMenu(
-                    context: context,
-                    children: [
-                      ListTile(
-                        title: const Text('仅写入内存'),
-                        trailing: Consumer(
-                          builder: (context, ref, _) {
-                            final writeToMemory = ref.watch(
-                              metadataSettingsProvider.select(
-                                (state) => state.writeToMemoryOnly,
-                              ),
-                            );
-                            return Checkbox(
-                              value: writeToMemory,
-                              onChanged: (value) => ref
-                                  .read(metadataSettingsProvider.notifier)
-                                  .updateWriteToMemoryOnly(value!),
-                            );
-                          },
-                        ),
-                      ),
-                      ListTile(
-                        title: const Text('强制写入元数据'),
-                        trailing: Consumer(
-                          builder: (context, ref, _) {
-                            final force = ref.watch(
-                              metadataSettingsProvider.select(
-                                (state) => state.forceWriteMetadata,
-                              ),
-                            );
-                            return Checkbox(
-                              value: force,
-                              onChanged: (value) => ref
-                                  .read(metadataSettingsProvider.notifier)
-                                  .updateForceWriteMetadata(value!),
-                            );
-                          },
-                        ),
-                      ),
-                    ].map((e) => PopupMenuItem(child: e)).toList(),
-                  );
-                }
-              : null,
-        );
-      },
-    );
-  }
-
-  static void showSettingsPopupMenu({
-    required BuildContext context,
-    required List<PopupMenuItem<void>> children,
-  }) {
-    final button = context.findRenderObject() as RenderBox;
-    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
-    final position = RelativeRect.fromRect(
-      Rect.fromPoints(
-        button.localToGlobal(Offset.zero, ancestor: overlay),
-        button.localToGlobal(
-          button.size.bottomRight(Offset.zero),
-          ancestor: overlay,
-        ),
-      ),
-      Offset.zero & overlay.size,
-    );
-    showMenu(context: context, position: position, items: children);
   }
 }
 

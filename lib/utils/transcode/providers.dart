@@ -75,20 +75,13 @@ class TranscodeUtil extends _$TranscodeUtil
               continue;
             }
             final metadata = track.metadata;
-            if (rewriteMetadata) {
-              await writeMetadata(
-                file: outputFile,
-                metadata: metadata,
-                force: true,
-              ); // 清除了元数据, 需要强制写入
-            }
-            if (rewriteFrontCover) {
-              await writeFrontCover(
-                file: outputFile,
-                cover: metadata.frontCover,
-                force: true,
-              );
-            }
+            await writeMetadata(
+              file: outputFile,
+              metadata: metadata,
+              force: true, // 清除了元数据, 需要强制写入
+              writeTags: rewriteMetadata,
+              writeCover: rewriteFrontCover,
+            );
             sendPort.send({'error': null});
           } else {
             final stderr = await process.stderr.transform(utf8.decoder).join();

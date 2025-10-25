@@ -64,41 +64,39 @@ class RatioAlertDialog extends StatelessWidget {
     return Dialog(
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: maxWidth, maxHeight: maxHeight),
-        child: IntrinsicHeight(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 16.0),
-                child: DefaultTextStyle(
-                  style: textTheme.headlineSmall!.copyWith(
-                    color: colorScheme.onSurface,
-                  ),
-                  child: title,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 16.0),
+              child: DefaultTextStyle(
+                style: textTheme.headlineSmall!.copyWith(
+                  color: colorScheme.onSurface,
                 ),
+                child: title,
               ),
-              Flexible(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(24.0, 0.0, 24.0, 24.0),
-                  child: DefaultTextStyle(
-                    style: textTheme.bodyMedium!.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                    child: content,
-                  ),
-                ),
-              ),
-              Padding(
+            ),
+            Flexible(
+              child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(24.0, 0.0, 24.0, 24.0),
-                child: OverflowBar(
-                  alignment: MainAxisAlignment.end,
-                  spacing: 8,
-                  children: actions,
+                child: DefaultTextStyle(
+                  style: textTheme.bodyMedium!.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  child: content,
                 ),
               ),
-            ],
-          ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24.0, 0.0, 24.0, 24.0),
+              child: OverflowBar(
+                alignment: MainAxisAlignment.end,
+                spacing: 8,
+                children: actions,
+              ),
+            ),
+          ],
         ),
       ),
     );

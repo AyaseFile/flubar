@@ -32,6 +32,7 @@ class _RenameDialog extends ConsumerWidget {
       title: const Text('重命名'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('将使用模板 "$tpl" 重命名 $length 个文件'),
           const SizedBox(height: 16),

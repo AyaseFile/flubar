@@ -1,11 +1,20 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flubar/app/constants.dart';
 import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/app/talker.dart';
+import 'package:flubar/models/state/metadata_backup.dart';
 import 'package:flubar/ui/dialogs/get_dialog/providers.dart';
+import 'package:flubar/ui/dialogs/metadata_backup_dialog/view.dart';
+import 'package:flubar/ui/dialogs/metadata_dialog/view.dart';
+import 'package:flubar/ui/snackbar/view.dart';
 import 'package:flubar/ui/view/settings_view/view.dart';
 import 'package:flubar/ui/widgets/media_drag_widget/providers.dart';
 import 'package:flubar/ui/widgets/player_widget/providers.dart';
+import 'package:flubar/utils/metadata/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -47,6 +56,7 @@ class _MenuBarWidgetState extends ConsumerState<MenuBarWidget> {
               final openPath = ref.read(historyProvider).openPath;
               final result = await FilePicker.platform.pickFiles(
                 allowMultiple: true,
+                type: FileType.custom,
                 allowedExtensions: kAudioExtensionsList,
                 initialDirectory: await getInitialDirectory(openPath),
               );
@@ -79,12 +89,110 @@ class _MenuBarWidgetState extends ConsumerState<MenuBarWidget> {
               }
             },
           ),
+          MenuEntry(
+            label: '从元数据备份添加',
+            onPressed: () async {
+              final openPath = ref.read(historyProvider).openPath;
+              try {
+                final result = await FilePicker.platform.pickFiles(
+                  allowMultiple: false,
+                  type: FileType.custom,
+                  allowedExtensions: ['json'],
+                  initialDirectory: await getInitialDirectory(openPath),
+                );
+                if (result == null || result.xFiles.isEmpty) {
+                  return;
+                }
+
+                final path = result.xFiles.first.path;
+                final newPath = '${p.dirname(path)}${p.separator}';
+                ref.read(historyProvider.notifier).updateOpenPath(newPath);
+
+                final content = await File(path).readAsString();
+                final json = jsonDecode(content) as Map<String, dynamic>;
+                final backup = MetadataBackupModel.fromJson(json);
+
+                await ref
+                    .read(mediaDragStateProvider.notifier)
+                    .addTracksFromMetadataBackup(backup);
+
+                globalTalker.info(
+                  '成功从元数据备份导入 ${backup.metadataList.length} 条音轨',
+                );
+              } catch (e, st) {
+                globalTalker.error('导入元数据备份失败', e, st);
+                showExceptionSnackbar(title: '错误', message: '导入元数据备份失败: $e');
+              }
+            },
+          ),
           const MenuEntry(divider: true),
           MenuEntry(
             label: '设置',
             onPressed: () async => await ref
                 .read(getDialogProvider.notifier)
                 .to(const SettingsView()),
+          ),
+        ],
+      ),
+      MenuEntry(
+        label: '元数据',
+        menuChildren: [
+          MenuEntry(
+            label: '编辑元数据',
+            enabled: hasSelectionProvider,
+            onPressed: () async => await ref
+                .read(getDialogProvider.notifier)
+                .show(
+                  const Dialog(child: EditMetadataDialog()),
+                  barrierDismissible: false,
+                ),
+            shortcut: const SingleActivator(LogicalKeyboardKey.f2),
+          ),
+          const MenuEntry(divider: true),
+          MenuEntry(
+            label: '导出元数据',
+            enabled: hasSelectionProvider,
+            onPressed: () async => await ref
+                .read(getDialogProvider.notifier)
+                .show(const MetadataExportDialog(), barrierDismissible: false),
+            shortcut: const SingleActivator(
+              LogicalKeyboardKey.keyE,
+              control: true,
+            ),
+          ),
+          MenuEntry(
+            label: '导入元数据',
+            enabled: hasSelectionProvider,
+            onPressed: () async => await ref
+                .read(getDialogProvider.notifier)
+                .show(const MetadataImportDialog(), barrierDismissible: false),
+            shortcut: const SingleActivator(
+              LogicalKeyboardKey.keyI,
+              control: true,
+            ),
+          ),
+          const MenuEntry(divider: true),
+          MenuEntry(
+            label: '写回元数据',
+            enabled: canWritebackSelectionProvider,
+            onPressed: () {
+              unawaited(
+                ref
+                    .read(metadataWritebackUtilProvider.notifier)
+                    .writebackSelected(),
+              );
+            },
+          ),
+          MenuEntry(
+            label: '强制写回元数据',
+            enabled: canWritebackSelectionProvider,
+            onPressed: () {
+              unawaited(
+                ref
+                    .read(metadataWritebackUtilProvider.notifier)
+                    .writebackSelectedForce(),
+              );
+            },
           ),
         ],
       ),

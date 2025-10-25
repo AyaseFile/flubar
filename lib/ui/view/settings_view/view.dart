@@ -79,15 +79,6 @@ class _SettingsListView extends StatelessWidget {
         SettingsSection(
           title: const Text('元数据'),
           tiles: [
-            SwitchSettingsTile<MetadataSettingsProvider, MetadataSettingsModel>(
-              title: '强制写入元数据',
-              leading: const Icon(Icons.edit),
-              provider: metadataSettingsProvider,
-              selector: (state) => state.forceWriteMetadata,
-              onToggle: (ref, value) => ref
-                  .read(metadataSettingsProvider.notifier)
-                  .updateForceWriteMetadata(value),
-            ),
             SettingsTile<
               MetadataSettingsProvider,
               MetadataSettingsModel,

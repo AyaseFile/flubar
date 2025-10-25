@@ -1,4 +1,3 @@
-import 'package:flubar/app/settings/providers.dart';
 import 'package:flubar/app/talker.dart';
 import 'package:flubar/models/extensions/metadata_extension.dart';
 import 'package:flubar/models/extensions/properties_extension.dart';
@@ -13,133 +12,103 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'providers.g.dart';
 
 @riverpod
-class MetadataUtil extends _$MetadataUtil {
+class MetadataApplyUtil extends _$MetadataApplyUtil {
   @override
-  AsyncValue<void> build() => const AsyncValue.data(null);
+  void build() {}
 
-  Future<bool> writeMetadata() async {
-    state = const AsyncValue.loading();
-
-    final writeToMemoryOnly = ref
-        .read(metadataSettingsProvider)
-        .writeToMemoryOnly;
-    if (writeToMemoryOnly) {
-      final id = ref.read(playlistIdProvider).selectedId;
-      final selectedTracks = ref.read(selectedTracksProvider);
-      ref.read(playlistsProvider.notifier).updateTracks(id, selectedTracks);
-      return true;
-    }
-
-    final force = ref.read(metadataSettingsProvider).forceWriteMetadata;
+  Future<bool> applyMetadata() async {
     final id = ref.read(playlistIdProvider).selectedId;
     final selectedTracks = ref.read(selectedTracksProvider);
-    final updatedTracks = <Track>[];
-    var failed = 0;
-    await Future.wait(
-      selectedTracks.map((t) async {
-        if (t.properties.isCue()) {
-          // 对于 cue, 不写入元数据, 只更新内存中的元数据
-          updatedTracks.add(t);
-          return;
-        }
-        try {
-          await lofty.writeMetadata(
-            metadata: t.metadata,
-            file: t.path,
-            force: force,
-          );
-          updatedTracks.add(t);
-        } catch (e) {
-          failed++;
-          if (force) {
-            globalTalker.error('无法强制更新元数据: ${t.path}', e);
-            return;
-          } else {
-            globalTalker.error('无法更新元数据: ${t.path}', e);
-          }
-        }
-      }),
+    final updatedTracks = selectedTracks.map(
+      (t) => t.copyWith(pendingWriteback: true),
     );
     ref.read(playlistsProvider.notifier).updateTracks(id, updatedTracks);
-    state = const AsyncValue.data(null);
-    if (failed != 0) {
-      showExceptionSnackbar(title: '错误', message: '无法更新 $failed 个文件的元数据');
-      return false;
-    }
     return true;
   }
 
-  Future<void> writeCover(bool batch) async {
-    state = const AsyncValue.loading();
-
-    final writeToMemoryOnly = ref
-        .read(metadataSettingsProvider)
-        .writeToMemoryOnly;
-    if (writeToMemoryOnly) {
-      final id = ref.read(playlistIdProvider).selectedId;
-      final coverModel = batch
-          ? ref.read(batchedTrackCoverProvider)
-          : ref.read(groupedTrackCoverProvider);
-      final updatedTracks = coverModel
-          .map((cover) {
-            final frontCover = cover.newCover;
-            return cover.tracks.map((t) {
-              final metadata = t.metadata.nullableCopyWith(
-                frontCover: () => frontCover,
-              );
-              return t.copyWith(metadata: metadata);
-            });
-          })
-          .expand((element) => element)
-          .toList();
-      ref.read(playlistsProvider.notifier).updateTracks(id, updatedTracks);
-      return;
-    }
-
-    final force = ref.read(metadataSettingsProvider).forceWriteMetadata;
+  Future<void> applyCover({required bool batch}) async {
     final id = ref.read(playlistIdProvider).selectedId;
     final coverModel = batch
         ? ref.read(batchedTrackCoverProvider)
         : ref.read(groupedTrackCoverProvider);
-    final updatedTracks = <Track>[];
-    var failed = 0;
-    await Future.wait(
-      coverModel.map((cover) async {
-        if (!cover.updated) return;
-        final frontCover = cover.newCover;
-        await Future.wait(
-          cover.tracks.map((t) async {
+    final updatedTracks = coverModel
+        .map((cover) {
+          if (!cover.updated) return const <Track>[];
+          final frontCover = cover.newCover;
+          return cover.tracks.map((t) {
             final metadata = t.metadata.nullableCopyWith(
               frontCover: () => frontCover,
             );
-            if (t.properties.isCue()) {
-              updatedTracks.add(t.copyWith(metadata: metadata));
-              return;
-            }
-            try {
-              await lofty.writeFrontCover(
-                file: t.path,
-                cover: frontCover,
-                force: force,
-              );
-              updatedTracks.add(t.copyWith(metadata: metadata));
-            } catch (e) {
-              failed++;
-              if (force) {
-                globalTalker.error('无法强制更新封面: ${t.path}', e);
-                return;
-              } else {
-                globalTalker.error('无法更新封面: ${t.path}', e);
-              }
-            }
-          }),
-        );
+            return t.copyWith(metadata: metadata, pendingWriteback: true);
+          });
+        })
+        .expand((element) => element)
+        .toList();
+    if (updatedTracks.isNotEmpty) {
+      ref.read(playlistsProvider.notifier).updateTracks(id, updatedTracks);
+    }
+  }
+}
+
+@Riverpod(keepAlive: true)
+class MetadataWritebackUtil extends _$MetadataWritebackUtil {
+  @override
+  AsyncValue<void> build() => const AsyncValue.data(null);
+
+  Future<bool> writebackSelected() => _writebackSelected(force: false);
+
+  Future<bool> writebackSelectedForce() => _writebackSelected(force: true);
+
+  Future<bool> _writebackSelected({required bool force}) async {
+    state = const AsyncValue.loading();
+
+    final id = ref.read(playlistIdProvider).selectedId;
+    final selectedTracks = ref.read(selectedTracksProvider);
+    final pendingTracks = selectedTracks
+        .where((t) => t.pendingWriteback)
+        .toList();
+    if (pendingTracks.isEmpty) {
+      state = const AsyncValue.data(null);
+      return true;
+    }
+
+    var failed = 0;
+    final results = await Future.wait(
+      pendingTracks.map((track) async {
+        if (track.properties.isCue()) {
+          return track.copyWith(pendingWriteback: false);
+        }
+        try {
+          await lofty.writeMetadata(
+            metadata: track.metadata,
+            file: track.path,
+            force: force,
+            writeTags: true,
+            writeCover: true,
+          );
+          return track.copyWith(pendingWriteback: false);
+        } catch (e, st) {
+          failed++;
+          globalTalker.error('写回元数据失败: ${track.path}', e, st);
+          return track;
+        }
       }),
     );
-    ref.read(playlistsProvider.notifier).updateTracks(id, updatedTracks);
-    if (failed != 0) {
-      showExceptionSnackbar(title: '错误', message: '无法更新 $failed 个文件的封面');
-    }
+
+    ref.read(playlistsProvider.notifier).updateTracks(id, results);
+
     state = const AsyncValue.data(null);
+    if (failed != 0) {
+      showExceptionSnackbar(title: '错误', message: '无法写回 $failed 个文件的元数据');
+      return false;
+    }
+
+    final successCount = results
+        .where((track) => !track.pendingWriteback)
+        .length;
+    if (successCount > 0) {
+      globalTalker.info('成功写回 $successCount 个文件的元数据');
+    }
+    return true;
   }
 }

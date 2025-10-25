@@ -11,105 +11,126 @@ use lofty::tag::{ItemKey, Tag, TagExt};
 
 use super::models::{Metadata, Properties};
 
-pub fn write_metadata(file: &str, metadata: Metadata, force: bool) -> Result<()> {
+pub fn write_metadata(
+    file: &str,
+    metadata: Metadata,
+    force: bool,
+    write_tags: bool,
+    write_cover: bool,
+) -> Result<()> {
     let (mut tag, file_type) = if force {
         create_or_get_tag(file)?
     } else {
         try_get_tag(file)?
     };
 
-    let is_wavpack = file_type == FileType::WavPack;
-    let date_key = if is_wavpack {
-        ItemKey::Year
-    } else {
-        ItemKey::RecordingDate
-    };
+    let Metadata {
+        title,
+        artist,
+        album,
+        album_artist,
+        track_number,
+        track_total,
+        disc_number,
+        disc_total,
+        date,
+        genre,
+        front_cover,
+    } = metadata;
 
-    fn set_or_remove(tag: &mut Tag, key: ItemKey, value: Option<String>) -> Result<()> {
-        match value {
-            Some(value) => {
-                if !tag.insert_text(key, value) {
-                    return Err(anyhow!("Failed to insert text for key: {:?}", key));
+    if write_tags {
+        let is_wavpack = file_type == FileType::WavPack;
+        let date_key = if is_wavpack {
+            ItemKey::Year
+        } else {
+            ItemKey::RecordingDate
+        };
+
+        fn set_or_remove(tag: &mut Tag, key: ItemKey, value: Option<String>) -> Result<()> {
+            match value {
+                Some(value) => {
+                    if !tag.insert_text(key, value) {
+                        return Err(anyhow!("Failed to insert text for key: {:?}", key));
+                    }
+                }
+                None => {
+                    tag.remove_key(key);
                 }
             }
-            None => {
-                tag.remove_key(key);
-            }
+            Ok(())
         }
-        Ok(())
+
+        set_or_remove(&mut tag, ItemKey::TrackTitle, title)?;
+        set_or_remove(&mut tag, ItemKey::AlbumTitle, album)?;
+        set_or_remove(&mut tag, ItemKey::AlbumArtist, album_artist)?;
+        set_or_remove(&mut tag, ItemKey::TrackArtist, artist)?;
+        set_or_remove(
+            &mut tag,
+            ItemKey::TrackNumber,
+            track_number.map(|n| n.to_string()),
+        )?;
+        set_or_remove(
+            &mut tag,
+            ItemKey::TrackTotal,
+            track_total.map(|n| n.to_string()),
+        )?;
+        set_or_remove(
+            &mut tag,
+            ItemKey::DiscNumber,
+            disc_number.map(|n| n.to_string()),
+        )?;
+        set_or_remove(
+            &mut tag,
+            ItemKey::DiscTotal,
+            disc_total.map(|n| n.to_string()),
+        )?;
+
+        set_or_remove(
+            &mut tag,
+            date_key,
+            date.map(|d| {
+                Timestamp::from_str(&d)
+                    .expect("Failed to parse date")
+                    .to_string()
+            }),
+        )?;
+
+        set_or_remove(&mut tag, ItemKey::Genre, genre)?;
     }
 
-    set_or_remove(&mut tag, ItemKey::TrackTitle, metadata.title)?;
-    set_or_remove(&mut tag, ItemKey::AlbumTitle, metadata.album)?;
-    set_or_remove(&mut tag, ItemKey::AlbumArtist, metadata.album_artist)?;
-    set_or_remove(&mut tag, ItemKey::TrackArtist, metadata.artist)?;
-    set_or_remove(
-        &mut tag,
-        ItemKey::TrackNumber,
-        metadata.track_number.map(|n| n.to_string()),
-    )?;
-    set_or_remove(
-        &mut tag,
-        ItemKey::TrackTotal,
-        metadata.track_total.map(|n| n.to_string()),
-    )?;
-    set_or_remove(
-        &mut tag,
-        ItemKey::DiscNumber,
-        metadata.disc_number.map(|n| n.to_string()),
-    )?;
-    set_or_remove(
-        &mut tag,
-        ItemKey::DiscTotal,
-        metadata.disc_total.map(|n| n.to_string()),
-    )?;
-
-    set_or_remove(
-        &mut tag,
-        date_key,
-        metadata.date.map(|d| {
-            Timestamp::from_str(&d)
-                .expect("Failed to parse date")
-                .to_string()
-        }),
-    )?;
-
-    set_or_remove(&mut tag, ItemKey::Genre, metadata.genre)?;
+    if write_cover {
+        update_front_cover(&mut tag, front_cover)?;
+    }
 
     tag.save_to_path(file, WriteOptions::default())?;
     Ok(())
 }
 
-pub fn write_front_cover(file: &str, cover: Option<Vec<u8>>, force: bool) -> Result<()> {
-    let (mut tag, _) = if force {
-        create_or_get_tag(file)?
-    } else {
-        try_get_tag(file)?
-    };
-
-    if let Some(cover) = cover {
-        let kind = infer::get(&cover).expect("Failed to get mime type");
-        let mime_type = MimeType::from_str(kind.mime_type());
-        let cover_front_index = tag
-            .pictures()
-            .iter()
-            .position(|p| p.pic_type() == PictureType::CoverFront);
-        let picture = lofty::picture::Picture::new_unchecked(
-            PictureType::CoverFront,
-            Some(mime_type),
-            None,
-            cover,
-        );
-        if let Some(index) = cover_front_index {
-            tag.set_picture(index, picture);
-        } else {
-            tag.push_picture(picture);
+fn update_front_cover(tag: &mut Tag, cover: Option<Vec<u8>>) -> Result<()> {
+    match cover {
+        Some(data) => {
+            let kind = infer::get(&data).expect("Failed to get mime type");
+            let mime_type = MimeType::from_str(kind.mime_type());
+            let cover_front_index = tag
+                .pictures()
+                .iter()
+                .position(|p| p.pic_type() == PictureType::CoverFront);
+            let picture = lofty::picture::Picture::new_unchecked(
+                PictureType::CoverFront,
+                Some(mime_type),
+                None,
+                data,
+            );
+            if let Some(index) = cover_front_index {
+                tag.set_picture(index, picture);
+            } else {
+                tag.push_picture(picture);
+            }
         }
-    } else {
-        tag.remove_picture_type(PictureType::CoverFront);
+        None => {
+            tag.remove_picture_type(PictureType::CoverFront);
+        }
     }
-
-    tag.save_to_path(file, WriteOptions::default())?;
     Ok(())
 }
 

@@ -9,7 +9,7 @@ pub fn init_ffmpeg() {
     ffmpeg::init().unwrap();
 }
 
-pub(crate) fn read_properties(file: &str) -> Result<Properties> {
+pub fn read_properties(file: &str) -> Result<Properties> {
     let mut context = ffmpeg::format::input(file)?;
 
     let mut properties = Properties::new();
