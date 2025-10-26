@@ -50,6 +50,7 @@ abstract class GeneralSettingsModel with _$GeneralSettingsModel {
 abstract class ScanSettingsModel with _$ScanSettingsModel {
   const factory ScanSettingsModel({
     @Default(_S.kCueAsPlaylist) bool cueAsPlaylist,
+    @Default(_S.kSkipAudioProperties) bool skipAudioProperties,
   }) = _ScanSettings;
 
   factory ScanSettingsModel.fromJson(Map<String, dynamic> json) =>

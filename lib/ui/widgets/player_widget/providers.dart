@@ -34,7 +34,7 @@ class Player extends _$Player {
     await stop();
     final selectedTracks = ref.read(selectedTracksProvider);
     final sources = selectedTracks.map((track) {
-      if (track.properties.isCue()) {
+      if (track.properties.isCue() && track.properties.cueStartSec != null) {
         final start = Duration(
           milliseconds: (track.properties.cueStartSec! * 1000).round(),
         );

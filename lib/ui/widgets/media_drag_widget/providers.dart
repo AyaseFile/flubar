@@ -62,6 +62,9 @@ class MediaDragState extends _$MediaDragState {
     };
 
     var failed = 0;
+    final skipAudioProperties = ref
+        .read(scanSettingsProvider)
+        .skipAudioProperties;
     final results = await Future.wait(
       filePaths.map((path) async {
         try {
@@ -81,7 +84,18 @@ class MediaDragState extends _$MediaDragState {
               );
             }).toList();
           } else {
-            final (metadata, properties) = await readHybrid(file: path);
+            final Metadata metadata;
+            final Properties properties;
+
+            if (skipAudioProperties) {
+              metadata = await readMetadata(file: path);
+              properties = const Properties();
+            } else {
+              final result = await readHybrid(file: path);
+              metadata = result.$1;
+              properties = result.$2;
+            }
+
             globalTalker.debug(
               '文件: $path, 元数据: ${metadata.toJson()}, 属性: ${properties.toJson()}',
             );

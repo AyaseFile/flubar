@@ -74,6 +74,15 @@ class _SettingsListView extends StatelessWidget {
                   .read(scanSettingsProvider.notifier)
                   .updateCueAsPlaylist(value),
             ),
+            SwitchSettingsTile<ScanSettingsProvider, ScanSettingsModel>(
+              title: '跳过音频属性读取',
+              leading: const Icon(Icons.speed),
+              provider: scanSettingsProvider,
+              selector: (state) => state.skipAudioProperties,
+              onToggle: (ref, value) => ref
+                  .read(scanSettingsProvider.notifier)
+                  .updateSkipAudioProperties(value),
+            ),
           ],
         ),
         SettingsSection(

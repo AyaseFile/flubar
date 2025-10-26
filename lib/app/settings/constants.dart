@@ -20,6 +20,7 @@ class DefaultSettings {
   static const kKeepAudioOnly = true;
   static const kRewriteMetadata = true;
   static const kRewriteFrontCover = true;
+  static const kSkipAudioProperties = false;
   static const kWarningToLossy = false;
   static const kWarningFloatToInt = true;
   static const kWarningHighToLowBit = true;

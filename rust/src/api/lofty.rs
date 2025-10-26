@@ -198,7 +198,7 @@ pub(crate) fn read_front_cover(file: &str) -> Result<Option<Vec<u8>>> {
     Ok(None)
 }
 
-pub fn read_hybrid(file: &str) -> Result<(Metadata, Properties)> {
+pub fn read_metadata(file: &str) -> Result<Metadata> {
     let tagged_file = lofty::read_from_path(file)?;
 
     let mut metadata = Metadata::new();
@@ -233,7 +233,11 @@ pub fn read_hybrid(file: &str) -> Result<(Metadata, Properties)> {
         }
     }
 
-    let properties = super::ffmpeg::read_properties(file)?;
+    Ok(metadata)
+}
 
+pub fn read_hybrid(file: &str) -> Result<(Metadata, Properties)> {
+    let metadata = read_metadata(file)?;
+    let properties = super::ffmpeg::read_properties(file)?;
     Ok((metadata, properties))
 }

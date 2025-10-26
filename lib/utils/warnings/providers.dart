@@ -22,25 +22,38 @@ class TranscodeWarningUtil extends _$TranscodeWarningUtil {
     if (warnings.toLossy && _isLossyTranscode(opts)) {
       warning += '使用有损转码\n';
     }
-    if (warnings.floatToInt) {
-      final hasFloat = tracks.any(
-        (track) => _isFloat(track.properties.sampleFormat),
-      );
-      if (hasFloat && _isIntTranscode(opts)) {
-        warning += '浮点数转整数\n';
+
+    final hasUnknownProperties = tracks.any(
+      (track) => _hasEmptyProperties(track.properties),
+    );
+
+    if (hasUnknownProperties) {
+      if ((warnings.floatToInt && _isIntTranscode(opts)) ||
+          (warnings.highToLowBit && _getTranscodeBitDepth(opts) != 0)) {
+        warning += '无法确定音频属性\n';
       }
-    }
-    if (warnings.highToLowBit) {
-      _bitDepth = _getTranscodeBitDepth(opts);
-      if (_bitDepth != 0) {
-        final hasHighToLowBit = tracks.any(
-          (track) => _isHighToLowBit(track.properties),
+    } else {
+      if (warnings.floatToInt) {
+        final hasFloat = tracks.any(
+          (track) => _isFloat(track.properties.sampleFormat),
         );
-        if (hasHighToLowBit) {
-          warning += '高位转低位\n';
+        if (hasFloat && _isIntTranscode(opts)) {
+          warning += '浮点数转整数\n';
+        }
+      }
+      if (warnings.highToLowBit) {
+        _bitDepth = _getTranscodeBitDepth(opts);
+        if (_bitDepth != 0) {
+          final hasHighToLowBit = tracks.any(
+            (track) => _isHighToLowBit(track.properties),
+          );
+          if (hasHighToLowBit) {
+            warning += '高位转低位\n';
+          }
         }
       }
     }
+
     return warning.trim();
   }
 
@@ -111,5 +124,15 @@ class TranscodeWarningUtil extends _$TranscodeWarningUtil {
         _ => true,
       },
     };
+  }
+
+  bool _hasEmptyProperties(Properties properties) {
+    return properties.codec == null &&
+        properties.sampleFormat == null &&
+        properties.sampleRate == null &&
+        properties.bitsPerRawSample == null &&
+        properties.bitsPerCodedSample == null &&
+        properties.bitRate == null &&
+        properties.channels == null;
   }
 }

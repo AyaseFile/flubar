@@ -165,13 +165,15 @@ class TranscodeUtil extends _$TranscodeUtil
       if (track.properties.isCue()) {
         final startSec = track.properties.cueStartSec;
         final durationSec = track.properties.cueDurationSec;
-        command = command.copyWith(
-          args: [
-            ...command.args,
-            CliArg(name: 'ss', value: startSec.toString()),
-            CliArg(name: 't', value: durationSec.toString()),
-          ],
-        );
+        if (startSec != null && durationSec != null) {
+          command = command.copyWith(
+            args: [
+              ...command.args,
+              CliArg(name: 'ss', value: startSec.toString()),
+              CliArg(name: 't', value: durationSec.toString()),
+            ],
+          );
+        }
       }
       return (command, track, outputFile);
     }).toList();

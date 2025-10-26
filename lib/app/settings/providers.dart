@@ -74,6 +74,7 @@ class ScanSettings extends _$ScanSettings {
         );
         return defaultSettings.copyWith(
           cueAsPlaylist: loadedSettings.cueAsPlaylist,
+          skipAudioProperties: loadedSettings.skipAudioProperties,
         );
       } catch (e) {
         globalTalker.handle(e, null, '无法解析扫描设置: $str');
@@ -85,6 +86,11 @@ class ScanSettings extends _$ScanSettings {
 
   void updateCueAsPlaylist(bool cueAsPlaylist) {
     state = state.copyWith(cueAsPlaylist: cueAsPlaylist);
+    _save();
+  }
+
+  void updateSkipAudioProperties(bool skipAudioProperties) {
+    state = state.copyWith(skipAudioProperties: skipAudioProperties);
     _save();
   }
 
