@@ -96,6 +96,7 @@
             ];
             shellHook = ''
               export PATH="$HOME/.pub-cache/bin:$PATH"
+              export CMAKE_POLICY_VERSION_MINIMUM="3.5"
               ${optionalString (system == "x86_64-linux") ''
                 export LD_LIBRARY_PATH="${pkgs.mpv-unwrapped}/lib:$LD_LIBRARY_PATH"
                 export LIBCLANG_PATH="${pkgs.libclang.lib}/lib"
