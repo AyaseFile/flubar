@@ -192,9 +192,9 @@ class _TrackTableViewState extends ConsumerState<TrackTableView> {
             ref.read(currentPlaylistProvider.notifier).setSortOrder(order);
           }
         },
-        onLongPress: () => Navigator.of(
-          context,
-        ).push(_createColumnControlsRoute(context, column)),
+        onLongPress: () =>
+            Navigator.of(context)
+                .push(_createColumnControlsRoute(context, column)),
         child: Align(
           alignment: Alignment.centerLeft,
           child: Padding(

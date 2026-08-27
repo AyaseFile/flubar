@@ -44,7 +44,9 @@ pub fn read_properties(file: &str) -> Result<Properties> {
             properties.channels = (channels != 0).then_some(channels as u8);
         }
 
-        if properties.bit_rate.is_none() && properties.duration_sec.is_some() {
+        if properties.bit_rate.is_none()
+            && let Some(duration) = properties.duration_sec
+        {
             let audio_stream_index = stream.index();
             let mut total_bytes = 0;
             for (stream, packet) in context.packets() {
@@ -52,7 +54,6 @@ pub fn read_properties(file: &str) -> Result<Properties> {
                     total_bytes += packet.size();
                 }
             }
-            let duration = properties.duration_sec.unwrap();
             properties.bit_rate = Some((total_bytes as f64 / duration * 8.0) as u32);
         }
     }

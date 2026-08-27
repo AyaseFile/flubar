@@ -29,8 +29,6 @@
           export LD_LIBRARY_PATH="$(pwd)/build/linux/x64/release/bundle/lib:$LD_LIBRARY_PATH"
         '';
         aarch64-darwin = ''
-          export PATH="/Library/Developer/CommandLineTools/usr/bin:$PATH"
-          export DEVELOPER_DIR="/Applications/Xcode.app/Contents/Developer"
           export SDKROOT="$(xcrun --show-sdk-path)"
         '';
       };
@@ -69,7 +67,7 @@
         {
           default = mkShellNoCC {
             nativeBuildInputs = [
-              flutter335
+              flutter347
               flutter_rust_bridge_codegen
               cargo-expand
               rust_toolchain
@@ -91,7 +89,7 @@
               rsync # fix permissions issue
             ];
             buildInputs = [
-              ffmpeg_8.dev
+              ffmpeg_9-headless.dev
               mpv-unwrapped
             ];
             shellHook = ''
@@ -108,7 +106,7 @@
               ''}
               ${shellHooks.${system}}
             '';
-            FLUTTER_ROOT = "${pkgs.flutter}";
+            FLUTTER_ROOT = "${pkgs.flutter347}";
             RUST_SRC_PATH = "${rust_toolchain}/lib/rustlib/src/rust/library";
           };
         }

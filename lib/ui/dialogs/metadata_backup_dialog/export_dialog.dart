@@ -88,15 +88,13 @@ Future<void> selectFile(WidgetRef ref, {bool pickFile = false}) async {
   final filename = _genFilename(ref.read(selectedTracksProvider));
   final filePath = await () async {
     if (pickFile) {
-      return FilePicker.platform
-          .pickFiles(
-            type: FileType.custom,
-            allowedExtensions: ['json'],
-            initialDirectory: outputPath,
-          )
-          .then((result) => result?.files.single.path);
+      return FilePicker.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+        initialDirectory: outputPath,
+      ).then((result) => result?.files.single.path);
     } else {
-      return FilePicker.platform.saveFile(
+      return FilePicker.saveFile(
         fileName: filename,
         type: FileType.custom,
         allowedExtensions: ['json'],

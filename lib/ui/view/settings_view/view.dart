@@ -94,8 +94,7 @@ class _SettingsListView extends StatelessWidget {
               String
             >(
               title: '文件名模板',
-              description:
-                  '可用项: %filename%, %title%, %artist%, %album%, %albumartist%, %tracknumber%, %tracktotal%, %discnumber%, %disctotal%, %date%, %genre%',
+              description: '可用项: %filename%, %title%, %artist%, %album%, %albumartist%, %tracknumber%, %tracktotal%, %discnumber%, %disctotal%, %date%, %genre%',
               leading: const Icon(Icons.text_fields),
               provider: metadataSettingsProvider,
               selector: (state) => state.fileNameTpl,

@@ -116,9 +116,9 @@ class _EditableTableViewState extends ConsumerState<EditableTableView> {
         _ => throw UnimplementedError(),
       };
       return InkWell(
-        onTap: () => Navigator.of(
-          context,
-        ).push(_createColumnControlsRoute(context, column)),
+        onTap: () =>
+            Navigator.of(context)
+                .push(_createColumnControlsRoute(context, column)),
         child: Align(
           alignment: Alignment.centerLeft,
           child: Padding(

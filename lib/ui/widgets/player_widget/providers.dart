@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_public_notifier_properties
+// ignore_for_file: riverpod_lint/avoid_public_notifier_properties
 import 'dart:async';
 
 import 'package:flubar/app/talker.dart';

@@ -115,12 +115,10 @@ fn update_front_cover(tag: &mut Tag, cover: Option<Vec<u8>>) -> Result<()> {
                 .pictures()
                 .iter()
                 .position(|p| p.pic_type() == PictureType::CoverFront);
-            let picture = lofty::picture::Picture::new_unchecked(
-                PictureType::CoverFront,
-                Some(mime_type),
-                None,
-                data,
-            );
+            let picture = lofty::picture::Picture::unchecked(data)
+                .pic_type(PictureType::CoverFront)
+                .mime_type(mime_type)
+                .build();
             if let Some(index) = cover_front_index {
                 tag.set_picture(index, picture);
             } else {

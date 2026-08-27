@@ -250,7 +250,7 @@ class _OutputDirectorySelector extends ConsumerWidget {
           ElevatedButton(
             onPressed: () async {
               final outputPath = ref.read(historyProvider).outputPath;
-              final selectedDir = await FilePicker.platform.getDirectoryPath(
+              final selectedDir = await FilePicker.getDirectoryPath(
                 initialDirectory: await getInitialDirectory(outputPath),
               );
               if (selectedDir != null) {

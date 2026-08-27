@@ -54,7 +54,7 @@ class _MenuBarWidgetState extends ConsumerState<MenuBarWidget> {
             label: '添加文件',
             onPressed: () async {
               final openPath = ref.read(historyProvider).openPath;
-              final result = await FilePicker.platform.pickFiles(
+              final result = await FilePicker.pickFiles(
                 allowMultiple: true,
                 type: FileType.custom,
                 allowedExtensions: kAudioExtensionsList,
@@ -77,7 +77,7 @@ class _MenuBarWidgetState extends ConsumerState<MenuBarWidget> {
             label: '添加文件夹',
             onPressed: () async {
               final openPath = ref.read(historyProvider).openPath;
-              final result = await FilePicker.platform.getDirectoryPath(
+              final result = await FilePicker.getDirectoryPath(
                 initialDirectory: await getInitialDirectory(openPath),
               );
               if (result != null) {
@@ -94,7 +94,7 @@ class _MenuBarWidgetState extends ConsumerState<MenuBarWidget> {
             onPressed: () async {
               final openPath = ref.read(historyProvider).openPath;
               try {
-                final result = await FilePicker.platform.pickFiles(
+                final result = await FilePicker.pickFiles(
                   allowMultiple: false,
                   type: FileType.custom,
                   allowedExtensions: ['json'],
@@ -261,9 +261,8 @@ class _MenuBarWidgetState extends ConsumerState<MenuBarWidget> {
       ),
     ];
     _shortcutsEntry?.dispose();
-    _shortcutsEntry = ShortcutRegistry.of(
-      context,
-    ).addAll(MenuEntry.shortcuts(entries));
+    _shortcutsEntry = ShortcutRegistry.of(context)
+        .addAll(MenuEntry.shortcuts(entries));
     return entries;
   }
 }
