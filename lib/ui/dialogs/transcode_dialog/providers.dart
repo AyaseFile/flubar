@@ -43,7 +43,13 @@ class TranscodeOpts extends _$TranscodeOpts {
           ),
         );
       case TranscodeFormat.wavPack:
-        return const TranscodeOptions.wavPack();
+        return TranscodeOptions.wavPack(
+          compressionLevel: ref.watch(
+            transcodeSettingsProvider.select(
+              (state) => state.wavPackCompressionLevel,
+            ),
+          ),
+        );
       case TranscodeFormat.wav:
         return TranscodeOptions.wav(
           encoder: ref.watch(
@@ -70,6 +76,18 @@ class TranscodeOpts extends _$TranscodeOpts {
           ref.read(
             transcodeSettingsProvider.select(
               (state) => state.flacCompressionLevel,
+            ),
+          ),
+    );
+  }
+
+  void setWavPackOptions({int? compressionLevel}) {
+    state = TranscodeOptions.wavPack(
+      compressionLevel:
+          compressionLevel ??
+          ref.read(
+            transcodeSettingsProvider.select(
+              (state) => state.wavPackCompressionLevel,
             ),
           ),
     );

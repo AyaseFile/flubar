@@ -117,8 +117,9 @@ class TranscodeUtil extends _$TranscodeUtil
         const CliArg(name: 'c:a', value: 'flac'),
         CliArg(name: 'compression_level', value: '$compressionLevel'),
       ],
-      WavPackTranscodeOptions() => [
+      WavPackTranscodeOptions(:final compressionLevel) => [
         const CliArg(name: 'c:a', value: 'wavpack'),
+        CliArg(name: 'compression_level', value: '$compressionLevel'),
       ],
       WavTranscodeOptions(:final encoder) => [
         CliArg(name: 'c:a', value: encoder.displayName),

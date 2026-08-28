@@ -146,6 +146,7 @@ class TranscodeSettings extends _$TranscodeSettings {
           transcodeFormat: loadedSettings.transcodeFormat,
           mp3Bitrate: loadedSettings.mp3Bitrate,
           flacCompressionLevel: loadedSettings.flacCompressionLevel,
+          wavPackCompressionLevel: loadedSettings.wavPackCompressionLevel,
           wavEncoder: loadedSettings.wavEncoder,
           rememberTranscodeChoice: loadedSettings.rememberTranscodeChoice,
           useOriginalDirectory: loadedSettings.useOriginalDirectory,
@@ -189,6 +190,11 @@ class TranscodeSettings extends _$TranscodeSettings {
     _save();
   }
 
+  void updateWavPackCompressionLevel(int wavPackCompressionLevel) {
+    state = state.copyWith(wavPackCompressionLevel: wavPackCompressionLevel);
+    _save();
+  }
+
   void updateWavEncoder(FfmpegEncoder wavEncoder) {
     state = state.copyWith(wavEncoder: wavEncoder);
     _save();
@@ -215,6 +221,10 @@ class TranscodeSettings extends _$TranscodeSettings {
       flacCompressionLevel: switch (options) {
         FlacTranscodeOptions(:final compressionLevel) => compressionLevel,
         _ => state.flacCompressionLevel,
+      },
+      wavPackCompressionLevel: switch (options) {
+        WavPackTranscodeOptions(:final compressionLevel) => compressionLevel,
+        _ => state.wavPackCompressionLevel,
       },
       wavEncoder: switch (options) {
         WavTranscodeOptions(:final encoder) => encoder,

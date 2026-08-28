@@ -18,7 +18,9 @@ sealed class TranscodeOptions with _$TranscodeOptions {
     @Default(_S.kDefaultFlacCompressionLevel) int compressionLevel,
   }) = FlacTranscodeOptions;
 
-  const factory TranscodeOptions.wavPack() = WavPackTranscodeOptions;
+  const factory TranscodeOptions.wavPack({
+    @Default(_S.kDefaultWavPackCompressionLevel) int compressionLevel,
+  }) = WavPackTranscodeOptions;
 
   const factory TranscodeOptions.wav({
     @Default(_S.kDefaultWavEncoder) FfmpegEncoder encoder,

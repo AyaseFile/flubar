@@ -441,8 +441,27 @@ class _TranscodeOptionsSelector extends ConsumerWidget {
           ],
         ),
       ),
-      WavPackTranscodeOptions() => const SizedBox(
-        height: kSettingRowVerticalPadding * 2,
+      WavPackTranscodeOptions(:final compressionLevel) => _SettingRow(
+        label: '压缩级别',
+        child: Row(
+          children: [
+            Expanded(
+              child: Slider(
+                min: 0,
+                max: kWavPackCompressionLevelMax.toDouble(),
+                divisions: kWavPackCompressionLevelMax,
+                value: compressionLevel.toDouble(),
+                onChanged: (value) => ref
+                    .read(transcodeOptsProvider.notifier)
+                    .setWavPackOptions(compressionLevel: value.toInt()),
+              ),
+            ),
+            SizedBox(
+              width: kCompressionLevelDisplayWidth,
+              child: Text(compressionLevel.toString()),
+            ),
+          ],
+        ),
       ),
       WavTranscodeOptions(:final encoder) => _SettingRow(
         label: '编码器',

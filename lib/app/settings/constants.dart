@@ -12,6 +12,7 @@ class DefaultSettings {
   static const kDefaultMp3Bitrate = 192;
   static const kDefaultFlacCompressionLevel = 5;
   static const kDefaultWavEncoder = FfmpegEncoder.pcm_s16le;
+  static const kDefaultWavPackCompressionLevel = 1;
   static const kRememberTranscodeChoice = true;
   static const kUseOriginalDirectory = true;
   static const kOverwriteExistingFiles = false;

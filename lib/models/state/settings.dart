@@ -75,6 +75,7 @@ abstract class TranscodeSettingsModel with _$TranscodeSettingsModel {
     @Default(_S.kTranscodeFormat) TranscodeFormat transcodeFormat,
     @Default(_S.kDefaultMp3Bitrate) int mp3Bitrate,
     @Default(_S.kDefaultFlacCompressionLevel) int flacCompressionLevel,
+    @Default(_S.kDefaultWavPackCompressionLevel) int wavPackCompressionLevel,
     @Default(_S.kDefaultWavEncoder) FfmpegEncoder wavEncoder,
     @Default(_S.kRememberTranscodeChoice) bool rememberTranscodeChoice,
     @Default(_S.kUseOriginalDirectory) bool useOriginalDirectory,

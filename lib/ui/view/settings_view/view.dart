@@ -251,6 +251,32 @@ class _SettingsListView extends StatelessWidget {
             SettingsTile<
               TranscodeSettingsProvider,
               TranscodeSettingsModel,
+              int
+            >(
+              title: 'WavPack 压缩等级',
+              leading: const Icon(Icons.equalizer, color: Colors.transparent),
+              provider: transcodeSettingsProvider,
+              selector: (state) => state.wavPackCompressionLevel,
+              onPressed: (ref, _) => Get.dialog(
+                SliderDialog(
+                  title: 'WavPack 压缩等级',
+                  min: 0,
+                  max: kWavPackCompressionLevelMax.toDouble(),
+                  divisions: kWavPackCompressionLevelMax,
+                  initialValue: ref.read(
+                    transcodeSettingsProvider.select(
+                      (state) => state.wavPackCompressionLevel,
+                    ),
+                  ),
+                  onChanged: (value) => ref
+                      .read(transcodeSettingsProvider.notifier)
+                      .updateWavPackCompressionLevel(value),
+                ),
+              ),
+            ),
+            SettingsTile<
+              TranscodeSettingsProvider,
+              TranscodeSettingsModel,
               String
             >(
               title: 'WAV 编码器',
