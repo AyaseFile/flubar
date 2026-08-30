@@ -8,6 +8,7 @@ def build():
     subprocess.run("flutter pub get", shell=True, env=env)
     subprocess.run("touch rust/src/frb_generated.rs", shell=True, env=env)
     subprocess.run("flutter_rust_bridge_codegen generate", shell=True, env=env)
+    subprocess.run("dart run build_runner build", shell=True, env=env)
     subprocess.run("flutter build macos --release -v", shell=True, env=env, check=True)
 
 
