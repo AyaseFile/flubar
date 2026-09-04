@@ -5,10 +5,19 @@
       url = "github:nix-community/fenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    rust-manifest = {
+      url = "https://static.rust-lang.org/dist/channel-rust-1.98.0.toml";
+      flake = false;
+    };
   };
 
   outputs =
-    { nixpkgs, fenix, ... }:
+    {
+      nixpkgs,
+      fenix,
+      rust-manifest,
+      ...
+    }:
     let
       inherit (nixpkgs) lib;
       inherit (lib)
@@ -48,7 +57,7 @@
         { pkgs, system, ... }:
         with pkgs;
         let
-          _rust_toolchain = fenix.packages.${system}.stable.withComponents [
+          _rust_toolchain = (fenix.packages.${system}.fromManifestFile rust-manifest).withComponents [
             "cargo"
             "rustc"
             "rust-src"
@@ -59,7 +68,7 @@
             if system == "aarch64-darwin" then
               fenix.packages.${system}.combine [
                 _rust_toolchain
-                fenix.packages.${system}.targets.x86_64-apple-darwin.stable.rust-std
+                (fenix.packages.${system}.targets.x86_64-apple-darwin.fromManifestFile rust-manifest).rust-std
               ]
             else
               _rust_toolchain;
