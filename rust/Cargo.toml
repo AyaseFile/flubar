@@ -9,7 +9,7 @@ crate-type = ["cdylib", "staticlib"]
 [dependencies]
 flutter_rust_bridge = "=2.13.0"
 anyhow = "1.0.104"
-lofty = "0.25.1"
+lofty = "0.25.4"
 ffmpeg-next = { version = "9.0.0", default-features = false, features = ["codec", "format", "build", "static"] }
 infer = "0.22.0"
 cue = { git = "https://github.com/AyaseFile/libcue.rs" }
